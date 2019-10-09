@@ -1,0 +1,13 @@
+diff --git a/sacred/observers/file_storage.py b/sacred/observers/file_storage.py
+index 9bf15db..bc1bbfa 100644
+--- a/sacred/observers/file_storage.py
++++ b/sacred/observers/file_storage.py
+@@ -143,7 +143,7 @@ class FileStorageObserver(RunObserver):
+         base_dir = ex_info["base_dir"]
+         source_info = []
+         for s, m in ex_info["sources"]:
+-            abspath = os.path.join(base_dir, s)
++            abspath = os.path.normpath(os.path.join(base_dir, s))
+             store_path, md5sum = self.find_or_save(abspath, self.source_dir)
+             # assert m == md5sum
+             relative_source = os.path.relpath(str(store_path), self.basedir)
