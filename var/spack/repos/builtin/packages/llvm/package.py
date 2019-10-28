@@ -92,11 +92,17 @@ class Llvm(CMakePackage):
     patch('llvm5-0011-libclang-Allow-visiting-of-implicit-declarations-and.patch', when='@5.0:6.999 +visionary')
     patch('llvm5-0012-libclang-WIP-Fix-get_tokens-in-macro-expansion.patch',       when='@5.0:6.999 +visionary')
 
-    patch('llvm7-0001-Tooling-Fully-qualify-template-parameters-of-nested-.patch', when='@7.0: +visionary')
-    patch('llvm7-0002-libclang-Add-support-for-obtaining-fully-qualified-n.patch', when='@7.0: +visionary')
-    patch('llvm7-0003-libclang-Add-option-to-keep-whitespace-when-tokenizi.patch', when='@7.0: +visionary')
-    patch('llvm7-0004-libclang-WIP-Allow-visiting-of-implicit-declarations.patch', when='@7.0: +visionary')
-    patch('llvm7-0005-libclang-WIP-Fix-get_tokens-in-macro-expansion.patch',       when='@7.0: +visionary')
+    patch('llvm7-0001-Tooling-Fully-qualify-template-parameters-of-nested-.patch', when='@7.0:7.999 +visionary')
+    patch('llvm7-0002-libclang-Add-support-for-obtaining-fully-qualified-n.patch', when='@7.0:7.999 +visionary')
+    patch('llvm7-0003-libclang-Add-option-to-keep-whitespace-when-tokenizi.patch', when='@7.0:7.999 +visionary')
+    patch('llvm7-0004-libclang-WIP-Allow-visiting-of-implicit-declarations.patch', when='@7.0:7.999 +visionary')
+    patch('llvm7-0005-libclang-WIP-Fix-get_tokens-in-macro-expansion.patch',       when='@7.0:7.999 +visionary')
+
+    patch('llvm9-0001-Tooling-Fully-qualify-template-parameters-of-nested-.patch', when='@9.0:9.999 +visionary')
+    patch('llvm9-0002-libclang-Add-support-for-obtaining-fully-qualified-n.patch', when='@9.0:9.999 +visionary')
+    patch('llvm9-0003-libclang-Add-option-to-keep-whitespace-when-tokenizi.patch', when='@9.0:9.999 +visionary')
+    patch('llvm9-0004-libclang-WIP-Allow-visiting-of-implicit-declarations.patch', when='@9.0:9.999 +visionary')
+    patch('llvm9-0005-libclang-WIP-Fix-get_tokens-in-macro-expansion.patch',       when='@9.0:9.999 +visionary')
 
     # Build dependency
     depends_on('cmake@3.4.3:', type='build')
@@ -627,29 +633,6 @@ class Llvm(CMakePackage):
 
     # Github issue #4986
     patch('llvm_gcc7.patch', when='@4.0.0:4.0.1+lldb %gcc@7.0:')
-    # see https://bugzilla.redhat.com/show_bug.cgi?id=1540620
-    patch('llvm_gcc8.patch', when='@5.0:5.999 %gcc@8.0:')
-
-    @run_before('cmake')
-    def check_darwin_lldb_codesign_requirement(self):
-        if not self.spec.satisfies('+lldb platform=darwin'):
-            return
-        codesign = which('codesign')
-        mkdir('tmp')
-        llvm_check_file = join_path('tmp', 'llvm_check')
-        copy('/usr/bin/false', llvm_check_file)
-
-        try:
-            codesign('-f', '-s', 'lldb_codesign', '--dryrun',
-                     llvm_check_file)
-
-        except ProcessError:
-            explanation = ('The "lldb_codesign" identity must be available'
-                           ' to build LLVM with LLDB. See https://llvm.org/'
-                           'svn/llvm-project/lldb/trunk/docs/code-signing'
-                           '.txt for details on how to create this identity.')
-            raise RuntimeError(explanation)
-
     # Backport from llvm master + additional fix
     # see  https://bugs.llvm.org/show_bug.cgi?id=39696
     # for a bug report about this problem in llvm master.
@@ -659,6 +642,8 @@ class Llvm(CMakePackage):
     # https://bugs.llvm.org/show_bug.cgi?id=38233
     # for a bug report about this problem in llvm master.
     patch('llvm_py37.patch', when='@4:6 ^python@3.7:')
+    # see https://bugzilla.redhat.com/show_bug.cgi?id=1540620
+    patch('llvm_gcc8.patch', when='@5.0:5.999 %gcc@8.0:')
 
     @run_before('cmake')
     def check_darwin_lldb_codesign_requirement(self):
@@ -734,10 +719,6 @@ class Llvm(CMakePackage):
         else:
             cmake_args.append('-DLLVM_EXTERNAL_LIBCXX_BUILD:Bool=OFF')
             cmake_args.append('-DLLVM_EXTERNAL_LIBCXXABI_BUILD:Bool=OFF')
-            # FIXME: check if non-system compiler (i.e. a spack-installed one) is used
-            cmake_args.append('-DGCC_INSTALL_PREFIX={0}'.format(
-                os.path.dirname(os.path.dirname(os.path.realpath(self.compiler.cc)))))
-
         if '+compiler-rt' not in spec:
             cmake_args.append('-DLLVM_EXTERNAL_COMPILER_RT_BUILD:Bool=OFF')
 
