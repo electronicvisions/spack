@@ -31,16 +31,16 @@ class Genpybind(WafPackage):
     homepage = "https://github.com/kljohann/genpybind"
     url      = "https://github.com/kljohann/genpybind/archive/v0.1.0.tar.gz"
 
-    # prefetches PR #14 typedef alias support
+    # prefetches PR #14 typedef alias support (and the llvm 9.x stuff)
     version('alias', git='https://github.com/electronicvisions/genpybind.git',
-            commit="d242fa116171a437871df9e0ce4078e17f240197", preferred=True)
+            commit="69ca6c09fbac46efc733ff2fd21bb13af9345140", preferred=True)
     version('0.1.1-pre', git='https://github.com/kljohann/genpybind.git',
             commit="9d06a3ad4b6b917c8fcc07261a97b13a3079bcba")
     version('0.1.0', '345ca9c6ca96f79c8a217e44a9c99fe6')
     version('develop', git='https://github.com/kljohann/genpybind.git')
 
     depends_on(
-            'llvm+clang+python+visionary@5.0.0:5.999.999,7.0.0:7.999.999',
+            'llvm+clang+python+visionary@5.0.0:5.999.999,7.0.0:7.999.999,9.0.0:9.999.999',
         type=('build', 'link', 'run'))
     depends_on('binutils', type='build')
     depends_on('python@2.7:', type=('build', 'run'))
