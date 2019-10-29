@@ -70,7 +70,6 @@ class VisionaryWafer(Package):
     depends_on('py-notebook')
     depends_on('py-pynn @0.7.5')
     depends_on('py-matplotlib backend=qt5agg')
-    depends_on('py-numba')
     depends_on('py-numpy')
     depends_on('py-pandas @0.19.0:')
     depends_on('py-tables @3.3.0:')
@@ -86,6 +85,9 @@ class VisionaryWafer(Package):
     # TODO Re-enable once https://github.com/spack/spack/pull/13112 is merged
     #  depends_on('tensorflow', when='+tensorflow')
     #  depends_on('tensorflow-estimator', when='^tensorflow@1.13:')
+
+    # TODO: py-numba is removed because its dependency py-llvmlite depends on llvm up to version 8 - re-add once it's fixed!
+    #  depends_on('py-numba')
 
     # hmf-fpga register file requires:
     depends_on('tcl-osys@890eafffbda95b58a472a2005c3cb9e90fd22ff6')
