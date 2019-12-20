@@ -48,6 +48,7 @@ class VisionaryWafer(Package):
     variant('gccxml', default=False)
 
     depends_on('catch2')
+    depends_on('clara')
     depends_on('gccxml', when='+gccxml')
     depends_on('gsl')
     depends_on('intel-tbb')
