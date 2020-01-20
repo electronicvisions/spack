@@ -75,6 +75,10 @@ class Llvm(CMakePackage):
     variant('visionary', default=False,
             description="Include patches necessary for visionary python "
             "bindings generator")
+    variant('force_full_view', default=False,
+            description='Force linking of all files into view, including '
+                        'known conflicts (e.g. libgomp).')
+
     patch('llvm5-0001-libclang-Add-support-for-checking-abstractness-of-re.patch', when='@5.0:6.999 +visionary')
     patch('llvm5-0002-libclang-Keep-track-of-TranslationUnit-instance-when.patch', when='@5.0:6.999 +visionary')
     patch('llvm5-0003-Fix-warnings-in-Tooling-QualTypeNamesTest.patch',            when='@5.0:6.999 +visionary')
@@ -804,3 +808,17 @@ class Llvm(CMakePackage):
 
         with working_dir(self.build_directory):
             install_tree('bin', join_path(self.prefix, 'libexec', 'llvm'))
+
+    def add_files_to_view(self, view, merge_map):
+        # we remove libgomp-related files from views as they conflict with
+        # gcc-ones
+        ignore_file_paths = [
+            join_path(self.prefix, "lib", "libgomp.so"),
+        ]
+
+        if '~force_full_view' in self.spec:
+            for path in ignore_file_paths:
+                if path in merge_map:
+                    del merge_map[path]
+
+        super(Llvm, self).add_files_to_view(view, merge_map)
