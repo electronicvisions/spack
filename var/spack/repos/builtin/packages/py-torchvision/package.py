@@ -32,6 +32,7 @@ class PyTorchvision(PythonPackage):
     depends_on('py-torch@1.2.0:', when='@0.4.0:', type=('build', 'run'))
     depends_on('py-torch@1.1.0:', type=('build', 'run'))
     depends_on('py-pillow@4.1.1:', type=('build', 'run'))  # or py-pillow-simd
+    depends_on('py-pybind11', type=('build', 'link', 'run'))
 
     # Many of the datasets require additional dependencies to use.
     # These can be installed after the fact.

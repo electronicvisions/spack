@@ -111,7 +111,7 @@ class PyTorch(PythonPackage):
     depends_on('py-future', when='@1.1: ^python@:2', type='build')
     depends_on('py-pyyaml', type=('build', 'run'))
     depends_on('py-typing', when='@0.4: ^python@:3.4', type=('build', 'run'))
-    depends_on('py-pybind11', when='@0.4:', type=('build', 'run'))
+    depends_on('py-pybind11', when='@0.4:', type=('build', 'link', 'run'))
     depends_on('blas')
     depends_on('lapack')
     depends_on('protobuf', when='@0.4:')
@@ -152,6 +152,10 @@ class PyTorch(PythonPackage):
     # Both build and install run cmake/make/make install
     # Only run once to speed up build times
     phases = ['install']
+
+    # This package depends on pybind11 -> do not install
+    # third_party version of pybind11.
+    patch('no-install-pybind11-1.3.1.patch', level=2, when='@1.3.1:')
 
     def setup_build_environment(self, env):
         def enable_or_disable(variant, keyword='USE', var=None, newer=False):
