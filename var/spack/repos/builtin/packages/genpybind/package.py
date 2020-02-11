@@ -31,13 +31,12 @@ class Genpybind(WafPackage):
     homepage = "https://github.com/kljohann/genpybind"
     url      = "https://github.com/kljohann/genpybind/archive/v0.1.0.tar.gz"
 
-    # prefetches PR #14 typedef alias support (and the llvm 9.x stuff)
-    version('alias', git='https://github.com/electronicvisions/genpybind.git',
-            commit="69ca6c09fbac46efc733ff2fd21bb13af9345140", preferred=True)
-    version('0.1.1-pre', git='https://github.com/kljohann/genpybind.git',
-            commit="9d06a3ad4b6b917c8fcc07261a97b13a3079bcba")
-    version('0.1.0', '345ca9c6ca96f79c8a217e44a9c99fe6')
-    version('develop', git='https://github.com/kljohann/genpybind.git')
+    version('0.2.1', sha256='e4d993f0c65cb5cf635cec7df899cbd91af1f0bd8a3626f33e9e0925f5383384')
+    version('0.2.0', sha256='9d1e9d026a9e355e282aca549a2af108bedcc5bc59ba0b76a6072f88e4c0be4c')
+    version('0.1.1-pre', commit="9d06a3ad4b6b917c8fcc07261a97b13a3079bcba")
+    version('0.1.0', sha256='f25cb2b3180103cb96c42fb8d37be8b1f06b7721f6aa08841d5ae16361896407')
+    version('master', branch='master')
+    version('develop', branch='develop')
 
     depends_on(
             'llvm+clang+python+visionary@5.0.0:5.999.999,7.0.0:7.999.999,9.0.0:9.999.999',
