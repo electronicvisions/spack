@@ -20,14 +20,23 @@ class PyLlvmlite(PythonPackage):
     version('0.23.0', sha256='bc8b1b46274d05b578fe9e980a6d98fa71c8727f6f9ed31d4d8468dce7aa5762')
     version('0.20.0', sha256='b2f174848df16bb9195a07fec102110a06d018da736bd9b3570a54d44c797c29')
 
+    variant('skipllvmcheck', default=True, description='skips the llvm version check for 0.31.0 to allow use of llvm@9')
+
+    patch('https://github.com/jschueller/llvmlite/commit/7c14ef015f2f95f264f53404dfcea68b1214d6e9.patch',
+          sha256='586f594a850b314800737dff4b12d04d641a96eb94c0507140a50aea5ba2f80e')
+
     depends_on('py-setuptools', type='build')
     depends_on('python@2.6:2.8,3.4:', type=('build', 'run'))
     depends_on('py-enum34', type=('build', 'run'), when='^python@:3.3.99')
-    depends_on('llvm@7.0:7.0.99', when='@0.27.0:')
-    depends_on('llvm@6.0:6.0.99', when='@0.23.0:0.26.99')
-    depends_on('llvm@4.0:4.0.99', when='@0.17.0:0.20.99')
+    depends_on('llvm@7.0:', when='@0.31.0:+skipllvmcheck')
+    depends_on('llvm@7.0:8.99', when='@0.31.0:~skipllvmcheck')
+    depends_on('llvm@7.0:8.99', when='@0.29.0:@0.30.99')
+    depends_on('llvm@7.0:7.99', when='@0.27.0:0.28.99')
+    depends_on('llvm@6.0:6.99', when='@0.23.0:0.26.99')
+    depends_on('llvm@4.0:4.99', when='@0.17.0:0.20.99')
     depends_on('binutils', type='build')
 
     def setup_build_environment(self, env):
+        env.set('CXXFLAGS', '-fPIC')
         # Need to set PIC flag since this is linking statically with LLVM
         env.set('CXX_FLTO_FLAGS', '-flto {0}'.format(self.compiler.pic_flag))
