@@ -29,6 +29,7 @@ class VisionaryDls(Package):
     depends_on('py-h5py')
     depends_on('py-lxml')  # collab tests
     depends_on('py-notebook')
+    depends_on('py-numba')
     depends_on('py-pandas')
     depends_on('py-pynn')
     depends_on('py-python-socketio')
