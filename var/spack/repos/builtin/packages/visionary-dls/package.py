@@ -35,6 +35,7 @@ class VisionaryDls(Package):
     depends_on('py-seaborn')
     depends_on('py-sqlalchemy')
     depends_on('py-torchvision')
+    depends_on('py-wfdb-python')
     depends_on('py-yccp@1.0.0:')
     depends_on('xerces-c')
 
