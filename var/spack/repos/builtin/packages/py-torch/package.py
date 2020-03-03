@@ -157,6 +157,9 @@ class PyTorch(PythonPackage):
     # third_party version of pybind11.
     patch('no-install-pybind11-1.3.1.patch', level=2, when='@1.3.1:')
 
+    # In 1.3.x torch.save is not saving source files, this is fixed in 1.4.0
+    patch('fix-serialization.patch', when='@1.3.1')
+
     def setup_build_environment(self, env):
         def enable_or_disable(variant, keyword='USE', var=None, newer=False):
             """Set environment variable to enable or disable support for a
