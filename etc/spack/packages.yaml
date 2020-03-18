@@ -65,8 +65,6 @@ packages:
   py-ipython:
     # newer versions require python 3.4+
     version: [5.8.0]
-  py-matplotlib:
-    version: [2.2.3]
   py-tables:
     variants: ['~auto~avx2+sse2']
   ruby:
