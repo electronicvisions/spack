@@ -30,6 +30,7 @@ class VisionaryDlsCore(Package):
     depends_on('genpybind')
     depends_on('gflags')
     depends_on('googletest+gmock')
+    depends_on('icarus')
     depends_on('intel-tbb')  # ppu gdbserver
     depends_on('libelf')
     depends_on('liblockfile')
