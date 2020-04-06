@@ -31,6 +31,7 @@ class PyParso(PythonPackage):
     homepage = "https://github.com/davidhalter/parso"
     url      = "https://pypi.io/packages/source/p/parso/parso-0.3.2.tar.gz"
 
+    version('0.5.2', sha256='55cf25df1a35fd88b878715874d2c4dc1ad3f0eebd1e0266a67e1f55efccfbe1')
     version('0.3.2', 'feb32694159dfba20c8ad7eab80189d5')
 
     depends_on('py-setuptools', type='build')
