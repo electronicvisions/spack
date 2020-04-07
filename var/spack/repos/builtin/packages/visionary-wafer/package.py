@@ -68,6 +68,7 @@ class VisionaryWafer(Package):
     depends_on('py-bokeh')
     depends_on('py-elephant')
     depends_on('py-notebook')
+    depends_on('py-numba')
     depends_on('py-pynn @0.7.5')
     depends_on('py-matplotlib backend=qt5agg')
     depends_on('py-numpy')
