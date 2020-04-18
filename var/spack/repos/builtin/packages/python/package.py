@@ -1,4 +1,4 @@
-# Copyright 2013-2019 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2020 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -34,9 +34,10 @@ class Python(AutotoolsPackage):
 
     maintainers = ['adamjstewart']
 
+    version('3.8.2',  sha256='e634a7a74776c2b89516b2e013dda1728c89c8149b9863b8cea21946daf9d561')
     version('3.8.0',  sha256='f1069ad3cae8e7ec467aa98a6565a62a48ef196cb8f1455a245a08db5e1792df')
     version('3.7.5',  sha256='8ecc681ea0600bbfb366f2b173f727b205bb825d93d2f0b286bc4e58d37693da')
-    version('3.7.4',  sha256='d63e63e14e6d29e17490abbe6f7d17afb3db182dbd801229f14e55f4157c4ba3', preferred=True)
+    version('3.7.4',  sha256='d63e63e14e6d29e17490abbe6f7d17afb3db182dbd801229f14e55f4157c4ba3')
     version('3.7.3',  sha256='d62e3015f2f89c970ac52343976b406694931742fbde2fed8d1ce8ebb4e1f8ff')
     version('3.7.2',  sha256='f09d83c773b9cc72421abba2c317e4e6e05d919f9bcf34468e192b6a6c8e328d')
     version('3.7.1',  sha256='36c1b81ac29d0f8341f727ef40864d99d8206897be96be73dc34d4739c9c9f06')
@@ -151,7 +152,7 @@ class Python(AutotoolsPackage):
 
     # Fixes build with the Intel compilers
     # https://github.com/python/cpython/pull/16717
-    patch('intel-3.6.7.patch', when='@3.6.7:3.6.8,3.7.1: %intel')
+    patch('intel-3.6.7.patch', when='@3.6.7:3.6.8,3.7.1:3.7.5 %intel')
 
     # For more information refer to this bug report:
     # https://bugs.python.org/issue29712
