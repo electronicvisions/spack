@@ -13,6 +13,7 @@ class PyAstroid(PythonPackage):
     homepage = "https://github.com/PyCQA/astroid"
     url      = "https://github.com/PyCQA/astroid/archive/astroid-1.4.5.tar.gz"
 
+    version('2.3.3', sha256='3a82983cf34dcbfe42ebcffeb98739e8a7bb868f03c1d9e298c530179b5075e7')
     version('2.2.5', sha256='232c2cfc72bae18a28de6541bbd560a1a3f42e08c52e41bd3f1f00ed74b0a4a6')
     version('2.2.0', sha256='7e289d0aa4a537b4aa798bd609fdf745de0f3c37e6b67642ed328e1482421a6d')
     version('2.0.4', sha256='e2161452b7a07a4663dba61bfb2191a7b61b792fb8239427581dad43773e071e')
@@ -33,9 +34,20 @@ class PyAstroid(PythonPackage):
     depends_on('py-lazy-object-proxy')
     depends_on('py-six')
     depends_on('py-wrapt')
+
+    # Starting with astroid 2.3.1, astroid's dependencies were restricted
+    # to a given minor version, c.f. commit e1b4e11.
+    depends_on('py-lazy-object-proxy@1.4.0:1.4.999', when='@2.3.1:')
+    depends_on('py-six@1.12:1.999', when='@2.3.1:')
+    depends_on('py-wrapt@1.11.0:1.11.999', when='@2.3.1:')
+
     depends_on('py-enum34@1.1.3:', when='^python@:3.3.99')
     depends_on('py-singledispatch', when='^python@:3.3.99')
     depends_on('py-backports-functools-lru-cache', when='^python@:3.2.99')
     depends_on('py-setuptools@17.1:')
     # typed ast is only needed for CPython but there are no other python implementations in spack
-    depends_on('py-typed-ast@1.3.0:', when='@2.2.5: ^python@3.7.0:')
+    # Note: upper boundary 2.3.0 has not been verified!
+    depends_on('py-typed-ast@1.3.0:1.3.999', when='@2.2.5:2.3.0 ^python@3.7.0:3.7.999')
+    # typed ast 1.4.* is required since 2.3.1, c.f. commit cdcd246
+    depends_on('py-typed-ast@1.4.0:1.4.999', when='@2.3.1: ^python@3.7.0:3.7.999')
+
