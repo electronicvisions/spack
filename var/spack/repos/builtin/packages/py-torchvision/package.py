@@ -21,6 +21,7 @@ class PyTorchvision(PythonPackage):
         'torchvision.models.detection'
     ]
 
+    version('0.5.0', sha256='eb9afc93df3d174d975ee0914057a9522f5272310b4d56c150b955c287a4d74d')
     version('0.4.2', sha256='1184a27eab85c9e784bacc6f9d6fec99e168ab4eda6047ef9f709e7fdb22d8f9')
     version('0.4.1', sha256='053689351272b3bd2ac3e6ba51efd284de0e4ca4a301f54674b949f1e62b7176')
     version('0.4.0', sha256='c270d74e568bad4559fed4544f6dd1e22e2eb1c60b088e04a5bd5787c4150589')
@@ -29,7 +30,8 @@ class PyTorchvision(PythonPackage):
     depends_on('py-setuptools', type='build')
     depends_on('py-numpy', type=('build', 'run'))
     depends_on('py-six', type=('build', 'run'))
-    depends_on('py-torch@1.2.0:', when='@0.4.0:', type=('build', 'run'))
+    depends_on('py-torch@1.4.0:', when='@0.5.0:', type=('build', 'run'))
+    depends_on('py-torch@1.2.0:', when='@0.4.0:0.4.999', type=('build', 'run'))
     depends_on('py-torch@1.1.0:', type=('build', 'run'))
     depends_on('py-pillow@4.1.1:', type=('build', 'run'))  # or py-pillow-simd
     depends_on('py-pybind11', type=('build', 'link', 'run'))

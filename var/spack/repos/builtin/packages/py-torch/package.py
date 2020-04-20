@@ -1,4 +1,4 @@
-# Copyright 2013-2019 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2020 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -7,7 +7,7 @@ from spack import *
 
 
 # TODO: try switching to CMakePackage for more control over build
-class PyTorch(PythonPackage):
+class PyTorch(PythonPackage, CudaPackage):
     """Tensors and Dynamic neural networks in Python
     with strong GPU acceleration."""
 
@@ -51,13 +51,18 @@ class PyTorch(PythonPackage):
     ]
 
     version('master', branch='master', submodules=True)
+    version('1.4.1', tag='v1.4.1', submodules=True)
+    # see https://github.com/pytorch/pytorch/issues/35149
+    version('1.4.0', tag='v1.4.0', submodules=True,
+            submodules_delete=['third_party/fbgemm'])
     version('1.3.1', tag='v1.3.1', submodules=True)
     version('1.3.0', tag='v1.3.0', submodules=True)
     version('1.2.0', tag='v1.2.0', submodules=True)
     version('1.1.0', tag='v1.1.0', submodules=True)
     version('1.0.1', tag='v1.0.1', submodules=True)
     version('1.0.0', tag='v1.0.0', submodules=True)
-    version('0.4.1', tag='v0.4.1', submodules=True)
+    version('0.4.1', tag='v0.4.1', submodules=True,
+            submodules_delete=['third_party/nervanagpu'])
     version('0.4.0', tag='v0.4.0', submodules=True)
     version('0.3.1', tag='v0.3.1', submodules=True)
 
@@ -99,6 +104,29 @@ class PyTorch(PythonPackage):
     conflicts('+redis', when='@:1.0')
     conflicts('+zstd', when='@:1.0')
     conflicts('+tbb', when='@:1.1')
+    # see https://github.com/pytorch/pytorch/issues/35149
+    conflicts('+fbgemm', when='@1.4.0')
+
+    cuda_arch_conflict = ('This version of Torch/Caffe2 only supports compute '
+                          'capabilities ')
+
+    conflicts('cuda_arch=none', when='+cuda',
+              msg='Must specify CUDA compute capabilities of your GPU, see '
+              'https://developer.nvidia.com/cuda-gpus')
+    conflicts('cuda_arch=52', when='@1.3.0:+cuda',
+              msg=cuda_arch_conflict + '>=5.3')
+    conflicts('cuda_arch=50', when='@1.3.0:+cuda',
+              msg=cuda_arch_conflict + '>=5.3')
+    conflicts('cuda_arch=35', when='@1.3.0:+cuda',
+              msg=cuda_arch_conflict + '>=5.3')
+    conflicts('cuda_arch=32', when='@1.3.0:+cuda',
+              msg=cuda_arch_conflict + '>=5.3')
+    conflicts('cuda_arch=30', when='@1.3.0:+cuda',
+              msg=cuda_arch_conflict + '>=5.3')
+    conflicts('cuda_arch=30', when='@1.2.0:+cuda',
+              msg=cuda_arch_conflict + '>=3.2')
+    conflicts('cuda_arch=20', when='@1.0.0:+cuda',
+              msg=cuda_arch_conflict + '>=3.0')
 
     # Required dependencies
     depends_on('cmake@3.5:', type='build')
@@ -125,12 +153,15 @@ class PyTorch(PythonPackage):
     depends_on('cudnn@7:', when='@1.1:+cudnn')
     depends_on('magma', when='+magma')
     # TODO: add dependency: https://github.com/pytorch/FBGEMM
-    depends_on('fbgemm', when='+fbgemm')
+    # depends_on('fbgemm', when='+fbgemm')
     # TODO: add dependency: https://github.com/ROCmSoftwarePlatform/MIOpen
-    depends_on('miopen', when='+miopen')
-    depends_on('intel-mkl-dnn', when='+mkldnn')
+    # depends_on('miopen', when='+miopen')
+    # TODO: See if there is a way to use an external mkldnn installation.
+    # Currently, only older versions of py-torch use an external mkldnn
+    # library.
+    depends_on('onednn', when='@0.4:0.4.1+mkldnn')
     # TODO: add dependency: https://github.com/Maratyszcza/NNPACK
-    depends_on('nnpack', when='+nnpack')
+    # depends_on('nnpack', when='+nnpack')
     depends_on('qnnpack', when='+qnnpack')
     depends_on('mpi', when='+distributed')
     depends_on('nccl', when='+nccl')
@@ -160,11 +191,15 @@ class PyTorch(PythonPackage):
     # In 1.3.x torch.save is not saving source files, this is fixed in 1.4.0
     patch('fix-serialization.patch', when='@1.3.1')
 
+    # 1.4.1 does not build on gcc 9 without these patches, see
+    # https://github.com/pytorch/pytorch/issues/32277
+    patch('gcc9_PR30332.patch', when='@1.4.0:1.4.1')
+    patch('gcc9_PR30333.patch', when='@1.4.0:1.4.1')
+
     def setup_build_environment(self, env):
         def enable_or_disable(variant, keyword='USE', var=None, newer=False):
             """Set environment variable to enable or disable support for a
             particular variant.
-
             Parameters:
                 variant (str): the variant to check
                 keyword (str): the prefix to use for enabling/disabling
@@ -187,11 +222,6 @@ class PyTorch(PythonPackage):
                 else:
                     env.set('NO_' + var, 'ON')
 
-        # Build system has problems locating MKL libraries
-        # See https://github.com/pytorch/pytorch/issues/24334
-        if 'mkl' in self.spec:
-            env.prepend_path('CMAKE_PREFIX_PATH', self.spec['mkl'].prefix.mkl)
-
         # Build in parallel to speed up build times
         env.set('MAX_JOBS', make_jobs)
 
@@ -209,6 +239,10 @@ class PyTorch(PythonPackage):
         enable_or_disable('cuda')
         if '+cuda' in self.spec:
             env.set('CUDA_HOME', self.spec['cuda'].prefix)
+            torch_cuda_arch = ';'.join('{0:.1f}'.format(float(i) / 10.0) for i
+                                       in
+                                       self.spec.variants['cuda_arch'].value)
+            env.set('TORCH_CUDA_ARCH_LIST', torch_cuda_arch)
 
         enable_or_disable('cudnn')
         if '+cudnn' in self.spec:
@@ -225,7 +259,7 @@ class PyTorch(PythonPackage):
             env.set('MIOPEN_LIBRARY', self.spec['miopen'].libs[0])
 
         enable_or_disable('mkldnn')
-        if '+mkldnn' in self.spec:
+        if '@0.4:0.4.1+mkldnn' in self.spec:
             env.set('MKLDNN_HOME', self.spec['intel-mkl-dnn'].prefix)
 
         enable_or_disable('nnpack')
@@ -269,9 +303,11 @@ class PyTorch(PythonPackage):
         enable_or_disable('zstd', newer=True)
         enable_or_disable('tbb', newer=True)
 
-    def test(self):
-        pass
-
     def install_test(self):
         with working_dir('test'):
             python('run_test.py')
+
+    # Tests need to be re-added since `phases` was overridden
+    run_after('install')(
+        PythonPackage._run_default_install_time_test_callbacks)
+    run_after('install')(PythonPackage.sanity_check_prefix)
