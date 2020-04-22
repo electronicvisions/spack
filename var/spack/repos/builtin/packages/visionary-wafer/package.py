@@ -103,7 +103,8 @@ class VisionaryWafer(Package):
     ##################
     # intel-mkldnn depends on intel-mkl which also provides blas ->
     # concretization error -> reinvestigate when needed
-    depends_on('py-torch ~mkldnn')
+    # 1.4.1 is last py2 compatible version, not specifying breaks concretization
+    depends_on('py-torch@:1.4.1 ~mkldnn')
 
     def install(self, spec, prefix):
         mkdirp(prefix.etc)
