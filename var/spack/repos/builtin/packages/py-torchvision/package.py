@@ -21,6 +21,7 @@ class PyTorchvision(PythonPackage):
         'torchvision.models.detection'
     ]
 
+    version('0.6.0', sha256='02de11b3abe6882de4032ce86dab9c7794cbc84369b44d04e667486580f0f1f7')
     version('0.5.0', sha256='eb9afc93df3d174d975ee0914057a9522f5272310b4d56c150b955c287a4d74d')
     version('0.4.2', sha256='1184a27eab85c9e784bacc6f9d6fec99e168ab4eda6047ef9f709e7fdb22d8f9')
     version('0.4.1', sha256='053689351272b3bd2ac3e6ba51efd284de0e4ca4a301f54674b949f1e62b7176')
