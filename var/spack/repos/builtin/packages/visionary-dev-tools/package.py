@@ -64,6 +64,8 @@ class VisionaryDevTools(Package):
     depends_on('py-nose2')
     depends_on('py-memory-profiler')
     depends_on('py-pudb')
+    depends_on('py-pylint@:1.999.999', when="^python@:2.999.999")
+    depends_on('py-pylint', when="^python@3.4.0:")
     depends_on('py-pyserial')
     depends_on('py-pytest')
     depends_on('py-pytest-xdist')
