@@ -62,9 +62,6 @@ packages:
     version: [1.6.6]
   py-h5py:
     variants: ['~mpi']
-  py-ipython:
-    # newer versions require python 3.4+
-    version: [5.8.0]
   py-tables:
     variants: ['~auto~avx2+sse2']
   ruby:
