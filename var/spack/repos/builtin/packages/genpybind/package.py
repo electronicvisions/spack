@@ -38,6 +38,8 @@ class Genpybind(WafPackage):
     version('master', branch='master')
     version('develop', branch='develop')
 
+    version('visions', branch='master', git='https://github.com/electronicvisions/genpybind')
+
     depends_on(
             'llvm+clang+python+visionary@5.0.0:5.999.999,7.0.0:7.999.999,9.0.0:9.999.999',
         type=('build', 'link', 'run'))
@@ -48,5 +50,11 @@ class Genpybind(WafPackage):
 
     def configure_args(self):
         args = super(Genpybind, self).configure_args()
-        args.append("--disable-tests")
+
+        if self.spec.satisfies("@visions"):
+            # currently only our HEAD supports the rename
+            # TODO: adapt once the change is upstream
+            args.append("--genpybind-disable-tests")
+        else:
+            args.append("--disable-tests")
         return args
