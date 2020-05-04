@@ -41,6 +41,7 @@ class VisionarySimulation(Package):
 
     depends_on('visionary-dev-tools', when='+dev')
 
+    depends_on('llvm+clang')  # for clang-format
     depends_on('nest+backports')
     depends_on('py-cython')  # add runtime dependency so cython is available in visionary-simulation app (needed for sbs)
     depends_on('py-elephant')

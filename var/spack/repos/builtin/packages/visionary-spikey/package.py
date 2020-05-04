@@ -45,6 +45,7 @@ class VisionarySpikey(Package):
     # taken from: https://electronicvisions.github.io/hbp-sp9-guidebook/pm/spikey/appendix.html#setup-software;
     depends_on('boost+python')
 #    depends_on('libusb')  # needs to be an external requirement
+    depends_on('llvm+clang')  # for clang-format
     depends_on('log4cxx')
     depends_on('qt@:4.8.999')
     depends_on('googletest')
