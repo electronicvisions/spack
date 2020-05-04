@@ -43,6 +43,7 @@ class VisionaryDlsCore(Package):
     depends_on('py-numpy')
     depends_on('py-pybind11')
     depends_on('py-pybind11-stubgen')
+    depends_on('py-pycodestyle')
     depends_on('py-pyelftools')
     depends_on('py-pylint')
     depends_on('py-sqlalchemy')
