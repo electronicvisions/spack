@@ -644,6 +644,8 @@ class Llvm(CMakePackage):
     patch('llvm_py37.patch', when='@4:6 ^python@3.7:')
     # see https://bugzilla.redhat.com/show_bug.cgi?id=1540620
     patch('llvm_gcc8.patch', when='@5.0:5.999 %gcc@8.0:')
+    # see https://bugs.gentoo.org/708730
+    patch('llvm_gcc10.patch', when='@8.0: %gcc@10.0:')
 
     @run_before('cmake')
     def check_darwin_lldb_codesign_requirement(self):
