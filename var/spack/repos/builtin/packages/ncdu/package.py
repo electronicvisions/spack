@@ -17,6 +17,7 @@ class Ncdu(Package):
     homepage = "http://dev.yorhel.nl/ncdu"
     url      = "http://dev.yorhel.nl/download/ncdu-1.11.tar.gz"
 
+    version('1.14.2', sha256='947a7f5c1d0cd4e338e72b4f5bc5e2873651442cec3cb012e04ad2c37152c6b1')
     version('1.13', sha256='f4d9285c38292c2de05e444d0ba271cbfe1a705eee37c2b23ea7c448ab37255a')
     version('1.12', sha256='820e4e4747a2a2ec7a2e9f06d2f5a353516362c22496a10a9834f871b877499a')
     version('1.11', sha256='d0aea772e47463c281007f279a9041252155a2b2349b18adb9055075e141bb7b')
