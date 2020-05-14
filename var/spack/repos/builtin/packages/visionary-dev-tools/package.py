@@ -79,7 +79,7 @@ class VisionaryDevTools(Package):
     depends_on('rtags')
     depends_on('tar')
     depends_on('texinfo')
-    depends_on('the-silver-searcher')
+    # ECM (2020-05-14): removed 'the-silver-searcher' due to build fail on gcc@10.1.0
     depends_on('tig')
     depends_on('time')
     depends_on('tmux')
