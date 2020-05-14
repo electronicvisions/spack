@@ -1,0 +1,296 @@
+From 04211d6b7706f28426a5e00b0d0920e0dff941b6 Mon Sep 17 00:00:00 2001
+From: Pauli Virtanen <pav@iki.fi>
+Date: Fri, 10 Apr 2020 18:37:31 +0300
+Subject: [PATCH 1/3] MAINT: allow build_clib pre-build hooks, and enable
+ multiple hooks
+
+Allow pre-build hooks also for build_clib command in addition to
+build_ext.
+
+Unify the calling mechanism, and allow use of multiple build hooks.
+---
+ setup.py | 31 +++++++++++++++++++++++++++++--
+ 1 file changed, 29 insertions(+), 2 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 213be69a2ec..6d1bee14b00 100755
+--- a/setup.py
++++ b/setup.py
+@@ -241,8 +241,8 @@ def build_extension(self, ext):
+                     ext.extra_link_args.append('-Wl,--version-script=' + script_fn)
+ 
+             # Allow late configuration
+-            if hasattr(ext, '_pre_build_hook'):
+-                ext._pre_build_hook(self, ext)
++            hooks = getattr(ext, '_pre_build_hook', ())
++            _run_pre_build_hooks(hooks, (self, ext))
+ 
+             old_build_ext.build_extension(self, ext)
+ 
+@@ -271,6 +271,32 @@ def __is_using_gnu_linker(self, ext):
+     return build_ext
+ 
+ 
++def get_build_clib_override():
++    """
++    Custom build_clib command to tweak library building.
++    """
++    from numpy.distutils.command.build_clib import build_clib as old_build_clib
++
++    class build_clib(old_build_clib):
++        def build_a_library(self, build_info, lib_name, libraries):
++            # Allow late configuration
++            hooks = build_info.get('_pre_build_hook', ())
++            _run_pre_build_hooks(hooks, (self, build_info))
++            old_build_clib.build_a_library(self, build_info, lib_name, libraries)
++
++    return build_clib
++
++
++def _run_pre_build_hooks(hooks, args):
++    """Call a sequence of pre-build hooks, if any"""
++    if hooks is None:
++        hooks = ()
++    elif not hasattr(hooks, '__iter__'):
++        hooks = (hooks,)
++    for hook in hooks:
++        hook(*args)
++
++
+ def generate_cython():
+     cwd = os.path.abspath(os.path.dirname(__file__))
+     print("Cythonizing sources")
+@@ -517,6 +543,7 @@ def setup_package():
+ 
+         # Customize extension building
+         cmdclass['build_ext'] = get_build_ext_override()
++        cmdclass['build_clib'] = get_build_clib_override()
+ 
+         cwd = os.path.abspath(os.path.dirname(__file__))
+         if not os.path.exists(os.path.join(cwd, 'PKG-INFO')):
+
+From 7f8dd50a8eb76c302c90c196e1f2692482bda5b5 Mon Sep 17 00:00:00 2001
+From: Pauli Virtanen <pav@iki.fi>
+Date: Fri, 10 Apr 2020 18:47:36 +0300
+Subject: [PATCH 2/3] BLD: fix build with gfortran 10
+
+Add -fallow-argument-mismatch flag for those extensions that need it.
+See https://gcc.gnu.org/gcc-10/porting_to.html
+---
+ scipy/_build_utils/_fortran.py            | 27 ++++++++++++++++++++++-
+ scipy/_build_utils/compiler_helper.py     |  8 ++++++-
+ scipy/linalg/setup.py                     | 13 ++++++-----
+ scipy/optimize/setup.py                   | 16 +++++++++-----
+ scipy/sparse/linalg/eigen/arpack/setup.py | 19 +++++++++-------
+ 5 files changed, 61 insertions(+), 22 deletions(-)
+
+diff --git a/scipy/_build_utils/_fortran.py b/scipy/_build_utils/_fortran.py
+index 062c36eb918..64c6fd49fe3 100644
+--- a/scipy/_build_utils/_fortran.py
++++ b/scipy/_build_utils/_fortran.py
+@@ -5,7 +5,7 @@ from distutils.dep_util import newer
+ 
+ 
+ __all__ = ['needs_g77_abi_wrapper', 'split_fortran_files',
+-           'get_g77_abi_wrappers']
++           'get_g77_abi_wrappers', 'gfortran_legacy_flag_hook']
+ 
+ 
+ def uses_mkl(info):
+@@ -46,6 +46,30 @@ def get_g77_abi_wrappers(info):
+     return wrapper_sources
+ 
+ 
++def gfortran_legacy_flag_hook(cmd, ext):
++    """
++    Pre-build hook to add dd gfortran legacy flag -fallow-argument-mismatch
++    """
++    from .compiler_helper import try_add_flag
++    from distutils.version import LooseVersion
++
++    if isinstance(ext, dict):
++        # build_clib
++        compilers = ((cmd._f_compiler, ext.setdefault('extra_f77_compile_args', [])),
++                      (cmd._f_compiler, ext.setdefault('extra_f90_compile_args', [])))
++    else:
++        # build_ext
++        compilers = ((cmd._f77_compiler, ext.extra_f77_compile_args),
++                     (cmd._f90_compiler, ext.extra_f90_compile_args))
++
++    for compiler, args in compilers:
++        if compiler is None:
++            continue
++
++        if compiler.compiler_type == "gnu95" and compiler.version >= LooseVersion("10"):
++            try_add_flag(args, compiler, "-fallow-argument-mismatch")
++
++
+ def split_fortran_files(source_dir, subroutines=None):
+     """Split each file in `source_dir` into separate files per subroutine.
+ 
+diff --git a/scipy/_build_utils/compiler_helper.py b/scipy/_build_utils/compiler_helper.py
+index 0d0e3ca76cf..bb7878bf4f1 100644
+--- a/scipy/_build_utils/compiler_helper.py
++++ b/scipy/_build_utils/compiler_helper.py
+@@ -7,8 +7,14 @@
+ def try_compile(compiler, code=None, flags=[], ext=None):
+     """Returns True if the compiler is able to compile the given code"""
+     from distutils.errors import CompileError
++    from numpy.distutils.fcompiler import FCompiler
++
++    if code is None:
++        if isinstance(compiler, FCompiler):
++            code = "      program main\n      return\n      end"
++        else:
++            code = 'int main (int argc, char **argv) { return 0; }'
+ 
+-    code = code or 'int main (int argc, char **argv) { return 0; }'
+     ext = ext or compiler.src_extensions[0]
+ 
+     with tempfile.TemporaryDirectory() as temp_dir:
+diff --git a/scipy/linalg/setup.py b/scipy/linalg/setup.py
+index 4f2d72c740a..480085324cb 100644
+--- a/scipy/linalg/setup.py
++++ b/scipy/linalg/setup.py
+@@ -8,7 +8,7 @@ def configuration(parent_package='', top
+     from distutils.sysconfig import get_python_inc
+     from scipy._build_utils.system_info import get_info, NotFoundError, numpy_info
+     from numpy.distutils.misc_util import Configuration, get_numpy_include_dirs
+-    from scipy._build_utils import (get_g77_abi_wrappers, split_fortran_files)
++    from scipy._build_utils import (get_g77_abi_wrappers, split_fortran_files, gfortran_legacy_flag_hook)
+ 
+     config = Configuration('linalg', parent_package, top_path)
+ 
+@@ -118,9 +118,10 @@ def configuration(parent_package='', top
+     fnames = split_fortran_files(join(dirname, 'src', 'id_dist', 'src'),
+                                  routines_to_split)
+     fnames = [join('src', 'id_dist', 'src', f) for f in fnames]
+-    config.add_extension('_interpolative', fnames + ["interpolative.pyf"],
+-                         extra_info=lapack_opt
+-                         )
++    ext = config.add_extension('_interpolative', fnames + ["interpolative.pyf"],
++                               extra_info=lapack_opt
++                               )
++    ext._pre_build_hook = gfortran_legacy_flag_hook
+ 
+     # _solve_toeplitz:
+     config.add_extension('_solve_toeplitz',
+diff --git a/scipy/optimize/setup.py b/scipy/optimize/setup.py
+index dab0f7f4fe4..86d2dfcb51c 100644
+--- a/scipy/optimize/setup.py
++++ b/scipy/optimize/setup.py
+@@ -6,6 +6,8 @@
+ def configuration(parent_package='',top_path=None):
+     from numpy.distutils.misc_util import Configuration
+     from scipy._build_utils.system_info import get_info
++    from scipy._build_utils import gfortran_legacy_flag_hook
++
+     config = Configuration('optimize',parent_package, top_path)
+ 
+     include_dirs = [join(os.path.dirname(__file__), '..', '_lib', 'src')]
+@@ -74,12 +76,14 @@ def configuration(parent_package='',top_path=None):
+                          **numpy_nodepr_api)
+ 
+     sources = ['slsqp.pyf', 'slsqp_optmz.f']
+-    config.add_extension('_slsqp', sources=[join('slsqp', x) for x in sources],
+-                         **numpy_nodepr_api)
+-
+-    config.add_extension('_nnls', sources=[join('nnls', x)
+-                                          for x in ["nnls.f","nnls.pyf"]],
+-                         **numpy_nodepr_api)
++    ext = config.add_extension('_slsqp', sources=[join('slsqp', x) for x in sources],
++                               **numpy_nodepr_api)
++    ext._pre_build_hook = gfortran_legacy_flag_hook
++
++    ext = config.add_extension('_nnls', sources=[join('nnls', x)
++                                                 for x in ["nnls.f","nnls.pyf"]],
++                               **numpy_nodepr_api)
++    ext._pre_build_hook = gfortran_legacy_flag_hook
+ 
+     config.add_extension('_group_columns', sources=['_group_columns.c'],)
+ 
+diff --git a/scipy/sparse/linalg/eigen/arpack/setup.py b/scipy/sparse/linalg/eigen/arpack/setup.py
+index a967185b6d9..ca5359d56e4 100644
+--- a/scipy/sparse/linalg/eigen/arpack/setup.py
++++ b/scipy/sparse/linalg/eigen/arpack/setup.py
+@@ -4,7 +4,8 @@
+ def configuration(parent_package='',top_path=None):
+     from scipy._build_utils.system_info import get_info
+     from numpy.distutils.misc_util import Configuration
+-    from scipy._build_utils import get_g77_abi_wrappers
++    from scipy._build_utils import (get_g77_abi_wrappers,
++                                    gfortran_legacy_flag_hook)
+ 
+     lapack_opt = get_info('lapack_opt')
+ 
+@@ -16,15 +17,17 @@ def configuration(parent_package='',top_path=None):
+     arpack_sources += get_g77_abi_wrappers(lapack_opt)
+ 
+     config.add_library('arpack_scipy', sources=arpack_sources,
+-                       include_dirs=[join('ARPACK', 'SRC')])
++                       include_dirs=[join('ARPACK', 'SRC')],
++                       _pre_build_hook=gfortran_legacy_flag_hook)
+ 
+     ext_sources = ['arpack.pyf.src']
+-    config.add_extension('_arpack',
+-                         sources=ext_sources,
+-                         libraries=['arpack_scipy'],
+-                         extra_info=lapack_opt,
+-                         depends=arpack_sources,
+-                         )
++    ext = config.add_extension('_arpack',
++                               sources=ext_sources,
++                               libraries=['arpack_scipy'],
++                               extra_info=lapack_opt,
++                               depends=arpack_sources,
++                               )
++    ext._pre_build_hook = gfortran_legacy_flag_hook
+ 
+     config.add_data_dir('tests')
+ 
+
+From 720498ecf9fc27d9453ad5a059d10a5e528ecbf2 Mon Sep 17 00:00:00 2001
+From: Pauli Virtanen <pav@iki.fi>
+Date: Sun, 12 Apr 2020 12:48:11 +0300
+Subject: [PATCH 3/3] BLD: disable distutils -j parallelization
+
+Python's distutils build parallelization is not safe to use
+due to race conditions in numpy.distutils
+---
+ setup.py | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/setup.py b/setup.py
+index 6d1bee14b00..3a49abc12f0 100755
+--- a/setup.py
++++ b/setup.py
+@@ -226,6 +226,16 @@ def get_build_ext_override():
+     from numpy.distutils.command.build_ext import build_ext as old_build_ext
+ 
+     class build_ext(old_build_ext):
++        def finalize_options(self):
++            super().finalize_options()
++
++            # Disable distutils parallel build, due to race conditions
++            # in numpy.distutils (Numpy issue gh-15957)
++            if self.parallel:
++                print("NOTE: -j build option not supportd. Set NPY_NUM_BUILD_JOBS=4 "
++                      "for parallel build.")
++            self.parallel = None
++
+         def build_extension(self, ext):
+             # When compiling with GNU compilers, use a version script to
+             # hide symbols during linking.
+@@ -278,6 +288,12 @@ def get_build_clib_override():
+     from numpy.distutils.command.build_clib import build_clib as old_build_clib
+ 
+     class build_clib(old_build_clib):
++        def finalize_options(self):
++            super().finalize_options()
++
++            # Disable parallelization (see build_ext above)
++            self.parallel = None
++
+         def build_a_library(self, build_info, lib_name, libraries):
+             # Allow late configuration
+             hooks = build_info.get('_pre_build_hook', ())

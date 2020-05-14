@@ -64,6 +64,11 @@ class PyScipy(PythonPackage):
     depends_on('blas')
     depends_on('lapack')
 
+    # https://github.com/scipy/scipy/issues/11611
+    patch('fix-gcc10-1.4.1.patch', when='@1.4.0:1.4.1 %gcc@10.1:')
+    # derived from patch above by mueller@kip.uni-heidelberg.de
+    patch('fix-gcc10-1.2.2.patch', level=2, when='@1.2.2:1.2.999 %gcc@10.1:')
+
     def build_args(self, spec, prefix):
         args = []
 
