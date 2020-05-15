@@ -18,6 +18,8 @@ class Openblas(MakefilePackage):
     git      = 'https://github.com/xianyi/OpenBLAS.git'
 
     version('develop', branch='develop')
+    version('0.3.9', sha256='17d4677264dfbc4433e97076220adc79b050e4f8a083ea3f853a53af253bc380')
+    version('0.3.8', sha256='8f86ade36f0dbed9ac90eb62575137388359d97d8f93093b38abe166ad7ef3a8')
     version('0.3.7', sha256='bde136122cef3dd6efe2de1c6f65c10955bbb0cc01a520c2342f5287c28f9379')
     version('0.3.6', sha256='e64c8fe083832ffbc1459ab6c72f71d53afd3b36e8497c922a15a06b72e9002f')
     version('0.3.5', sha256='0950c14bd77c90a6427e26210d6dab422271bc86f9fc69126725833ecdaa0e85')
@@ -33,13 +35,10 @@ class Openblas(MakefilePackage):
     version('0.2.16', sha256='766f350d0a4be614812d535cead8c816fc3ad3b9afcd93167ea5e4df9d61869b')
     version('0.2.15', sha256='73c40ace5978282224e5e122a41c8388c5a19e65a6f2329c2b7c0b61bacc9044')
 
-    variant(
-        'shared',
-        default=True,
-        description='Build shared libraries as well as static libs.'
-    )
-    variant('ilp64', default=False, description='64 bit integers')
+    variant('ilp64', default=False, description='Force 64-bit Fortran native integers')
     variant('pic', default=True, description='Build position independent code')
+    variant('shared', default=True, description='Build shared libraries')
+    variant('consistent_fpcsr', default=False, description='Synchronize FP CSR between threads (x86/x86_64 only)')
 
     variant('cpu_target', default='auto',
             description='Set CPU target architecture (leave empty for '
@@ -83,6 +82,8 @@ class Openblas(MakefilePackage):
     patch('openblas_icc_openmp.patch', when='@:0.2.20%intel@16.0:')
     patch('openblas_icc_fortran.patch', when='%intel@16.0:')
     patch('openblas_icc_fortran2.patch', when='%intel@18.0:')
+    # See https://github.com/spack/spack/issues/15385
+    patch('lapack-0.3.9-xerbl.patch', when='@0.3.8: %intel')
 
     # Fixes compilation error on POWER8 with GCC 7
     # https://github.com/xianyi/OpenBLAS/pull/1098
@@ -110,10 +111,20 @@ class Openblas(MakefilePackage):
           sha256='f1b066a4481a50678caeb7656bf3e6764f45619686ac465f257c8017a2dc1ff0',
           when='@0.3.0:0.3.3')
 
+    # Fix https://github.com/xianyi/OpenBLAS/issues/2431
+    # Patch derived from https://github.com/xianyi/OpenBLAS/pull/2424
+    patch('openblas-0.3.8-darwin.patch', when='@0.3.8 platform=darwin')
+    # Fix ICE in LLVM 9.0.0 https://github.com/xianyi/OpenBLAS/pull/2329
+    # Patch as in https://github.com/xianyi/OpenBLAS/pull/2597
+    patch('openblas_appleclang11.patch', when='@0.3.8:0.3.9 %clang@11.0.3-apple')
+
     # Add conditions to f_check to determine the Fujitsu compiler
     patch('openblas_fujitsu.patch', when='%fj')
 
+    # See https://github.com/spack/spack/issues/3036
     conflicts('%intel@16', when='@0.2.15:0.2.19')
+    conflicts('+consistent_fpcsr', when='threads=none',
+              msg='FPCSR consistency only applies to multithreading')
 
     @property
     def parallel(self):
@@ -149,7 +160,6 @@ class Openblas(MakefilePackage):
         # When mixing compilers make sure that
         # $SPACK_ROOT/lib/spack/env/<compiler> have symlinks with reasonable
         # names and hack them inside lib/spack/spack/compilers/<compiler>.py
-
         make_defs = [
             'CC={0}'.format(spack_cc),
             'FC={0}'.format(spack_fc),
@@ -206,6 +216,15 @@ class Openblas(MakefilePackage):
                 make_defs += ['NO_AVX2=1']
             if '~avx512' in self.spec:
                 make_defs += ['NO_AVX512=1']
+
+        # Synchronize floating-point control and status register (FPCSR)
+        # between threads (x86/x86_64 only).
+        if '+consistent_fpcsr' in self.spec:
+            make_defs += ['CONSISTENT_FPCSR=1']
+
+        # Prevent errors in `as` assembler from newer instructions
+        if self.spec.satisfies('%gcc@:4.8.4'):
+            make_defs.append('NO_AVX2=1')
 
         return make_defs
 
