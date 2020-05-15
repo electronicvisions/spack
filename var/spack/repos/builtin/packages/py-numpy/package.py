@@ -93,7 +93,7 @@ class PyNumpy(PythonPackage):
 
     # Allows you to specify order of BLAS/LAPACK preference
     # https://github.com/numpy/numpy/pull/13132
-    patch('blas-lapack-order.patch', when='@1.15:1.16')
+    patch('blas-lapack-order.patch', when='@1.15:1.16.999')
 
     # GCC 4.8 is the minimum version that works
     conflicts('%gcc@:4.7', msg='GCC 4.8+ required')
