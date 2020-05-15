@@ -47,6 +47,7 @@ class VisionaryDevTools(Package):
     depends_on('ncdu')
     depends_on('node-js')
     depends_on('openssh')
+    depends_on('pigz')
     depends_on('pkg-config')
     depends_on('py-autopep8')
     depends_on('py-black', when="^python@3.6.0:")
