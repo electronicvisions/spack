@@ -29,6 +29,8 @@ class Boost(Package):
             submodules=True)
 
     version('develop', branch='develop', submodules=True)
+    version('1.73.0', sha256='4eb3b8d442b426dc35346235c8733b5ae35ba431690e38c6a8263dce9fcbb402')
+    version('1.72.0', sha256='59c9b274bc451cf91a9ba1dd2c7fdcaf5d60b1b3aa83f2c9fa143417cc660722')
     version('1.71.0', sha256='d73a8da01e8bf8c7eda40b4c84915071a8c8a0df4a6734537ddde4a8580524ee')
     version('1.70.0', sha256='430ae8354789de4fd19ee52f3b1f739e1fba576f0aded0897c3c2bc00fb38778')
     version('1.69.0', sha256='8f32d4617390d1c2d16f26a27ab60d97807b35440d45891fa340fc2648b04406')
