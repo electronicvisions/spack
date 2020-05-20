@@ -1,5 +1,5 @@
-diff -rpu boost_1_67_0_old/include/boost/utility/result_of.hpp boost_1_67_0/boost/utility/result_of.hpp
---- boost_1_67_0_old/utility/result_of.hpp	2018-12-06 12:33:38.000000000 +0000
+diff -rpu boost_1_67_0_old/boost/utility/result_of.hpp boost_1_67_0/boost/utility/result_of.hpp
+--- boost_1_67_0_old/boost/utility/result_of.hpp	2018-12-06 12:33:38.000000000 +0000
 +++ boost_1_67_0/boost/utility/result_of.hpp	2018-12-06 17:07:15.610456453 +0000
 @@ -74,7 +74,8 @@ template<class T> struct result_of_has_r
      template<class U> static result_of_yes_type f( result_of_has_type<typename U::result_type>* );

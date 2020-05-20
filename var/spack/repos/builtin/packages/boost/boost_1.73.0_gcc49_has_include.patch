@@ -1,0 +1,15 @@
+diff --git a/spack-src/boost/config/detail/select_stdlib_config.hpp b/spack-src2/boost/config/detail/select_stdlib_config.hpp
+index 1a09dda..0dd7933 100644
+--- a/spack-src/boost/config/detail/select_stdlib_config.hpp
++++ b/spack-src2/boost/config/detail/select_stdlib_config.hpp
+@@ -15,6 +15,10 @@
+ // otherwise include <cstddef> to determine if some version of STLport is in use as the std lib
+ // (do not rely on this header being included since users can short-circuit this header 
+ //  if they know whose std lib they are using.)
++#if defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 9) && defined(__has_include)
++// gcc 4.9.x defines but does not implement it
++#undef __has_include
++#endif
+ #if defined(__cplusplus) && defined(__has_include)
+ #  if __has_include(<version>)
+ // It should be safe to include `<version>` when it is present without checking

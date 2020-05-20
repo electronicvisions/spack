@@ -1,0 +1,36 @@
+From e51fdf7f45bac2f35582c6059528d6aa29450774 Mon Sep 17 00:00:00 2001
+From: Mathias Gaunard <mathias@gaunard.com>
+Date: Thu, 14 May 2020 13:25:44 +0100
+Subject: [PATCH] C++20 allocator compatibility
+
+---
+ include/boost/bimap/detail/bimap_core.hpp | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/include/boost/bimap/detail/bimap_core.hpp b/include/boost/bimap/detail/bimap_core.hpp
+index f642e96..cd837de 100644
+--- a/include/boost/bimap/detail/bimap_core.hpp
++++ b/include/boost/bimap/detail/bimap_core.hpp
+@@ -29,6 +29,7 @@
+ #include <boost/type_traits/is_same.hpp>
+ 
+ #include <boost/concept_check.hpp>
++#include <boost/container/allocator_traits.hpp>
+ 
+ // Boost.MultiIndex
+ #include <boost/multi_index_container.hpp>
+@@ -404,9 +405,11 @@ class bimap_core
+     <
+         relation,
+         core_indices,
+-        BOOST_DEDUCED_TYPENAME parameters::allocator::
+-            BOOST_NESTED_TEMPLATE rebind<relation>::other
+-
++        BOOST_DEDUCED_TYPENAME ::boost::container::allocator_traits
++        <
++            BOOST_DEDUCED_TYPENAME parameters::allocator
++        >::
++            BOOST_NESTED_TEMPLATE portable_rebind_alloc<relation>::type
+     > core_type;
+ 
+     // Core metadata

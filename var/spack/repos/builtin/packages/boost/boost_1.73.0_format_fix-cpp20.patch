@@ -1,0 +1,34 @@
+From 92b3b956ac37026e0c14ebe967c2c9768fddec45 Mon Sep 17 00:00:00 2001
+From: Mathias Gaunard <mathias@gaunard.com>
+Date: Wed, 13 May 2020 18:17:21 +0100
+Subject: [PATCH] std::allocator allocate doesn't take a second argument
+ anymore
+
+This was deprecated in C++17 and removed in C++20.
+As is the code does not compile with GCC 10.1 in C++20 mode.
+---
+ include/boost/format/alt_sstream_impl.hpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/boost/format/alt_sstream_impl.hpp b/include/boost/format/alt_sstream_impl.hpp
+index 998f8b2e..14992051 100644
+--- a/include/boost/format/alt_sstream_impl.hpp
++++ b/include/boost/format/alt_sstream_impl.hpp
+@@ -41,7 +41,7 @@ namespace boost {
+                 void *vd_ptr = alloc_.allocate(sz, is_allocated_? eback() : 0);
+                 Ch *new_ptr = static_cast<Ch *>(vd_ptr);
+ #else
+-                Ch *new_ptr = alloc_.allocate(sz, is_allocated_? eback() : 0);
++                Ch *new_ptr = alloc_.allocate(sz);
+ #endif
+                 // if this didnt throw, we're safe, update the buffer
+                 dealloc();
+@@ -258,7 +258,7 @@ namespace boost {
+                     void *vdptr = alloc_.allocate(new_size, is_allocated_? oldptr : 0);
+                     newptr = static_cast<Ch *>(vdptr);
+ #else
+-                    newptr = alloc_.allocate(new_size, is_allocated_? oldptr : 0);
++                    newptr = alloc_.allocate(new_size);
+ #endif
+                 }
+ 

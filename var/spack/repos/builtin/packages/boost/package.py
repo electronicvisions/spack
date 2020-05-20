@@ -212,6 +212,9 @@ class Boost(Package):
     # Patch fix from https://github.com/boostorg/config/issues/225
     patch('boost_1.66.0_gcc49_has_include.patch', when='@1.59.0:')
 
+    # patch by mueller@kip.uni-heidelberg.de (upstream does not patch, cf. above)
+    patch('boost_1.73.0_gcc49_has_include.patch', level=2, when='@1.73.0:')
+
     # Patch fix from https://github.com/boostorg/type_traits/issues/69 fixed in 1.68.0
     patch('boost_1.66.0_gcc42_common_arithmetic_type.patch', when='@1.60.0:1.67.999')
 
@@ -236,6 +239,14 @@ class Boost(Package):
     # Add option to C/C++ compile commands in clang-linux.jam
     patch('clang-linux_add_option.patch', when='@1.56.0:1.63.0')
     patch('clang-linux_add_option2.patch', when='@:1.55.0')
+
+    # (imperfect) patches for the current boost version when using gcc@10: and modern C++
+    # cf. https://github.com/boostorg/bimap/pull/24
+    patch('boost_1.73.0_bimap_fix-cpp20.patch', level=2, when='cxxstd=17 %gcc@10:')
+    # cf. https://github.com/boostorg/format/pull/70
+    patch('boost_1.73.0_format_fix-cpp20.patch', level=2, when='cxxstd=17 %gcc@10:')
+    # cf. https://github.com/boostorg/ublas/pull/53
+    patch('boost_1.73.0_ublas_fix-cpp20.patch', level=2, when='cxxstd=17 %gcc@10:')
 
     def url_for_version(self, version):
         if version >= Version('1.63.0'):
