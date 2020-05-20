@@ -1,0 +1,88 @@
+diff --git a/GCC_XML/Support/GCC/4.2/gccxml_builtins.h b/GCC_XML/Support/GCC/4.2/gccxml_builtins.h
+index cef3939..5a41316 100644
+--- a/GCC_XML/Support/GCC/4.2/gccxml_builtins.h
++++ b/GCC_XML/Support/GCC/4.2/gccxml_builtins.h
+@@ -130,5 +130,6 @@ float       __complex__ __builtin_cpowf(float __complex__, float __complex__);
+ double      __complex__ __builtin_cpow(double __complex__, double __complex__);
+ long double __complex__ __builtin_cpowl(long double __complex__, long double __complex__);
+ 
++extern unsigned short  __builtin_bswap16(unsigned short _data);
+ extern unsigned int  __builtin_bswap32(unsigned int _data);
+ extern unsigned long __builtin_bswap64(unsigned long _data);
+diff --git a/GCC_XML/Support/GCC/4.3/gccxml_builtins.h b/GCC_XML/Support/GCC/4.3/gccxml_builtins.h
+index b375478..f92500d 100644
+--- a/GCC_XML/Support/GCC/4.3/gccxml_builtins.h
++++ b/GCC_XML/Support/GCC/4.3/gccxml_builtins.h
+@@ -182,5 +182,6 @@ library.
+ #define __is_empty(x) false
+ #define __has_trivial_destructor(x) false
+ 
++extern unsigned short  __builtin_bswap16(unsigned short _data);
+ extern unsigned int  __builtin_bswap32(unsigned int _data);
+ extern unsigned long __builtin_bswap64(unsigned long _data);
+diff --git a/GCC_XML/Support/GCC/4.4/gccxml_builtins.h b/GCC_XML/Support/GCC/4.4/gccxml_builtins.h
+index 24563f3..f2c75f7 100644
+--- a/GCC_XML/Support/GCC/4.4/gccxml_builtins.h
++++ b/GCC_XML/Support/GCC/4.4/gccxml_builtins.h
+@@ -152,5 +152,6 @@ int  __builtin_va_arg_pack_len(...);
+ #define __is_empty(x) false
+ #define __has_trivial_destructor(x) false
+ 
++extern unsigned short  __builtin_bswap16(unsigned short _data);
+ extern unsigned int  __builtin_bswap32(unsigned int _data);
+ extern unsigned long __builtin_bswap64(unsigned long _data);
+diff --git a/GCC_XML/Support/GCC/4.5/gccxml_builtins.h b/GCC_XML/Support/GCC/4.5/gccxml_builtins.h
+index ad97eb1..222a0b3 100644
+--- a/GCC_XML/Support/GCC/4.5/gccxml_builtins.h
++++ b/GCC_XML/Support/GCC/4.5/gccxml_builtins.h
+@@ -153,5 +153,6 @@ int  __builtin_va_arg_pack_len(...);
+ #define __has_trivial_destructor(x) false
+ #define __has_trivial_constructor(x) false
+ 
++extern unsigned short  __builtin_bswap16(unsigned short _data);
+ extern unsigned int  __builtin_bswap32(unsigned int _data);
+ extern unsigned long __builtin_bswap64(unsigned long _data);
+diff --git a/GCC_XML/Support/GCC/4.6/gccxml_builtins.h b/GCC_XML/Support/GCC/4.6/gccxml_builtins.h
+index 533b165..6c0c8a6 100644
+--- a/GCC_XML/Support/GCC/4.6/gccxml_builtins.h
++++ b/GCC_XML/Support/GCC/4.6/gccxml_builtins.h
+@@ -154,5 +154,6 @@ int  __builtin_va_arg_pack_len(...);
+ #define __has_trivial_destructor(x) false
+ #define __has_trivial_constructor(x) false
+ 
++extern unsigned short  __builtin_bswap16(unsigned short _data);
+ extern unsigned int  __builtin_bswap32(unsigned int _data);
+ extern unsigned long __builtin_bswap64(unsigned long _data);
+diff --git a/GCC_XML/Support/GCC/4.7/gccxml_builtins.h b/GCC_XML/Support/GCC/4.7/gccxml_builtins.h
+index 533b165..6c0c8a6 100644
+--- a/GCC_XML/Support/GCC/4.7/gccxml_builtins.h
++++ b/GCC_XML/Support/GCC/4.7/gccxml_builtins.h
+@@ -154,5 +154,6 @@ int  __builtin_va_arg_pack_len(...);
+ #define __has_trivial_destructor(x) false
+ #define __has_trivial_constructor(x) false
+ 
++extern unsigned short  __builtin_bswap16(unsigned short _data);
+ extern unsigned int  __builtin_bswap32(unsigned int _data);
+ extern unsigned long __builtin_bswap64(unsigned long _data);
+diff --git a/GCC_XML/Support/GCC/4.8/gccxml_builtins.h b/GCC_XML/Support/GCC/4.8/gccxml_builtins.h
+index 533b165..6c0c8a6 100644
+--- a/GCC_XML/Support/GCC/4.8/gccxml_builtins.h
++++ b/GCC_XML/Support/GCC/4.8/gccxml_builtins.h
+@@ -154,5 +154,6 @@ int  __builtin_va_arg_pack_len(...);
+ #define __has_trivial_destructor(x) false
+ #define __has_trivial_constructor(x) false
+ 
++extern unsigned short  __builtin_bswap16(unsigned short _data);
+ extern unsigned int  __builtin_bswap32(unsigned int _data);
+ extern unsigned long __builtin_bswap64(unsigned long _data);
+diff --git a/GCC_XML/Support/GCC/4.9/gccxml_builtins.h b/GCC_XML/Support/GCC/4.9/gccxml_builtins.h
+index 533b165..6c0c8a6 100644
+--- a/GCC_XML/Support/GCC/4.9/gccxml_builtins.h
++++ b/GCC_XML/Support/GCC/4.9/gccxml_builtins.h
+@@ -154,5 +154,6 @@ int  __builtin_va_arg_pack_len(...);
+ #define __has_trivial_destructor(x) false
+ #define __has_trivial_constructor(x) false
+ 
++extern unsigned short  __builtin_bswap16(unsigned short _data);
+ extern unsigned int  __builtin_bswap32(unsigned int _data);
+ extern unsigned long __builtin_bswap64(unsigned long _data);
