@@ -20,4 +20,4 @@ class PySoundfile(PythonPackage):
     depends_on('py-setuptools', type='build')
     depends_on('py-cffi@1.0:', type=('build', 'run'))
     depends_on('py-numpy', type=('build', 'run'), when='+numpy')
-    depends_on('libsndfile', type='run')
+    depends_on('libsndfile+external-libs', type='run')
