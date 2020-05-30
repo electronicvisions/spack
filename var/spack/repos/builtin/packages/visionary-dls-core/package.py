@@ -22,6 +22,7 @@ class VisionaryDlsCore(Package):
     depends_on('visionary-nux ~dev')
 
     # depends_on('libusb-1.0')  external dependency
+    depends_on('bear')
     depends_on('boost@1.69.0: +graph+icu+mpi+python+numpy+coroutine+context+valgrind cxxstd=17')
     depends_on('cereal')
     depends_on('cppcheck')
