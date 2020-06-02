@@ -22,11 +22,25 @@ class Cppcheck(MakefilePackage):
     version('1.68', sha256='add6e5e12b05ca02b356cd0ec7420ae0dcafddeaef183b4dfbdef59c617349b1')
 
     variant('htmlreport', default=False, description="Install cppcheck-htmlreport")
+    variant('rules', default=True, description="Install with rules-support")
 
     depends_on('py-pygments', when='+htmlreport', type='run')
+    depends_on('pcre', when='+rules', type=('build', 'link'))
 
-    def build(self, spec, prefix):
-        make('CFGDIR={0}'.format(prefix.cfg))
+    @property
+    def build_targets(self):
+        # recommended release build according to README
+        targets = [
+            'MATCHCOMPILER=yes',
+            'FILESDIR={0}'.format(self.prefix),
+            'CXXFLAGS=-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function',
+        ]
+
+        if self.spec.satisfies('+rules'):
+            targets.append('HAVE_RULES=yes')
+
+        return targets
+
 
     def install(self, spec, prefix):
         # Manually install the final cppcheck binary
