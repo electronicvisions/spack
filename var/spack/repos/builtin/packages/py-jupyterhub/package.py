@@ -33,3 +33,8 @@ class PyJupyterhub(PythonPackage):
     depends_on('py-pamela', type=('build', 'run'))
     depends_on('py-notebook', type=('build', 'run'))
     depends_on('py-prometheus-client@0.0.21:', type=('build', 'run'))
+    depends_on('npm', type='build')
+
+    @run_before('install')
+    def install_npm_stuff(self):
+        which('npm')('install', '-g', 'configurable-http-proxy')
