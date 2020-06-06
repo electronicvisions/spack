@@ -59,6 +59,7 @@ class Tensorflow(Package):
 
     patch('url-zlib.patch',  when='@0.10.0')
     patch('crosstool.patch', when='@1.0.0-rc2') # auch auf 0.10.0 wenn mit cuda!
+    patch('sha-icu.patch',   when='@1.13.1')
 
     variant('gcp', default=False,
             description='Enable Google Cloud Platform Support')
