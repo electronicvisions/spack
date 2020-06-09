@@ -12,6 +12,7 @@ class PyJupyterhub(PythonPackage):
     homepage = "https://pypi.org/project/jupyterhub"
     url      = "https://pypi.io/packages/source/j/jupyterhub/jupyterhub-1.0.0.tar.gz"
 
+    version('1.1.0',    sha256='852a70225a03abd631b36a207f3ffdf69326a0db4cef539825fde39ec1b713d7')
     version('1.0.0',    sha256='33541a515a041b9a518ca057c1c4ab4215a7450fdddc206401713ee8137fa67f')
     version('0.9.4',    sha256='7848bbb299536641a59eb1977ec3c7c95d931bace4a2803d7e9b28b9256714da')
 
@@ -33,7 +34,9 @@ class PyJupyterhub(PythonPackage):
     depends_on('py-pamela', type=('build', 'run'))
     depends_on('py-notebook', type=('build', 'run'))
     depends_on('py-prometheus-client@0.0.21:', type=('build', 'run'))
-    depends_on('npm', type='build')
+    depends_on('py-jupyter-telemetry@0.1.0:', when='@1.1.0:', type=('build', 'run'))
+    # npm needed at runtime for configurable-http-proxy
+    depends_on('npm', when='@1.1.0:', type=('build', 'run'))
 
     @run_before('install')
     def install_npm_stuff(self):
