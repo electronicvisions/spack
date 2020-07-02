@@ -13,6 +13,7 @@ class PyJedi(PythonPackage):
     url      = "https://pypi.io/packages/source/j/jedi/jedi-0.9.0.tar.gz"
 
     # unfortunately pypi.io only offers a .whl
+    version('0.17.1', sha256='807d5d4f96711a2bcfdd5dfa3b1ae6d09aa53832b182090b222b5efb81f52f63')
     version('0.15.1', sha256='ba859c74fa3c966a22f2aeebe1b74ee27e2a462f56d3f5f7ca4a59af61bfe42e')
     version('0.15.0', sha256='9f16cb00b2aee940df2efc1d7d7c848281fd16391536a3d4561f5aea49db1ee6')
     version('0.14.1', sha256='53c850f1a7d3cfcd306cc513e2450a54bdf5cacd7604b74e42dd1f0758eaaf36')
@@ -31,7 +32,10 @@ class PyJedi(PythonPackage):
     version('0.9.0',  sha256='3b4c19fba31bdead9ab7350fb9fa7c914c59b0a807dcdd5c00a05feb85491d31')
 
     depends_on('py-setuptools', type='build')
-    depends_on('py-parso@0.2.0:', type=('build', 'run'), when='@0.12.0')
-    depends_on('py-parso@0.3.0:', type=('build', 'run'), when='@0.12.1:0.14.0')
-    depends_on('py-parso@0.5.0:', type=('build', 'run'), when='@0.14.1:0.15.1')
-    depends_on('py-parso@0.5.2:', type=('build', 'run'), when='@0.15.2:')
+    depends_on('python@2.7:2.8,3.4:', type=('build', 'run'), when="@0.13.0:0.16.99")
+    depends_on('python@2.7:2.8,3.5:', type=('build', 'run'), when="@0.17.0:")
+    depends_on('py-parso@0.2.0:0.7.99', type=('build', 'run'), when='@0.12.0')
+    depends_on('py-parso@0.3.0:0.7.99', type=('build', 'run'), when='@0.12.1:0.14.0')
+    depends_on('py-parso@0.5.0:0.7.99', type=('build', 'run'), when='@0.14.1:0.15.1')
+    depends_on('py-parso@0.5.2:0.7.99', type=('build', 'run'), when='@0.15.2:0.16.99')
+    depends_on('py-parso@0.7.0:0.7.99', type=('build', 'run'), when='@0.17.0:')
