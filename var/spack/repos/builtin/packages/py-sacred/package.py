@@ -18,6 +18,9 @@ class PySacred(PythonPackage):
 
     # relative paths of dependencies break the file observer
     patch('file_observer_normpath.patch')
+    # multiprocessing sometimes break fd output capturing
+    # cf. https://github.com/IDSIA/sacred/pull/740
+    patch("fix-tee_740.patch", when="@0.8.0:")
 
     depends_on('py-setuptools', type='build')
     depends_on("python@3.5.0:", type=('build', 'run'))

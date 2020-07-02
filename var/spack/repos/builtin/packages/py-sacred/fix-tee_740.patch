@@ -1,0 +1,41 @@
+From 4ee33705db961491054413c287626b74dbbea8a7 Mon Sep 17 00:00:00 2001
+From: "Steven H. Wang" <wang.steven.h@gmail.com>
+Date: Sun, 31 May 2020 15:11:51 -0700
+Subject: [PATCH] Terminate tee subproc if wait TimeoutExpired
+
+---
+ sacred/stdout_capturing.py | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/sacred/stdout_capturing.py b/sacred/stdout_capturing.py
+index ff9f948e..e1deb182 100644
+--- a/sacred/stdout_capturing.py
++++ b/sacred/stdout_capturing.py
+@@ -4,6 +4,7 @@
+ import os
+ import sys
+ import subprocess
++import warnings
+ from io import StringIO
+ from contextlib import contextmanager
+ import wrapt
+@@ -172,8 +173,17 @@ def tee_output_fd():
+             os.dup2(saved_stdout_fd, original_stdout_fd)
+             os.dup2(saved_stderr_fd, original_stderr_fd)
+ 
+-            tee_stdout.wait(timeout=1)
+-            tee_stderr.wait(timeout=1)
++            try:
++                tee_stdout.wait(timeout=1)
++            except subprocess.TimeoutExpired:
++                warnings.warn("tee_stdout.wait timeout. Forcibly terminating.")
++                tee_stdout.terminate()
++
++            try:
++                tee_stderr.wait(timeout=1)
++            except subprocess.TimeoutExpired:
++                warnings.warn("tee_stderr.wait timeout. Forcibly terminating.")
++                tee_stderr.terminate()
+ 
+             os.close(saved_stdout_fd)
+             os.close(saved_stderr_fd)
