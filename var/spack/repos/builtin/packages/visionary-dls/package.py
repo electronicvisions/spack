@@ -45,14 +45,6 @@ class VisionaryDls(Package):
     depends_on('py-yccp@1.0.0:')
     depends_on('xerces-c')
 
-
-    ##################
-    # Current fixups #
-    ##################
-    # intel-mkldnn depends on intel-mkl which also provides blas ->
-    # concretization error -> reinvestigate when needed
-    depends_on('py-torch ~mkldnn')
-
     # TODO Re-enable once https://github.com/spack/spack/pull/13112 is merged
     #  depends_on('tensorflow')
 

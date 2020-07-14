@@ -49,6 +49,13 @@ class VisionaryDlsCore(Package):
     depends_on('py-pylint')
     depends_on('py-sqlalchemy')
 
+    ##################
+    # Current fixups #
+    ##################
+    # intel-mkldnn depends on intel-mkl which also provides blas ->
+    # concretization error -> reinvestigate when needed
+    depends_on('py-torch ~mkldnn')
+
     # we only support Python 3.7+!
     depends_on('python@3.7.0:')
 
