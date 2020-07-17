@@ -47,6 +47,7 @@ class VisionaryDlsCore(Package):
     depends_on('py-pycodestyle')
     depends_on('py-pyelftools')
     depends_on('py-pylint')
+    depends_on('py-pynn')
     depends_on('py-sqlalchemy')
 
     ##################

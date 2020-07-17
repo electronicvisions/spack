@@ -31,7 +31,6 @@ class VisionaryDls(Package):
     depends_on('py-notebook')
     depends_on('py-numba')
     depends_on('py-pandas')
-    depends_on('py-pynn')
     depends_on('py-python-socketio')
     depends_on('py-pytorch-ignite')
     depends_on('py-sacred')
