@@ -13,6 +13,7 @@ class PyAstroid(PythonPackage):
     homepage = "https://github.com/PyCQA/astroid"
     url      = "https://github.com/PyCQA/astroid/archive/astroid-1.4.5.tar.gz"
 
+    version('2.4.2', sha256='34d480d364dcf3e176bc302da56c5ef585ab45d4460f5a2761f960d2fd7b624c')
     version('2.3.3', sha256='3a82983cf34dcbfe42ebcffeb98739e8a7bb868f03c1d9e298c530179b5075e7')
     version('2.2.5', sha256='232c2cfc72bae18a28de6541bbd560a1a3f42e08c52e41bd3f1f00ed74b0a4a6')
     version('2.2.0', sha256='7e289d0aa4a537b4aa798bd609fdf745de0f3c37e6b67642ed328e1482421a6d')
@@ -29,7 +30,8 @@ class PyAstroid(PythonPackage):
     patch('PR546.patch', when='@1.6.6')
 
     depends_on('python@2.7:2.8,3.4:', when='@:1.999.999')
-    depends_on('python@3.4:', when='@2:')
+    depends_on('python@3.4:', when='@2:2.2.999')
+    depends_on('python@3.5:', when='@2.3:')
 
     depends_on('py-lazy-object-proxy')
     depends_on('py-six')

@@ -12,6 +12,7 @@ class PyPylint(PythonPackage):
     homepage = "https://pypi.python.org/pypi/pylint"
     url      = "https://pypi.io/packages/source/p/pylint/pylint-1.6.5.tar.gz"
 
+    version('2.5.3', sha256='7dd78437f2d8d019717dbf287772d0b2dbdfd13fc016aa7faa08d67bccc46adc')
     version('2.4.4', sha256='3db5468ad013380e987410a8d6956226963aed94ecb5f9d3a28acca6d9ac36cd')
     version('2.3.1', sha256='723e3db49555abaf9bf79dc474c6b9e2935ad82230b10c1138a71ea41ac0fff1')
     version('2.3.0', sha256='ee80c7af4f127b2a480d83010c9f0e97beb8eaa652b78c2837d3ed30b12e1182')
@@ -21,12 +22,13 @@ class PyPylint(PythonPackage):
     version('1.4.3', sha256='1dce8c143a5aa15e0638887c2b395e2e823223c63ebaf8d5f432a99e44b29f60')
     version('1.4.1', sha256='3e383060edd432cbbd0e8bd686f5facfe918047ffe1bb401ab5897cb6ee0f030')
 
-    depends_on('python@3.4.0:', when='@2.0.0:')
+    depends_on('python@3.5.0:', when='@2.4.0:')
+    depends_on('python@3.4.0:', when='@2.0.0:2.3.999')
     depends_on('python@2.7.0:2.8.0', when='@:1.999.999')
-    depends_on('py-astroid@2.3.0:2.3.999', type=('build', 'run'),
-               when='@2.4.0:')
-    depends_on('py-astroid@2.2.0:2.2.999', type=('build', 'run'),
-               when='@2.3.0:2.3.999')
+    depends_on('py-toml@0.7.1:', type=('build', 'run'), when='@2.5.0:')
+    depends_on('py-astroid@2.4.0:2.4.999', type=('build', 'run'), when='@2.5.0:')
+    depends_on('py-astroid@2.3.0:2.3.999', type=('build', 'run'), when='@2.4.0:2.4.999')
+    depends_on('py-astroid@2.2.0:2.2.999', type=('build', 'run'), when='@2.3.0:2.3.999')
     # note there is no working version of astroid for this
     depends_on('py-astroid@1.5.1:2.999.999', type=('build', 'run'), when='@1.7:1.999.999')
     depends_on('py-six', type=('build', 'run'))
