@@ -11,6 +11,11 @@ class Googletest(CMakePackage):
     homepage = "https://github.com/google/googletest"
     url      = "https://github.com/google/googletest/tarball/release-1.10.0"
 
+    # there not yet exists a release with this commit, but it is in master and therefore
+    # expected to be in the next release.
+    # version number is arbitrarily chosen above the last release
+    version('2.0.0', git='https://github.com/google/googletest',
+            commit='ce654c2ff5cce36a1f7481352be28cc3068fe0f1')
     version('1.10.0', sha256='e4a7cd97c903818abe7ddb129db9c41cc9fd9e2ded654be57ced26d45c72e4c9')
     version('1.8.1',  sha256='8e40a005e098b1ba917d64104549e3da274e31261dedc57d6250fe91391b2e84')
     version('1.8.0',  sha256='d8c33605d23d303b08a912eaee7f84c4e091d6e3d90e9a8ec8aaf7450dfe2568')
