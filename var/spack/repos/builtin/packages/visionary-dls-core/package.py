@@ -50,6 +50,7 @@ class VisionaryDlsCore(Package):
     depends_on('py-pynn')
     depends_on('py-scipy')
     depends_on('py-sqlalchemy')
+    depends_on('yaml-cpp+shared')
 
     ##################
     # Current fixups #
