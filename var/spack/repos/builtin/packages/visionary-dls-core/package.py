@@ -49,6 +49,7 @@ class VisionaryDlsCore(Package):
     depends_on('py-pyelftools')
     depends_on('py-pylint')
     depends_on('py-pynn')
+    depends_on('py-python-usbtmc')
     depends_on('py-scipy')
     depends_on('py-sqlalchemy')
     depends_on('yaml-cpp+shared')
