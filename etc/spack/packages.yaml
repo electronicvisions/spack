@@ -45,6 +45,10 @@ packages:
     compiler: [gcc@4.9.2]
   hdf5:
     variants: ['~mpi+hl']
+  libusb:
+    paths:
+      libusb@1.0.22: /usr
+    buildable: False
   llvm:
     variants: ['~shared_libs+visionary+python~libcxx build_type=Release']
   openblas:
