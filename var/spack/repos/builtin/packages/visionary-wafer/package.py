@@ -60,8 +60,7 @@ class VisionaryWafer(Package):
     depends_on('boost@1.69.0: +graph+icu+mpi+python+numpy cxxstd=17')
     depends_on('tensorflow', when='+tensorflow')
     depends_on('log4cxx')
-    depends_on('googletest +gmock @:1.8.1')  # Need to rename all occurences of TEST_CASE to TEST_SUITE prior to updating to googletest 1.10.0
-                                             # see: https://github.com/google/googletest/blob/master/googletest/docs/primer.md#beware-of-the-nomenclature
+    depends_on('googletest +gmock')
     depends_on('py-slurm-pipeline')
     depends_on('nest@2.2.2+python')
     depends_on('py-brian')
