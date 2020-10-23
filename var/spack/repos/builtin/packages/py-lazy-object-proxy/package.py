@@ -17,4 +17,5 @@ class PyLazyObjectProxy(PythonPackage):
 
     conflicts('^python@3.0:3.2.99')
 
+    depends_on('py-setuptools-scm@3.3.1:', type='build')
     depends_on('py-setuptools', type='build')
