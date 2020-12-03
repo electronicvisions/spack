@@ -52,6 +52,7 @@ class VisionaryDlsCore(Package):
     depends_on('py-python-usbtmc')
     depends_on('py-scipy')
     depends_on('py-sqlalchemy')
+    depends_on('util-linux') # from lib-rcf
     depends_on('yaml-cpp+shared')
 
     ##################

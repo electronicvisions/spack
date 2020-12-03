@@ -91,6 +91,9 @@ class VisionaryWafer(Package):
     depends_on('tk@8.5.19')
     depends_on('tcl@8.5.19')
 
+    # lib-rcf depends on libuuid which is part of this
+    depends_on('util-linux')
+
     ##################
     # Current fixups #
     ##################
