@@ -20,7 +20,11 @@ class UtilLinux(AutotoolsPackage):
     version('2.29.1', sha256='a6a7adba65a368e6dad9582d9fbedee43126d990df51266eaee089a73c893653')
     version('2.25',   sha256='7e43273a9e2ab99b5a54ac914fddf5d08ba7ab9b114c550e9f03474672bd23a1')
 
-    depends_on('python@2.7:')
+    variant('python',
+            default=False,
+            description='Build with python bindings')
+
+    depends_on('python@2.7:', when='+python')
     depends_on('pkgconfig')
 
     # Make it possible to disable util-linux's libuuid so that you may
@@ -37,4 +41,5 @@ class UtilLinux(AutotoolsPackage):
             '--disable-makeinstall-chown',
         ]
         config_args.extend(self.enable_or_disable('libuuid'))
+        config_args.extend(self.with_or_without('python'))
         return config_args
