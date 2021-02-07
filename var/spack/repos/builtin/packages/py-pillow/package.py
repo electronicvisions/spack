@@ -25,6 +25,8 @@ class PyPillow(PythonPackage):
     provides('pil')
 
     # These defaults correspond to Pillow defaults
+    variant('jpeg',     default=True, description='Access to JPEG files')
+    variant('zlib',     default=True, description='Provide zlib support')
     variant('tiff',     default=False, description='Access to TIFF files')
     variant('freetype', default=False, description='Font related services')
     variant('lcms',     default=False, description='Color management')
@@ -41,10 +43,10 @@ class PyPillow(PythonPackage):
     depends_on('binutils', type='build', when=sys.platform != 'darwin')
     depends_on('python@2.7:2.8,3.5:', type=('build', 'run'))
     depends_on('py-setuptools', type='build')
-    depends_on('jpeg')
-    depends_on('zlib')
 
     # Optional dependencies
+    depends_on('jpeg', when='+jpeg')
+    depends_on('zlib', when='+zlib')
     depends_on('libtiff', when='+tiff')
     depends_on('freetype', when='+freetype')
     depends_on('lcms', when='+lcms')
