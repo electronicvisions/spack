@@ -47,6 +47,7 @@ class VisionaryDevTools(Package):
     depends_on('munge')
     depends_on('ncdu')
     depends_on('node-js')
+    depends_on('octave+fftw')
     depends_on('openssh')
     depends_on('pigz')
     depends_on('pkg-config')
