@@ -12,6 +12,8 @@ class PyIpykernel(PythonPackage):
     homepage = "https://pypi.python.org/pypi/ipykernel"
     url      = "https://github.com/ipython/ipykernel/archive/4.5.0.tar.gz"
 
+    version('5.3.4', sha256='f363a7331074f18d6fdbc49010ed2d06aac834fa23dbb6d7fd9f59d9b5e5056b')
+    version('5.1.1', sha256='a735d3df42e76e8176849dcc8d7746eda80b7768e8f1b38cd9aa6cabfd28baf5')
     version('5.1.0', sha256='30f01a2a1470d3fabbad03f5c43606c1bc2142850fc4ccedcf44281664ae9122')
     version('4.10.0', sha256='df2714fd0084085ed68876f75ab846202d261420b5f4069af6335b8df0475391')
     version('4.5.0', sha256='c5ec5130f5f7eda71345b9ef638c9213c4c2f41610a9ad338a0f1d0819421adf')
@@ -25,14 +27,21 @@ class PyIpykernel(PythonPackage):
     version('4.1.1', sha256='59e7e1ca516b9ee109e9a51b942bda03ac8e214891956e787da997b252f5e736')
     version('4.1.0', sha256='b72c3354ac12a219b9be928ff3b5125e5c861e9592fb4eb342f1d47592cb3740')
 
-    # ipykernel 5.x and above only supports python 3.4 and later
     depends_on('python@2.7:2.8,3.3:', type=('build', 'run'))
-    depends_on('python@3.4:', when='@5:', type=('build', 'run'))
+    depends_on('python@3.4:', when='@5.0:', type=('build', 'run'))
+    depends_on('python@3.5:', when='@5.2:', type=('build', 'run'))
     depends_on('py-setuptools', type='build', when='@5:')
-    depends_on('py-traitlets@4.1.0:', type=('build', 'run'))
-    depends_on('py-tornado@4.0:', when='@:4.999', type=('build', 'run'))
-    depends_on('py-tornado@4.2:', when='@5.0.0:', type=('build', 'run'))
     depends_on('py-ipython@4.0:', when='@:4.999', type=('build', 'run'))
     depends_on('py-ipython@5.0:', when='@5.0.0:', type=('build', 'run'))
+    depends_on('py-traitlets@4.1.0:', type=('build', 'run'))
     depends_on('py-jupyter-client', type=('build', 'run'))
-    depends_on('py-pexpect', type=('build', 'run'))
+    depends_on('py-tornado@4.0:', when='@:4.999', type=('build', 'run'))
+    depends_on('py-tornado@4.2:', when='@5.0.0:', type=('build', 'run'))
+    depends_on('py-appnope', when='platform=darwin', type=('build', 'run'))
+
+    phases = ['build', 'install', 'install_data']
+
+    def install_data(self, spec, prefix):
+        """ install the Jupyter kernel spec """
+        self.spec['python'].command(
+            '-m', 'ipykernel', 'install', '--prefix=' + prefix)
