@@ -12,6 +12,7 @@ class PyJupyterClient(PythonPackage):
     homepage = "https://github.com/jupyter/jupyter_client"
     url      = "https://github.com/jupyter/jupyter_client/archive/4.4.0.tar.gz"
 
+    version('6.1.11', sha256='7a318b26b5e7aaece370f58c4a107d3ba35b01063f0668ec2e44939847a03177')
     version('5.3.4', sha256='2af6f0e0e4d88009b11103490bea0bfb405c1c470e226c2b7b17c10e5dda9734')
     version('5.3.3', sha256='9d76231da1b4969afc762896fa79f0135f9f650cab2c1fc6526941d20d9aa8c9')
     version('5.3.2', sha256='2ff67cf04f58a3aeefa9ea201f36feb5f5b46efb0641b472f86d28021c2bf223')
@@ -33,10 +34,11 @@ class PyJupyterClient(PythonPackage):
 
     depends_on('python@2.7:2.8,3.3:', type=('build', 'run'))
     depends_on('python@2.7:2.8,3.5:', type=('build', 'run'), when='@5:')
+    depends_on('python@3.5:', type=('build', 'run'), when='@6:')
+    depends_on('py-setuptools', type=('build', 'run'), when='@5:')
     depends_on('py-traitlets', type=('build', 'run'))
     depends_on('py-jupyter-core', type=('build', 'run'))
+    depends_on('py-jupyter-core@4.6.0:', type=('build', 'run'), when='@6:')
     depends_on('py-pyzmq@13:', type=('build', 'run'))
-    depends_on('py-pyzmq@17:', type=('build', 'run'), when='^py-tornado@5:')
     depends_on('py-python-dateutil@2.1:', type=('build', 'run'), when='@5:')
     depends_on('py-tornado@4.1:', type=('build', 'run'), when='@5:')
-    depends_on('py-setuptools', type='build', when='@5:')
