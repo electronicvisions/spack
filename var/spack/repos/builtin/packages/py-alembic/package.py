@@ -12,10 +12,12 @@ class PyAlembic(PythonPackage):
     homepage = "https://pypi.org/project/alembic/"
     url      = "https://pypi.io/packages/source/a/alembic/alembic-1.0.7.tar.gz"
 
+    version('1.5.5', sha256='df0028c19275a2cff137e39617a39cdcdbd1173733b87b6bfa257b7c0860213b')
     version('1.0.7', sha256='16505782b229007ae905ef9e0ae6e880fddafa406f086ac7d442c1aaf712f8c2')
 
     depends_on('py-setuptools', type='build')
-    depends_on('py-sqlalchemy@1.1.0:', type=('build', 'run'))
+    depends_on('py-sqlalchemy@1.3.0:', type=('build', 'run'), when='@1.5:')
+    depends_on('py-sqlalchemy@1.1.0:', type=('build', 'run'), when='@:1.4.999')
     depends_on('py-mako', type=('build', 'run'))
     depends_on('py-python-dateutil', type=('build', 'run'))
     depends_on('py-python-editor@0.3:', type=('build', 'run'))
