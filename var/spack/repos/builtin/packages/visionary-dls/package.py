@@ -38,6 +38,8 @@ class VisionaryDls(Package):
     depends_on('py-scikit-learn')
     depends_on('py-seaborn')
     depends_on('py-soundfile')
+    depends_on('py-sphinx')
+    depends_on('py-sphinxcontrib-jupyter')
     depends_on('py-sqlalchemy')
     depends_on('py-tqdm')
     depends_on('py-torchvision')
