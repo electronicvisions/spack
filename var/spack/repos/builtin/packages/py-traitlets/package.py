@@ -12,6 +12,7 @@ class PyTraitlets(PythonPackage):
     homepage = "https://pypi.python.org/pypi/traitlets"
     url      = "https://github.com/ipython/traitlets/archive/4.3.1.tar.gz"
 
+    version('5.0.4', sha256='881b7fb2a1bad2da56298f2d00e912fa582f67201bbf94d3dc64cec6c1af5a0b')
     version('4.3.3', sha256='b686c1aadf6ee5a9ee4c22df23bc5cd5bb7b5cfa18afe092e0a139cc2f05fe2e')
     version('4.3.2', sha256='370f938ad730d52272ef74f96f831cb21138f6168e46fe582fe256c35cc656ce')
     version('4.3.1', sha256='3d50b2968f2e1477bd0de4b9656df40fd5624fc85cd1fc15f6c885cd68a4f6a1')
@@ -22,8 +23,9 @@ class PyTraitlets(PythonPackage):
     version('4.1.0', sha256='93ead8dbf7e9617c88b79620072bfc499e7f25613f3df2234e5fdf08348c0a83')
     version('4.0.0', sha256='03f380cb2e47689ae55dbe9a5dccbdde5cad8c4637312d720f4c3a991fb15cd2')
 
+    depends_on('python@3.7:', when='@5:', type=('build', 'run'))
     depends_on('python@2.7:2.8,3.3:', type=('build', 'run'))
-    depends_on('py-six', type=('build', 'run'))
-    depends_on('py-decorator', type=('build', 'run'))
     depends_on('py-ipython-genutils', type=('build', 'run'))
+    depends_on('py-six', when='@:4', type=('build', 'run'))
+    depends_on('py-decorator', when='@:4', type=('build', 'run'))
     depends_on('py-enum34', when='^python@:3.3', type=('build', 'run'))
