@@ -24,3 +24,6 @@ class PySphinxcontribJupyter(PythonPackage):
     depends_on('py-ipython', type=('build', 'run'))
     depends_on('py-nbconvert', type=('build', 'run'))
     depends_on('py-jupyter-client', type=('build', 'run'))
+
+    # patch away dependency on pip
+    patch('init_pip.patch', when='@0.4.0:')

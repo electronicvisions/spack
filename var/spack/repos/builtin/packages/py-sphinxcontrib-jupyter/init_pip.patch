@@ -1,0 +1,11 @@
+--- spack-src/sphinxcontrib/jupyter/__init__.py    2021-03-01 13:30:32.125626735 +0100
++++ spack-src/sphinxcontrib/jupyter/__init__.py    2021-03-01 13:30:24.261511832 +0100
+@@ -13,7 +13,7 @@ from .directive.jupyter import JupyterDe
+ from .transform import JupyterOnlyTransform
+ 
+ import pkg_resources
+-VERSION = pkg_resources.get_distribution('pip').version
++VERSION = pkg_resources.get_distribution('sphinxcontrib-jupyter').version
+ 
+ import sphinx
+ SPHINX_VERSION = sphinx.version_info
