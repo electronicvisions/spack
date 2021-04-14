@@ -12,6 +12,7 @@ class PyIpywidgets(PythonPackage):
     homepage = "https://github.com/ipython/ipywidgets"
     url      = "https://github.com/ipython/ipywidgets/archive/5.2.2.tar.gz"
 
+    version('7.6.3', sha256='fd4e4d880d45537ef05ad0f8b53f5ed547360a0b8c78d80c3b27c3a794c0e513')
     version('7.5.1', sha256='e4253384886aabbaf10966916a2cf9ffa72551bd045d536fa2a379f14b50cec3')
     version('7.4.2', sha256='f156165e8a855ed862fdf48e72700bdcd6956d089a2018c5b36d358255d45b2b')
     version('5.2.2', sha256='d61ab8bb12b90981a3a6010429816d70eaa041e622043207bcb74239b664d4f3')
@@ -29,4 +30,4 @@ class PyIpywidgets(PythonPackage):
     depends_on('py-widgetsnbextension@3.4.0:3.4.999', type=('build', 'run'),
                when='@7.4.2')
     depends_on('py-widgetsnbextension@3.5.0:3.5.999', type=('build', 'run'),
-               when='@7.5.1')
+               when='@7.5.1:')
