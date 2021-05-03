@@ -1,0 +1,46 @@
+From 12b9ec29c7fd1a8fdcf1d6fd08a40da20943c8ea Mon Sep 17 00:00:00 2001
+From: arneki <38592784+arneki@users.noreply.github.com>
+Date: Mon, 26 Apr 2021 15:34:29 +0200
+Subject: [PATCH 1/2] Add support for solution images
+
+Code blocks with the class "solution" can already optionally be hidden. This commit extends that functionality to images.
+---
+ sphinxcontrib/jupyter/writers/translate_all.py | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/sphinxcontrib/jupyter/writers/translate_all.py b/sphinxcontrib/jupyter/writers/translate_all.py
+index 9cdf396b..4ab24d79 100644
+--- a/sphinxcontrib/jupyter/writers/translate_all.py
++++ b/sphinxcontrib/jupyter/writers/translate_all.py
+@@ -202,6 +202,9 @@ def visit_image(self, node):
+         ### preventing image from the index file at the moment
+         if self.in_book_index:
+             return
++        ### Skip solutions if we say to 
++        if "solution" in node.attributes['classes'] and self.jupyter_drop_solutions:
++            return
+         uri = node.attributes["uri"]
+         self.images.append(uri)             #TODO: list of image files
+         if self.jupyter_download_nb_image_urlpath:
+
+From ef7a1af84de039b4394caec014caef001818cd9d Mon Sep 17 00:00:00 2001
+From: arneki <38592784+arneki@users.noreply.github.com>
+Date: Mon, 26 Apr 2021 15:49:10 +0200
+Subject: [PATCH 2/2] Add test for solution images
+
+---
+ tests/base/solutions.rst | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/tests/base/solutions.rst b/tests/base/solutions.rst
+index c9a6ed44..8afca863 100644
+--- a/tests/base/solutions.rst
++++ b/tests/base/solutions.rst
+@@ -34,3 +34,6 @@ when :math:`x \in [0,1]`
+     ax.fill(x, y, zorder=10)
+     ax.grid(True, zorder=5)
+     plt.show()
++
++.. image:: _static/hood.jpg
++    :class: solution
+

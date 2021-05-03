@@ -27,3 +27,5 @@ class PySphinxcontribJupyter(PythonPackage):
 
     # patch away dependency on pip
     patch('init_pip.patch', when='@0.4.0:')
+    # support for solution images (see: https://github.com/QuantEcon/sphinxcontrib-jupyter/pull/337)
+    patch('solution_images.patch', when='@0.5.10:')
