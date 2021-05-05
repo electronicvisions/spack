@@ -53,12 +53,15 @@ class VisionaryWafer(Package):
     depends_on('gsl')
     depends_on('intel-tbb')
     depends_on('liblockfile')
-    depends_on('npm')
+    # depends_on('npm')         FIXME: might be able to use the npm from node-js
+    depends_on('node-js')     # FIXME: see above
     depends_on('pkg-config')
     depends_on('py-lxml') # collab tests
     depends_on('xerces-c')
     depends_on('boost@1.69.0: +graph+icu+mpi+python+numpy cxxstd=17')
-    depends_on('tensorflow', when='+tensorflow')
+    # we didn't introduce cuda support at all, upstream defaults to it
+    # if we want cuda we need to decide on the cuda_arch, cf. py-torch
+    # depends_on('py-tensorflow~cuda~tensorrt~nccl', when='+tensorflow')
     depends_on('log4cxx')
     depends_on('googletest +gmock')
     depends_on('py-slurm-pipeline')
@@ -70,7 +73,7 @@ class VisionaryWafer(Package):
     depends_on('py-notebook')
     depends_on('py-numba')
     depends_on('py-pynn @0.7.5')
-    depends_on('py-matplotlib backend=qt5agg')
+    depends_on('py-matplotlib')
     depends_on('py-numpy')
     depends_on('py-pandas @0.19.0:')
     depends_on('py-tables @3.3.0:')

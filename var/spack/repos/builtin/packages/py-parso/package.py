@@ -1,39 +1,28 @@
-##############################################################################
-# Copyright (c) 2013-2017, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
+# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
+# Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
-# This file is part of Spack.
-# Created by Todd Gamblin, tgamblin@llnl.gov, All rights reserved.
-# LLNL-CODE-647188
-#
-# For details, see https://github.com/spack/spack
-# Please also see the NOTICE and LICENSE files for our notice and the LGPL.
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License (as
-# published by the Free Software Foundation) version 2.1, February 1999.
-#
-# This program is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the terms and
-# conditions of the GNU Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public
-# License along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-##############################################################################
+# SPDX-License-Identifier: (Apache-2.0 OR MIT)
+
 from spack import *
 
 
 class PyParso(PythonPackage):
-    """An autocompletion tool for Python that can be used for text editors."""
+    """Parso is a Python parser that supports error recovery and round-trip parsing
+       for different Python versions (in multiple Python versions).
+       Parso is also able to list multiple syntax errors
+       in your python file."""
 
-    homepage = "https://github.com/davidhalter/parso"
-    url      = "https://pypi.io/packages/source/p/parso/parso-0.3.2.tar.gz"
+    pypi = "parso/parso-0.6.1.tar.gz"
 
+    version('0.8.1', sha256='8519430ad07087d4c997fda3a7918f7cfa27cb58972a8c89c2a0295a1c940e9e')
+    version('0.7.1', sha256='caba44724b994a8a5e086460bb212abc5a8bc46951bf4a9a1210745953622eb9')
     version('0.7.0', sha256='908e9fae2144a076d72ae4e25539143d40b8e3eafbaeae03c1bfe226f4cdf12c')
+    version('0.6.1', sha256='56b2105a80e9c4df49de85e125feb6be69f49920e121406f15e7acde6c9dfc57')
     version('0.5.2', sha256='55cf25df1a35fd88b878715874d2c4dc1ad3f0eebd1e0266a67e1f55efccfbe1')
+    version('0.4.0', sha256='2e9574cb12e7112a87253e14e2c380ce312060269d04bd018478a3c92ea9a376')
     version('0.3.2', 'feb32694159dfba20c8ad7eab80189d5')
 
-    depends_on('py-setuptools', type='build')
-    depends_on('python@2.7:2.8,3.4:', type=('build', 'run'), when="@0.6.0:")
+    depends_on('python@3.6:', type=('build', 'run'), when='@0.8.1:')
+    depends_on('python@2.7:2.8,3.4:', type=('build', 'run'), when='@0.6.1:')
+    depends_on('python@2.6:2.8,3.3:', type=('build', 'run'), when='@0.4.0:')
+    depends_on('py-setuptools',    type='build')

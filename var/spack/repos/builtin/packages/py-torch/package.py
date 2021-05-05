@@ -1,59 +1,33 @@
-# Copyright 2013-2020 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
 from spack import *
+import os
 
 
-# TODO: try switching to CMakePackage for more control over build
 class PyTorch(PythonPackage, CudaPackage):
     """Tensors and Dynamic neural networks in Python
     with strong GPU acceleration."""
 
     homepage = "https://pytorch.org/"
     git      = "https://github.com/pytorch/pytorch.git"
-    install_time_test_callbacks = ['install_test', 'import_module_test']
 
     maintainers = ['adamjstewart']
-    import_modules = [
-        'tools', 'caffe2', 'torch', 'tools.cwrap', 'tools.autograd',
-        'tools.setup_helpers', 'tools.shared', 'tools.jit', 'tools.pyi',
-        'tools.nnwrap', 'tools.cwrap.plugins', 'caffe2.core', 'caffe2.proto',
-        'caffe2.python', 'caffe2.distributed', 'caffe2.perfkernels',
-        'caffe2.experiments', 'caffe2.contrib', 'caffe2.quantization',
-        'caffe2.core.nomnigraph', 'caffe2.python.ideep', 'caffe2.python.mint',
-        'caffe2.python.layers', 'caffe2.python.onnx', 'caffe2.python.trt',
-        'caffe2.python.models', 'caffe2.python.docs', 'caffe2.python.modeling',
-        'caffe2.python.mkl', 'caffe2.python.examples',
-        'caffe2.python.predictor', 'caffe2.python.helpers',
-        'caffe2.python.rnn', 'caffe2.python.onnx.bin',
-        'caffe2.python.models.seq2seq', 'caffe2.experiments.python',
-        'caffe2.contrib.nnpack', 'caffe2.contrib.warpctc',
-        'caffe2.contrib.nccl', 'caffe2.contrib.playground',
-        'caffe2.contrib.gloo', 'caffe2.contrib.script', 'caffe2.contrib.prof',
-        'caffe2.contrib.tensorboard', 'caffe2.contrib.aten',
-        'caffe2.contrib.playground.resnetdemo',
-        'caffe2.contrib.script.examples', 'caffe2.contrib.aten.docs',
-        'caffe2.quantization.server', 'torch.nn', 'torch.onnx',
-        'torch.distributed', 'torch.autograd', 'torch.multiprocessing',
-        'torch.cuda', 'torch.backends', 'torch.optim', 'torch.utils',
-        'torch.contrib', 'torch.jit', 'torch.sparse',
-        'torch.for_onnx', 'torch._thnn', 'torch.distributions',
-        'torch.nn.parallel', 'torch.nn._functions', 'torch.nn.backends',
-        'torch.nn.utils', 'torch.nn.modules', 'torch.nn.parallel.deprecated',
-        'torch.nn._functions.thnn', 'torch.distributed.deprecated',
-        'torch.autograd._functions', 'torch.backends.cuda',
-        'torch.backends.mkl', 'torch.backends.mkldnn', 'torch.backends.openmp',
-        'torch.backends.cudnn', 'torch.utils.backcompat',
-        'torch.utils.bottleneck', 'torch.utils.ffi', 'torch.utils.tensorboard',
-        'torch.utils.data', 'torch.utils.data._utils'
-    ]
+
+    # Exact set of modules is version- and variant-specific
+    import_modules = ['torch', 'torch.autograd', 'torch.nn', 'torch.utils']
 
     version('master', branch='master', submodules=True)
+    version('1.8.1', tag='v1.8.1', submodules=True)
+    version('1.8.0', tag='v1.8.0', submodules=True)
+    version('1.7.1', tag='v1.7.1', submodules=True)
+    version('1.7.0', tag='v1.7.0', submodules=True)
+    version('1.6.0', tag='v1.6.0', submodules=True)
+    version('1.5.1', tag='v1.5.1', submodules=True)
     version('1.5.0', tag='v1.5.0', submodules=True)
     version('1.4.1', tag='v1.4.1', submodules=True)
-    # see https://github.com/pytorch/pytorch/issues/35149
     version('1.4.0', tag='v1.4.0', submodules=True,
             submodules_delete=['third_party/fbgemm'])
     version('1.3.1', tag='v1.3.1', submodules=True)
@@ -67,8 +41,9 @@ class PyTorch(PythonPackage, CudaPackage):
     version('0.4.0', tag='v0.4.0', submodules=True)
     version('0.3.1', tag='v0.3.1', submodules=True)
 
-    variant('cuda', default=False, description='Enables CUDA build')
-    variant('cudnn', default=False, description='Enables the cuDNN build')
+    variant('cuda', default=True, description='Build with CUDA')
+    variant('cudnn', default=True, description='Enables the cuDNN build')
+    variant('rocm', default=False, description='Build with ROCm build')
     variant('magma', default=False, description='Enables the MAGMA build')
     variant('fbgemm', default=False, description='Enables the FBGEMM build')
     variant('test', default=False, description='Enables the test build')
@@ -76,6 +51,7 @@ class PyTorch(PythonPackage, CudaPackage):
     variant('mkldnn', default=True, description='Enables use of MKLDNN')
     variant('nnpack', default=False, description='Enables NNPACK build')
     variant('qnnpack', default=False, description='Enables QNNPACK build (quantized 8-bit operators)')
+    variant('xnnpack', default=False, description='Enables XNNPACK build')
     variant('distributed', default=False, description='Enables distributed (c10d, gloo, mpi, etc.) build')
     variant('nccl', default=False, description='Use Spack-installed NCCL')
     variant('caffe2', default=False, description='Enables Caffe2 operators build')
@@ -96,6 +72,7 @@ class PyTorch(PythonPackage, CudaPackage):
     conflicts('+miopen', when='@:0.4')
     conflicts('+mkldnn', when='@:0.3')
     conflicts('+qnnpack', when='@:0.4')
+    conflicts('+xnnpack', when='@:1.4')
     conflicts('+nccl', when='~cuda')
     conflicts('+opencv', when='@:0.4')
     conflicts('+ffmpeg', when='@:0.4')
@@ -105,47 +82,53 @@ class PyTorch(PythonPackage, CudaPackage):
     conflicts('+redis', when='@:1.0')
     conflicts('+zstd', when='@:1.0')
     conflicts('+tbb', when='@:1.1')
-    # see https://github.com/pytorch/pytorch/issues/35149
+    # https://github.com/pytorch/pytorch/issues/35149
     conflicts('+fbgemm', when='@1.4.0')
-
-    cuda_arch_conflict = ('This version of Torch/Caffe2 only supports compute '
-                          'capabilities ')
 
     conflicts('cuda_arch=none', when='+cuda',
               msg='Must specify CUDA compute capabilities of your GPU, see '
               'https://developer.nvidia.com/cuda-gpus')
-    conflicts('cuda_arch=52', when='@1.3.0:+cuda',
-              msg=cuda_arch_conflict + '>=5.3')
-    conflicts('cuda_arch=50', when='@1.3.0:+cuda',
-              msg=cuda_arch_conflict + '>=5.3')
-    conflicts('cuda_arch=35', when='@1.3.0:+cuda',
-              msg=cuda_arch_conflict + '>=5.3')
-    conflicts('cuda_arch=32', when='@1.3.0:+cuda',
-              msg=cuda_arch_conflict + '>=5.3')
-    conflicts('cuda_arch=30', when='@1.3.0:+cuda',
-              msg=cuda_arch_conflict + '>=5.3')
-    conflicts('cuda_arch=30', when='@1.2.0:+cuda',
-              msg=cuda_arch_conflict + '>=3.2')
-    conflicts('cuda_arch=20', when='@1.0.0:+cuda',
-              msg=cuda_arch_conflict + '>=3.0')
+    # conflicts('cuda_arch=52', when='@1.3.0:+cuda',
+    #           msg=cuda_arch_conflict + '>=5.3')
+    # conflicts('cuda_arch=50', when='@1.3.0:+cuda',
+    #           msg=cuda_arch_conflict + '>=5.3')
+    # conflicts('cuda_arch=35', when='@1.3.0:+cuda',
+    #           msg=cuda_arch_conflict + '>=5.3')
+    # conflicts('cuda_arch=32', when='@1.3.0:+cuda',
+    #           msg=cuda_arch_conflict + '>=5.3')
+    # conflicts('cuda_arch=30', when='@1.3.0:+cuda',
+    #           msg=cuda_arch_conflict + '>=5.3')
+    # conflicts('cuda_arch=30', when='@1.2.0:+cuda',
+    #           msg=cuda_arch_conflict + '>=3.2')
+    # conflicts('cuda_arch=20', when='@1.0.0:+cuda',
+    #           msg=cuda_arch_conflict + '>=3.0')
+    conflicts('+rocm', when='+cuda')
 
     # Required dependencies
     depends_on('cmake@3.5:', type='build')
     # Use Ninja generator to speed up build times
     # Automatically used if found
     depends_on('ninja@1.5:', type='build')
+    depends_on('python@3.6.2:', when='@1.7.1:', type=('build', 'link', 'run'))
+    depends_on('python@3.6.1:', when='@1.6:', type=('build', 'link', 'run'))
+    depends_on('python@3.5:', when='@1.5:', type=('build', 'link', 'run'))
+    depends_on('python@2.7:2.8,3.5:', type=('build', 'link', 'run'))
     depends_on('python@2.7:2.8,3.5:3.7.999', when='@0.3.1:1.3.999', type=('build', 'run'))
     depends_on('python@2.7:2.8,3.5:', when='@1.4.0:1.4.999', type=('build', 'run'))
-    depends_on('python@3.6.1:', when='@1.5.0:', type=('build', 'run'))
-    depends_on('py-setuptools', type='build')
+    depends_on('py-setuptools', type=('build', 'run'))
     depends_on('py-numpy', type=('build', 'run'))
-    depends_on('py-future', when='@1.1: ^python@:2', type='build')
+    depends_on('py-future', when='@1.5:', type=('build', 'run'))
+    depends_on('py-future', when='@1.1: ^python@:2', type=('build', 'run'))
     depends_on('py-pyyaml', type=('build', 'run'))
     depends_on('py-typing', when='@0.4: ^python@:3.4', type=('build', 'run'))
+    depends_on('py-typing-extensions', when='@1.7:', type=('build', 'run'))
     depends_on('py-pybind11', when='@0.4:', type=('build', 'link', 'run'))
+    depends_on('py-dataclasses', when='@1.7: ^python@3.6.0:3.6.999', type=('build', 'run'))
+    depends_on('py-tqdm', type='run')
     depends_on('blas')
     depends_on('lapack')
     depends_on('protobuf', when='@0.4:')
+    depends_on('py-protobuf', when='@0.4:', type=('build', 'run'))
     depends_on('eigen', when='@0.4:')
     # TODO: replace all third_party packages with Spack packages
 
@@ -166,11 +149,13 @@ class PyTorch(PythonPackage, CudaPackage):
     # TODO: add dependency: https://github.com/Maratyszcza/NNPACK
     # depends_on('nnpack', when='+nnpack')
     depends_on('qnnpack', when='+qnnpack')
+    # TODO: add dependency: https://github.com/google/XNNPACK
+    # depends_on('xnnpack', when='+xnnpack')
     depends_on('mpi', when='+distributed')
     depends_on('nccl', when='+nccl')
     depends_on('gloo', when='+gloo')
     depends_on('opencv', when='+opencv')
-    depends_on('llvm-openmp', when='%clang platform=darwin +openmp')
+    depends_on('llvm-openmp', when='%apple-clang +openmp')
     depends_on('ffmpeg', when='+ffmpeg')
     depends_on('leveldb', when='+leveldb')
     depends_on('lmdb', when='+lmdb')
@@ -183,13 +168,46 @@ class PyTorch(PythonPackage, CudaPackage):
     depends_on('py-six', type='test')
     depends_on('py-psutil', type='test')
 
+    # https://github.com/pytorch/pytorch/pull/35607
+    # https://github.com/pytorch/pytorch/pull/37865
+    # Fixes CMake configuration error when XNNPACK is disabled
+    patch('xnnpack.patch', when='@1.5.0:1.5.999')
+
+    # Fixes Build error for when ROCm is enable for pytorch-1.5 release
+    patch('rocm.patch', when='@1.5.0:1.5.999+rocm')
+
+    # https://github.com/pytorch/pytorch/pull/37086
+    # Fixes compilation with Clang 9.0.0 and Apple Clang 11.0.3
+    patch('https://github.com/pytorch/pytorch/commit/e921cd222a8fbeabf5a3e74e83e0d8dfb01aa8b5.patch',
+          sha256='17561b16cd2db22f10c0fe1fdcb428aecb0ac3964ba022a41343a6bb8cba7049',
+          when='@1.1:1.5')
+
+    # Fix for 'FindOpenMP.cmake'
+    # to detect openmp settings used by Fujitsu compiler.
+    patch('detect_omp_of_fujitsu_compiler.patch', when='%fj')
+
     # Both build and install run cmake/make/make install
     # Only run once to speed up build times
     phases = ['install']
 
+    @property
+    def libs(self):
+        root = join_path(
+            self.prefix, self.spec['python'].package.site_packages_dir,
+            'torch', 'lib')
+        return find_libraries('libtorch', root)
+
+    @property
+    def headers(self):
+        root = join_path(
+            self.prefix, self.spec['python'].package.site_packages_dir,
+            'torch', 'include')
+        headers = find_all_headers(root)
+        headers.directories = [root]
+        return headers
     # This package depends on pybind11 -> do not install
     # third_party version of pybind11.
-    patch('no-install-pybind11-1.3.1.patch', level=2, when='@1.3.1:')
+    patch('no-install-pybind11-1.3.1.patch', level=2, when='@1.3.1:1.6.99')
 
     # In 1.3.x torch.save is not saving source files, this is fixed in 1.4.0
     patch('fix-serialization.patch', when='@1.3.1')
@@ -198,6 +216,13 @@ class PyTorch(PythonPackage, CudaPackage):
     # https://github.com/pytorch/pytorch/issues/32277
     patch('gcc9_PR30332.patch', when='@1.4.0:1.4.1')
     patch('gcc9_PR30333.patch', when='@1.4.0:1.4.1')
+
+    @when('@1.5.0:')
+    def patch(self):
+        # https://github.com/pytorch/pytorch/issues/52208
+        filter_file('torch_global_deps PROPERTIES LINKER_LANGUAGE C',
+                    'torch_global_deps PROPERTIES LINKER_LANGUAGE CXX',
+                    'caffe2/CMakeLists.txt')
 
     def setup_build_environment(self, env):
         def enable_or_disable(variant, keyword='USE', var=None, newer=False):
@@ -255,7 +280,9 @@ class PyTorch(PythonPackage, CudaPackage):
 
         enable_or_disable('fbgemm')
         enable_or_disable('test', keyword='BUILD')
-
+        enable_or_disable('rocm')
+        if '+rocm' in self.spec:
+            env.set('USE_MKLDNN', 0)
         if '+miopen' in self.spec:
             env.set('MIOPEN_LIB_DIR', self.spec['miopen'].libs.directories[0])
             env.set('MIOPEN_INCLUDE_DIR', self.spec['miopen'].prefix.include)
@@ -263,10 +290,12 @@ class PyTorch(PythonPackage, CudaPackage):
 
         enable_or_disable('mkldnn')
         if '@0.4:0.4.1+mkldnn' in self.spec:
+            # env.set('MKLDNN_HOME', self.spec['onednn'].prefix)
             env.set('MKLDNN_HOME', self.spec['intel-mkl-dnn'].prefix)
 
         enable_or_disable('nnpack')
         enable_or_disable('qnnpack')
+        enable_or_disable('xnnpack')
         enable_or_disable('distributed')
 
         enable_or_disable('nccl')
@@ -285,8 +314,9 @@ class PyTorch(PythonPackage, CudaPackage):
         enable_or_disable('lmdb', newer=True)
         enable_or_disable('binary', keyword='BUILD', newer=True)
 
-        env.set('PYTORCH_BUILD_VERSION', self.version)
-        env.set('PYTORCH_BUILD_NUMBER', 0)
+        if not self.spec.satisfies('@master'):
+            env.set('PYTORCH_BUILD_VERSION', self.version)
+            env.set('PYTORCH_BUILD_NUMBER', 0)
 
         # BLAS to be used by Caffe2
         if '^mkl' in self.spec:
@@ -306,6 +336,13 @@ class PyTorch(PythonPackage, CudaPackage):
         enable_or_disable('zstd', newer=True)
         enable_or_disable('tbb', newer=True)
 
+    @run_before('install')
+    def build_amd(self):
+        if '+rocm' in self.spec:
+            python(os.path.join('tools', 'amd_build', 'build_amd.py'))
+
+    @run_after('install')
+    @on_package_attributes(run_tests=True)
     def install_test(self):
         with working_dir('test'):
             python('run_test.py')

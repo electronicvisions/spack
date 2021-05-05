@@ -30,6 +30,7 @@ class Genpybind(WafPackage):
 
     homepage = "https://github.com/kljohann/genpybind"
     url      = "https://github.com/kljohann/genpybind/archive/v0.1.0.tar.gz"
+    git      = "https://github.com/kljohann/genpybind.git"
 
     version('0.2.1', sha256='e4d993f0c65cb5cf635cec7df899cbd91af1f0bd8a3626f33e9e0925f5383384')
     version('0.2.0', sha256='9d1e9d026a9e355e282aca549a2af108bedcc5bc59ba0b76a6072f88e4c0be4c')

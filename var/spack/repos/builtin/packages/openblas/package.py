@@ -1,13 +1,13 @@
-# Copyright 2013-2019 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
 import os
+import re
 
 from spack import *
 from spack.package_test import compare_output_file, compile_c_and_execute
-import spack.architecture
 
 
 class Openblas(MakefilePackage):
@@ -18,6 +18,11 @@ class Openblas(MakefilePackage):
     git      = 'https://github.com/xianyi/OpenBLAS.git'
 
     version('develop', branch='develop')
+    version('0.3.14', sha256='d381935d26f9cae8e4bbd7d7f278435adf8e3a90920edf284bb9ad789ee9ad60')
+    version('0.3.13', sha256='79197543b17cc314b7e43f7a33148c308b0807cd6381ee77f77e15acf3e6459e')
+    version('0.3.12', sha256='65a7d3a4010a4e3bd5c0baa41a234797cd3a1735449a4a5902129152601dc57b')
+    version('0.3.11', sha256='bc4617971179e037ae4e8ebcd837e46db88422f7b365325bd7aba31d1921a673')
+    version('0.3.10', sha256='0484d275f87e9b8641ff2eecaa9df2830cbe276ac79ad80494822721de6e1693')
     version('0.3.9', sha256='17d4677264dfbc4433e97076220adc79b050e4f8a083ea3f853a53af253bc380')
     version('0.3.8', sha256='8f86ade36f0dbed9ac90eb62575137388359d97d8f93093b38abe166ad7ef3a8')
     version('0.3.7', sha256='bde136122cef3dd6efe2de1c6f65c10955bbb0cc01a520c2342f5287c28f9379')
@@ -39,34 +44,17 @@ class Openblas(MakefilePackage):
     variant('pic', default=True, description='Build position independent code')
     variant('shared', default=True, description='Build shared libraries')
     variant('consistent_fpcsr', default=False, description='Synchronize FP CSR between threads (x86/x86_64 only)')
+    variant('bignuma', default=False, description='Enable experimental support for up to 1024 CPUs/Cores and 128 numa nodes')
 
     variant('cpu_target', default='auto',
             description='Set CPU target architecture (leave empty for '
                         'autodetection; GENERIC, SSE_GENERIC, NEHALEM, ...)')
-
+    variant('locking', default=True, description='Build with thread safety')
     variant(
         'threads', default='none',
         description='Multithreading support',
         values=('pthreads', 'openmp', 'none'),
         multi=False
-    )
-
-    variant(
-        'virtual_machine',
-        default=False,
-        description="Adding options to build openblas on Linux virtual machine"
-    )
-
-    variant(
-        'avx2',
-        default=True,
-        description='Enable use of AVX2 instructions'
-    )
-
-    variant(
-        'avx512',
-        default=False,
-        description='Enable use of AVX512 instructions'
     )
 
     # virtual dependency
@@ -83,7 +71,7 @@ class Openblas(MakefilePackage):
     patch('openblas_icc_fortran.patch', when='%intel@16.0:')
     patch('openblas_icc_fortran2.patch', when='%intel@18.0:')
     # See https://github.com/spack/spack/issues/15385
-    patch('lapack-0.3.9-xerbl.patch', when='@0.3.8: %intel')
+    patch('lapack-0.3.9-xerbl.patch', when='@0.3.8:0.3.9 %intel')
 
     # Fixes compilation error on POWER8 with GCC 7
     # https://github.com/xianyi/OpenBLAS/pull/1098
@@ -116,15 +104,42 @@ class Openblas(MakefilePackage):
     patch('openblas-0.3.8-darwin.patch', when='@0.3.8 platform=darwin')
     # Fix ICE in LLVM 9.0.0 https://github.com/xianyi/OpenBLAS/pull/2329
     # Patch as in https://github.com/xianyi/OpenBLAS/pull/2597
-    patch('openblas_appleclang11.patch', when='@0.3.8:0.3.9 %clang@11.0.3-apple')
+    patch('openblas_appleclang11.patch', when='@0.3.8:0.3.9 %apple-clang@11.0.3')
+    # There was an error in Reference-LAPACK that is triggeret by Xcode12
+    # fixed upstream by https://github.com/xianyi/OpenBLAS/pull/2808 and
+    # should be included in post 0.3.10 versions. Application to earlier
+    # versions was not tested.
+    # See also https://github.com/xianyi/OpenBLAS/issues/2870
+    patch('https://github.com/xianyi/OpenBLAS/commit/f42e84d46c52f4ee1e05af8f365cd85de8a77b95.patch',
+          sha256='7b1eec78d1b1f55d3a3f1249696be7da0e2e1cd3b7fadae852e97dc860f8a7fd',
+          when='@0.3.8:0.3.10 %apple-clang@12.0.0:')
 
     # Add conditions to f_check to determine the Fujitsu compiler
-    patch('openblas_fujitsu.patch', when='%fj')
+    # See https://github.com/xianyi/OpenBLAS/pull/3010
+    # UPD: the patch has been merged starting version 0.3.13
+    patch('openblas_fujitsu.patch', when='@:0.3.10 %fj')
+    patch('openblas_fujitsu_v0.3.11.patch', when='@0.3.11:0.3.12 %fj')
+    patch('openblas_fujitsu2.patch', when='@0.3.10:0.3.12 %fj')
+
+    # Use /usr/bin/env perl in build scripts
+    patch('0001-use-usr-bin-env-perl.patch', when='@:0.3.13')
+
+    # See https://github.com/spack/spack/issues/19932#issuecomment-733452619
+    conflicts('%gcc@7.0.0:7.3.99,8.0.0:8.2.99', when='@0.3.11:')
+
+    # See https://github.com/xianyi/OpenBLAS/issues/3074
+    conflicts('%gcc@:10.1.99', when='@0.3.13 target=ppc64le:')
 
     # See https://github.com/spack/spack/issues/3036
     conflicts('%intel@16', when='@0.2.15:0.2.19')
     conflicts('+consistent_fpcsr', when='threads=none',
               msg='FPCSR consistency only applies to multithreading')
+
+    conflicts('threads=pthreads', when='~locking', msg='Pthread support requires +locking')
+    conflicts('threads=openmp', when='%apple-clang', msg="Apple's clang does not support OpenMP")
+    conflicts('threads=openmp @:0.2.19', when='%clang', msg='OpenBLAS @:0.2.19 does not support OpenMP with clang!')
+
+    depends_on('perl', type='build')
 
     @property
     def parallel(self):
@@ -141,17 +156,91 @@ class Openblas(MakefilePackage):
                 'OpenBLAS requires both C and Fortran compilers!'
             )
 
-        # Add support for OpenMP
-        if (self.spec.satisfies('threads=openmp') and
-            self.spec.satisfies('%clang')):
-            if str(self.spec.compiler.version).endswith('-apple'):
-                raise InstallError("Apple's clang does not support OpenMP")
-            if '@:0.2.19' in self.spec:
-                # Openblas (as of 0.2.19) hardcoded that OpenMP cannot
-                # be used with any (!) compiler named clang, bummer.
-                raise InstallError(
-                    'OpenBLAS @:0.2.19 does not support OpenMP with clang!'
-                )
+    @staticmethod
+    def _read_targets(target_file):
+        """Parse a list of available targets from the OpenBLAS/TargetList.txt
+        file.
+        """
+        micros = []
+        re_target = re.compile(r'^[A-Z0-9_]+$')
+        for line in target_file:
+            match = re_target.match(line)
+            if match is not None:
+                micros.append(line.strip().lower())
+
+        return micros
+
+    def _microarch_target_args(self):
+        """Given a spack microarchitecture and a list of targets found in
+        OpenBLAS' TargetList.txt, determine the best command-line arguments.
+        """
+        # Read available openblas targets
+        targetlist_name = join_path(self.stage.source_path, "TargetList.txt")
+        if os.path.exists(targetlist_name):
+            with open(targetlist_name) as f:
+                available_targets = self._read_targets(f)
+        else:
+            available_targets = []
+
+        # Get our build microarchitecture
+        microarch = self.spec.target
+
+        # List of arguments returned by this function
+        args = []
+
+        # List of available architectures, and possible aliases
+        openblas_arch = set(['alpha', 'arm', 'ia64', 'mips', 'mips64',
+                             'power', 'sparc', 'zarch'])
+        openblas_arch_map = {
+            'amd64': 'x86_64',
+            'powerpc64': 'power',
+            'i386': 'x86',
+            'aarch64': 'arm64',
+        }
+        openblas_arch.update(openblas_arch_map.keys())
+        openblas_arch.update(openblas_arch_map.values())
+
+        # Add spack-only microarchitectures to list
+        skylake = set(["skylake", "skylake_avx512"])
+        available_targets = set(available_targets) | skylake | openblas_arch
+
+        # Find closest ancestor that is known to build in blas
+        if microarch.name not in available_targets:
+            for microarch in microarch.ancestors:
+                if microarch.name in available_targets:
+                    break
+
+        if self.version >= Version("0.3"):
+            # 'ARCH' argument causes build errors in older OpenBLAS
+            # see https://github.com/spack/spack/issues/15385
+            arch_name = microarch.family.name
+            if arch_name in openblas_arch:
+                # Apply possible spack->openblas arch name mapping
+                arch_name = openblas_arch_map.get(arch_name, arch_name)
+                args.append('ARCH=' + arch_name)
+
+        if microarch.vendor == 'generic':
+            # User requested a generic platform, or we couldn't find a good
+            # match for the requested one. Allow OpenBLAS to determine
+            # an optimized kernel at run time, including older CPUs, while
+            # forcing it not to add flags for the current host compiler.
+            args.append('DYNAMIC_ARCH=1')
+            if self.spec.version >= Version('0.3.12'):
+                # These are necessary to prevent OpenBLAS from targeting the
+                # host architecture on newer version of OpenBLAS, but they
+                # cause build errors on 0.3.5 .
+                args.extend(['DYNAMIC_OLDER=1', 'TARGET=GENERIC'])
+
+        elif microarch.name in skylake:
+            # Special case for renaming skylake family
+            args.append('TARGET=SKYLAKEX')
+            if microarch.name == "skylake":
+                # Special case for disabling avx512 instructions
+                args.append('NO_AVX512=1')
+        else:
+            args.append('TARGET=' + microarch.name.upper())
+
+        return args
 
     @property
     def make_defs(self):
@@ -171,33 +260,26 @@ class Openblas(MakefilePackage):
         else:
             make_defs.append('MAKE_NB_JOBS=0')  # flag provided by OpenBLAS
 
-        if self.spec.variants['virtual_machine'].value:
-            make_defs += [
-                'DYNAMIC_ARCH=1',
-                'NUM_THREADS=64',  # OpenBLAS stores present no of CPUs as max
-            ]
+        # Add target and architecture flags
+        make_defs += self._microarch_target_args()
 
-        if self.spec.variants['cpu_target'].value != 'auto':
-            make_defs += [
-                'TARGET={0}'.format(self.spec.variants['cpu_target'].value)
-            ]
-        # invoke make with the correct TARGET for aarch64
-        elif 'aarch64' in spack.architecture.sys_type():
-            make_defs += [
-                'TARGET=ARMV8'
-            ]
-        if self.spec.satisfies('%gcc@:4.8.4'):
-            make_defs += ['NO_AVX2=1']
         if '~shared' in self.spec:
             if '+pic' in self.spec:
                 make_defs.extend([
-                    'CFLAGS={0}'.format(self.compiler.pic_flag),
-                    'FFLAGS={0}'.format(self.compiler.pic_flag)
+                    'CFLAGS={0}'.format(self.compiler.cc_pic_flag),
+                    'FFLAGS={0}'.format(self.compiler.f77_pic_flag)
                 ])
             make_defs += ['NO_SHARED=1']
         # fix missing _dggsvd_ and _sggsvd_
         if self.spec.satisfies('@0.2.16'):
             make_defs += ['BUILD_LAPACK_DEPRECATED=1']
+
+        # serial, but still thread-safe version
+        if self.spec.satisfies('@0.3.7:'):
+            if '+locking' in self.spec:
+                make_defs += ['USE_LOCKING=1']
+            else:
+                make_defs += ['USE_LOCKING=0']
 
         # Add support for multithreading
         if self.spec.satisfies('threads=openmp'):
@@ -211,11 +293,18 @@ class Openblas(MakefilePackage):
         if '+ilp64' in self.spec:
             make_defs += ['INTERFACE64=1']
 
-        if self.spec.target.family == 'x86_64':
-            if '~avx2' in self.spec:
-                make_defs += ['NO_AVX2=1']
-            if '~avx512' in self.spec:
-                make_defs += ['NO_AVX512=1']
+        # Synchronize floating-point control and status register (FPCSR)
+        # between threads (x86/x86_64 only).
+        if '+consistent_fpcsr' in self.spec:
+            make_defs += ['CONSISTENT_FPCSR=1']
+
+        # Flang/f18 does not provide ETIME as an intrinsic
+        if self.spec.satisfies('%clang'):
+            make_defs.append('TIMER=INT_CPU_TIME')
+
+        # Prevent errors in `as` assembler from newer instructions
+        if self.spec.satisfies('%gcc@:4.8.4'):
+            make_defs.append('NO_AVX2=1')
 
         # Synchronize floating-point control and status register (FPCSR)
         # between threads (x86/x86_64 only).
@@ -225,6 +314,18 @@ class Openblas(MakefilePackage):
         # Prevent errors in `as` assembler from newer instructions
         if self.spec.satisfies('%gcc@:4.8.4'):
             make_defs.append('NO_AVX2=1')
+
+        # Fujitsu Compiler dose not add  Fortran runtime in rpath.
+        if self.spec.satisfies('%fj'):
+            make_defs.append('LDFLAGS=-lfj90i -lfj90f -lfjsrcinfo -lelf')
+
+        # Newer versions of openblas will try to find ranlib in the compiler's
+        # prefix, for instance, .../lib/spack/env/gcc/ranlib, which will fail.
+        if self.spec.satisfies('@0.3.13:'):
+            make_defs.append('RANLIB=ranlib')
+
+        if self.spec.satisfies('+bignuma'):
+            make_defs.append('BIGNUMA=1')
 
         return make_defs
 

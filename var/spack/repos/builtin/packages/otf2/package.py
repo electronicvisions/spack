@@ -1,4 +1,4 @@
-# Copyright 2013-2019 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -24,6 +24,10 @@ class Otf2(AutotoolsPackage):
     version('1.3.1', sha256='c4605ace845d89fb1a19223137b92cc503b01e3db5eda8c9e0715d0cfcf2e4b9')
     version('1.2.1', sha256='1db9fb0789de4a9c3c96042495e4212a22cb581f734a1593813adaf84f2288e4')
 
+    # Fix missing initialization of variable resulting in issues when used by
+    # APEX/HPX: https://github.com/STEllAR-GROUP/hpx/issues/5239
+    patch('collective_callbacks.patch', when='@2.1:2.2')
+
     def configure_args(self):
         return [
             '--enable-shared',
@@ -31,6 +35,7 @@ class Otf2(AutotoolsPackage):
             'CXX={0}'.format(spack_cxx),
             'F77={0}'.format(spack_f77),
             'FC={0}'.format(spack_fc),
-            'CFLAGS={0}'.format(self.compiler.pic_flag),
-            'CXXFLAGS={0}'.format(self.compiler.pic_flag)
+            'CFLAGS={0}'.format(self.compiler.cc_pic_flag),
+            'CXXFLAGS={0}'.format(self.compiler.cxx_pic_flag),
+            'PYTHON_FOR_GENERATOR=:',
         ]

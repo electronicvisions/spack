@@ -112,7 +112,7 @@ class Emscripten(Package):
         with open(self.path_em_config(), "w") as f:
             f.writelines(map(lambda l: "{0}\n".format(l), em_config_lines))
 
-    def setup_environment(self, spack_env, run_env):
+    def setup_run_environment(self, run_env):
         run_env.set("EM_CONFIG", self.path_em_config())
 
     def path_em_config(self):

@@ -1,40 +1,35 @@
-# -------------------------------------------------------------------------
-# This file controls default concretization preferences for Spack.
-#
-# Settings here are versioned with Spack and are intended to provide
-# sensible defaults out of the box. Spack maintainers should edit this
-# file to keep it current.
-#
-# Users can override these settings by editing the following files.
-#
-# Per-spack-instance settings (overrides defaults):
-#   $SPACK_ROOT/etc/spack/packages.yaml
-#
-# Per-user settings (overrides default and site settings):
-#   ~/.spack/packages.yaml
-# -------------------------------------------------------------------------
 packages:
   all:
-    compiler: [gcc@8.3.0]
+    # AMTHosts
+    target: [sandybridge]
     providers:
       mpi: [openmpi, mpich]
       blas: [openblas]
       lapack: [openblas]
       pil: [py-pillow]
-      java: [jdk]
+      java: [openjdk]
       pkgconfig: [pkg-config]
+  dask:
+    variants: [~distributed]
+  ncurses:
+    version: [6.1]
+    variants: [+termlib]
+  py-torch:
+    variants: [~binary~caffe2~cuda~cudnn~distributed~fbgemm~ffmpeg~gloo~leveldb~lmdb~magma~miopen~mkldnn~nccl~nnpack~opencv+openmp~qnnpack~redis~tbb~test~zstd]
   bazel:
-    version: [0.19.0]
+    version: [0.25.2]
   binutils:
-    variants: ['+gold+plugins']
+    variants: [+gold+plugins]
   cairo:
-    variants: ['+X']
+    variants: [+X]
   cppcheck:
-    variants: ['+htmlreport']
+    variants: [+htmlreport]
   doxygen:
     # always build with graphviz to help concretizer
     variants: +graphviz
     # newer version requires meson, requires python3, requires pain
+  gdb:
+    version: [8.3]
   gdk-pixbuf:
     version: [2.31.2]
   gtkplus:
@@ -44,33 +39,34 @@ packages:
   gcc:
     compiler: [gcc@4.9.2]
   hdf5:
-    variants: ['~mpi+hl']
+    variants: [~mpi+hl]
   libusb:
-    paths:
-      libusb@1.0.22: /usr
-    buildable: False
+    buildable: false
+    externals:
+    - spec: libusb@1.0.22
+      prefix: /usr
   llvm:
-    variants: ['~shared_libs+visionary+python~libcxx build_type=Release']
+    variants: [~shared_libs+visionary+python~libcxx build_type=Release]
   openblas:
-    variants: ['cpu_target=NEHALEM']
+    variants: [cpu_target=NEHALEM]
   nest:
-    variants: ['~mpi']
+    variants: [~mpi+python]
   node-js:
     version: [8.15.0]
   pango:
-    variants: ['+X']
+    variants: [+X]
   pcre:
-    variants: ['+jit']
+    variants: [+jit]
   py-astroid:
     # newer version require py3
     version: [1.6.6]
   py-h5py:
-    variants: ['~mpi']
+    variants: [~mpi]
   py-tables:
-    variants: ['~auto~avx2+sse2']
+    variants: [~auto~avx2+sse2]
   ruby:
-    variants: ['~openssl']
+    variants: [~openssl]
   tk:
-    variants: ['+X']
+    variants: [+X]
   vim:
-    variants: ['+x']
+    variants: [+x]

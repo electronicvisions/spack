@@ -1,2 +1,1 @@
-mirrors:
-  global: file:///wang/environment/software/jessie/spack/mirror
+mirrors: {}

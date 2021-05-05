@@ -1,4 +1,4 @@
-# Copyright 2013-2019 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -9,7 +9,7 @@ import pytest
 import spack.spec
 from spack.main import SpackCommand
 
-pytestmark = pytest.mark.usefixtures('config', 'mutable_mock_packages')
+pytestmark = pytest.mark.usefixtures('config', 'mutable_mock_repo')
 
 spec = SpackCommand('spec')
 
@@ -87,9 +87,3 @@ def test_spec_returncode():
     with pytest.raises(spack.main.SpackCommandError):
         spec()
     assert spec.returncode == 1
-
-
-def test_spec_singlestring():
-    spec('multivalue_variant foo=baz target=x86_64 ^a@1.0')
-
-    assert spec.returncode == 0

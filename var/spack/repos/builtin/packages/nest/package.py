@@ -1,4 +1,4 @@
-# Copyright 2013-2019 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -15,9 +15,10 @@ class Nest(CMakePackage):
 
     homepage = "http://www.nest-simulator.org"
     url      = "https://github.com/nest/nest-simulator/releases/download/v2.12.0/nest-2.12.0.tar.gz"
-    list_url = "http://www.nest-simulator.org/download"
-    list_depth = 2
+    git      = "https://github.com/nest/nest-simulator.git"
 
+    version('master', branch='master')
+    version('2.20.0', sha256='40e33187c22d6e843d80095b221fa7fd5ebe4dbc0116765a91fc5c425dd0eca4')
     version('2.14.0', sha256='d6316d6c9153100a3220488abfa738958c4b65bf2622bd15540e4aa81e79f17f')
     version('2.12.0', sha256='bac578f38bb0621618ee9d5f2f1febfee60cddc000ff32e51a5f5470bb3df40d')
     version('2.10.0', sha256='2b6fc562cd6362e812d94bb742562a5a685fb1c7e08403765dbe123d59b0996c')
@@ -39,9 +40,11 @@ class Nest(CMakePackage):
                         " deactivated by default to get reproducible but"
                         " wrong behavior")
 
-    variant('python', default=True,
+    maintainers = ['ikitayama']
+
+    variant('python', default=False,
             description='Build the PyNest interface')
-    variant('mpi', default=True,
+    variant('mpi', default=False,
             description='Build with MPI bindings')
     variant('openmp', default=True,
             description='"Enable OpenMP support"')
@@ -68,6 +71,7 @@ class Nest(CMakePackage):
 
     depends_on('python@2.6:',       when='+python', type=('build', 'run'))
     depends_on('py-numpy',          when='+python', type=('build', 'run'))
+    depends_on('py-scipy',          when='+python', type=('run'))
     depends_on('py-cython@0.19.2:', when='+python', type='build')
     depends_on('py-nose',           when='+python', type='test')
     depends_on('py-setuptools',     when='+python', type='build')
@@ -80,8 +84,17 @@ class Nest(CMakePackage):
     depends_on('readline')
     depends_on('libtool')
     depends_on('pkgconfig', type='build')
+    depends_on('ncurses', when='@2.2.2')
 
     extends('python', when='+python')
+
+    @when('@2.2.2')
+    def patch(self):
+        filter_file(
+            '-lncurses',
+            '-ltinfo -lncurses',
+            join_path(self.stage.source_path, 'configure')
+            )
 
     # Before 2.12.0 it was an autotools package
     @when('@:2.10.99')
@@ -118,7 +131,8 @@ class Nest(CMakePackage):
         configure(*configure_args)
 
         make()
-        make("install")
+        # otherwise there are stochastic fails
+        make("install", "-j1")
 
     def cmake_args(self):
         args = []
@@ -128,9 +142,8 @@ class Nest(CMakePackage):
         else:
             args.append('-Dwith-mpi=OFF')
 
-        if '+python':
-            version = self.spec['python'].version[0]
-            args.append('-Dwith-python={0}'.format(version))
+        if '+python' in self.spec:
+            args.append('-Dwith-python=ON')
             args.append('-Dcythonize-pynest=' + self.spec['py-cython'].prefix)
         else:
             args.append('-Dwith-python=OFF')
@@ -180,5 +193,5 @@ class Nest(CMakePackage):
         for f in find_headers('*', path_source, recursive=True):
             install(f, path_headers)
 
-    def setup_environment(self, spack_env, run_env):
-        run_env.set("NEST_INSTALL_DIR", self.spec.prefix)
+    def setup_run_environment(self, env):
+        env.set("NEST_INSTALL_DIR", self.spec.prefix)

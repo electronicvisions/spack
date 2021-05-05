@@ -1,38 +1,28 @@
-##############################################################################
-# Copyright (c) 2013-2017, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
+# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
+# Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
-# This file is part of Spack.
-# Created by Todd Gamblin, tgamblin@llnl.gov, All rights reserved.
-# LLNL-CODE-647188
-#
-# For details, see https://github.com/spack/spack
-# Please also see the NOTICE and LICENSE files for our notice and the LGPL.
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License (as
-# published by the Free Software Foundation) version 2.1, February 1999.
-#
-# This program is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the terms and
-# conditions of the GNU Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public
-# License along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-##############################################################################
+# SPDX-License-Identifier: (Apache-2.0 OR MIT)
+
 from spack import *
 
 
 class PyConfigargparse(PythonPackage):
-    """A drop-in replacement for argparse that allows options to also be set
-       via config files and/or environment variables."""
+    """Applications with more than a handful of user-settable
+    options are best configured through a combination of
+    command line args, config files, hard-coded defaults, and
+    in some cases, environment variables.
 
-    homepage = "https://pypi.org/project/ConfigArgParse"
-    url      = "https://pypi.io/packages/source/C/ConfigArgParse/ConfigArgParse-0.14.0.tar.gz"
+    Python's command line parsing modules such as argparse have
+    very limited support for config files and environment
+    variables, so this module extends argparse to add these
+    features."""
 
-    version('0.14.0', sha256='2e2efe2be3f90577aca9415e32cb629aa2ecd92078adbe27b53a03e53ff12e91')
+    homepage = "https://github.com/bw2/ConfigArgParse"
+    url      = "https://github.com/bw2/ConfigArgParse/archive/1.2.3.tar.gz"
 
+    version('1.2.3', sha256='0f1144a204e3b896d6ac900e151c1d13bde3103d6b7d541e3bb57514a94083bf')
+    version('0.14.0', sha256='b52a859838c90f4d662f824e4b2dc25395cd32abab9bc8f4c4d64725197dd517')
+
+    depends_on('python@2.2:2.999,3.5:', type=('build', 'run'))
     depends_on('py-setuptools', type='build')
     depends_on('py-pyyaml',     type=('build', 'run'))

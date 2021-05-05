@@ -1,4 +1,4 @@
-# Copyright 2013-2019 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -29,27 +29,21 @@ class PyAstroid(PythonPackage):
     # fixes symlink resolution, already included in 2: but not in 1.6.6
     patch('PR546.patch', when='@1.6.6')
 
-    depends_on('python@2.7:2.8,3.4:', when='@:1.999.999')
-    depends_on('python@3.4:', when='@2:2.2.999')
-    depends_on('python@3.5:', when='@2.3:')
-
-    depends_on('py-lazy-object-proxy')
-    depends_on('py-six')
-    depends_on('py-wrapt')
-
+    # Dependencies taken from astroid/__pkginfo__.py
+    depends_on('python@2.7:2.8,3.4:', when='@:1.999', type=('build', 'run'))
+    depends_on('python@3.4:', when='@2.0.0:', type=('build', 'run'))
+    depends_on('python@3.5:', when='@2.3.3:', type=('build', 'run'))
+    depends_on('py-lazy-object-proxy', type=('build', 'run'))
     # Starting with astroid 2.3.1, astroid's dependencies were restricted
     # to a given minor version, c.f. commit e1b4e11.
-    depends_on('py-lazy-object-proxy@1.4.0:1.4.999', when='@2.3.1:')
-    depends_on('py-six@1.12:1.999', when='@2.3.1:')
-    depends_on('py-wrapt@1.11.0:1.11.999', when='@2.3.1:')
-
-    depends_on('py-enum34@1.1.3:', when='^python@:3.3.99')
-    depends_on('py-singledispatch', when='^python@:3.3.99')
-    depends_on('py-backports-functools-lru-cache', when='^python@:3.2.99')
-    depends_on('py-setuptools@17.1:')
-    # typed ast is only needed for CPython but there are no other python implementations in spack
-    # Note: upper boundary 2.3.0 has not been verified!
+    depends_on('py-lazy-object-proxy@1.4:1.4.999', when='@2.3.1:', type=('build', 'run'))
+    depends_on('py-six', type=('build', 'run'))
+    depends_on('py-six@1.12:1.999', when='@2.3.3:', type=('build', 'run'))
+    depends_on('py-wrapt', when='@:2.2.999', type=('build', 'run'))
+    depends_on('py-wrapt@1.11:1.11.999', when='@2.3.3:', type=('build', 'run'))
+    depends_on('py-enum34@1.1.3:', when='^python@:3.3.99', type=('build', 'run'))
+    depends_on('py-singledispatch', when='^python@:3.3.99', type=('build', 'run'))
+    depends_on('py-backports-functools-lru-cache', when='^python@:3.2.99', type=('build', 'run'))
     depends_on('py-typed-ast@1.3.0:1.3.999', when='@2.2.5:2.3.0 ^python@3.7.0:3.7.999')
-    # typed ast 1.4.* is required since 2.3.1, c.f. commit cdcd246
-    depends_on('py-typed-ast@1.4.0:1.4.999', when='@2.3.1: ^python@3.7.0:3.7.999')
-
+    depends_on('py-typed-ast@1.4.0:1.4.999', when='@2.3.1: ^python@:3.7.999', type=('build', 'run'))
+    depends_on('py-setuptools@17.1:', type='build')

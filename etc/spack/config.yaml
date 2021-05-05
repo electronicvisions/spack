@@ -3,3 +3,21 @@ config:
   # when obreitwi parallizes ALL the things, some delays might occur
   # (why the heck is READ locking seemingly exclusive anyway?!?!)
   db_lock_timeout: 3600
+
+  # Directory in which to run tests and store test results.
+  # Tests will be stored in directories named by date/time and package
+  # name/hash.
+  test_stage: $spack/.spack/test
+
+  # Cache directory for miscellaneous files, like the package index.
+  # This can be purged with `spack clean --misc-cache
+  misc_cache: $tempdir/.spack/cache
+
+  # If set to true, Spack will fetch deprecated versions without warning.
+  # If false, Spack will raise an error when trying to install a deprecated version.
+  deprecated: true
+
+  # If set to true, Spack will attempt to build any compiler on the spec
+  # that is not already available. If set to False, Spack will only use
+  # compilers already configured in compilers.yaml
+  install_missing_compilers: true

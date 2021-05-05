@@ -1,4 +1,4 @@
-# Copyright 2013-2019 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -7,14 +7,9 @@ from spack import *
 
 
 class PyPylint(PythonPackage):
-    """
-    Pylint is a Python static code analysis tool which looks for programming
-    errors, helps enforcing a coding standard, sniffs for code smells and
-    offers simple refactoring suggestions.
-    """
+    """python code static checker"""
 
-    homepage = "https://pypi.python.org/pypi/pylint"
-    url      = "https://pypi.io/packages/source/p/pylint/pylint-1.6.5.tar.gz"
+    pypi = "pylint/pylint-1.6.5.tar.gz"
 
     version('2.5.3', sha256='7dd78437f2d8d019717dbf287772d0b2dbdfd13fc016aa7faa08d67bccc46adc')
     version('2.4.4', sha256='3db5468ad013380e987410a8d6956226963aed94ecb5f9d3a28acca6d9ac36cd')
@@ -26,21 +21,29 @@ class PyPylint(PythonPackage):
     version('1.4.3', sha256='1dce8c143a5aa15e0638887c2b395e2e823223c63ebaf8d5f432a99e44b29f60')
     version('1.4.1', sha256='3e383060edd432cbbd0e8bd686f5facfe918047ffe1bb401ab5897cb6ee0f030')
 
+    extends('python', ignore=r'bin/pytest')
+    depends_on('python@2.7:2.8,3.4:3.6', when='@:1', type=('build', 'run'))
+    depends_on('python@3.4:', when='@2:', type=('build', 'run'))
     depends_on('python@3.5.0:', when='@2.4.0:')
-    depends_on('python@3.4.0:', when='@2.0.0:2.3.999')
-    depends_on('python@2.7.0:2.8.0', when='@:1.999.999')
-    depends_on('py-toml@0.7.1:', type=('build', 'run'), when='@2.5.0:')
-    depends_on('py-astroid@2.4.0:2.4.999', type=('build', 'run'), when='@2.5.0:')
-    depends_on('py-astroid@2.3.0:2.3.999', type=('build', 'run'), when='@2.4.0:2.4.999')
-    depends_on('py-astroid@2.2.0:2.2.999', type=('build', 'run'), when='@2.3.0:2.3.999')
+    depends_on('py-astroid', type=('build', 'run'))
     # note there is no working version of astroid for this
-    depends_on('py-astroid@1.5.1:2.999.999', type=('build', 'run'), when='@1.7:1.999.999')
-    depends_on('py-six', type=('build', 'run'))
-    depends_on('py-isort@4.2.5:4.999.999')
-    depends_on('py-mccabe@0.6.0:0.6.999')
-    depends_on('py-editdistance')
+    depends_on('py-astroid@1.5.1:', type=('build', 'run'), when='@1.7:')
+    depends_on('py-astroid@1.6:1.9', type=('build', 'run'), when='@1.9.4')
+    depends_on('py-astroid@2.0:', type=('build', 'run'), when='@2.2.0:')
+    depends_on('py-astroid@2.2.0:2.999.999', type=('build', 'run'), when='@2.3.0:')
+    depends_on('py-astroid@2.3.0:2.3.999', type=('build', 'run'), when='@2.4.0:2.4.999')
+    depends_on('py-astroid@2.4.0:2.4.999', type=('build', 'run'), when='@2.5.0:')
+    depends_on('py-six', type=('build', 'run'), when='@1:')
+    depends_on('py-isort@4.2.5:', type=('build', 'run'))
+    depends_on('py-isort@4.2.5:4.999', when='@2.3.1:', type=('build', 'run'))
+    depends_on('py-mccabe', type=('build', 'run'))
+    depends_on('py-mccabe@0.6.0:0.6.999', when='@2.3.1:', type=('build', 'run'))
+    depends_on('py-editdistance', type=('build', 'run'), when='@:1.7')
     depends_on('py-setuptools@17.1:', type='build')
     # depends_on('py-setuptools-scm@1.15.0:', type='build')
-    depends_on('py-configparser', when='^python@:2.8')
-    depends_on('py-backports-functools-lru-cache', when='^python@:2.8')
-    depends_on('py-singledispatch', when='^python@:3.3.99')
+    depends_on('py-configparser', when='^python@:2.8', type=('build', 'run'))
+    depends_on('py-backports-functools-lru-cache', when='^python@:2.8', type=('build', 'run'))
+    depends_on('py-singledispatch', when='^python@:3.3.99', type=('build', 'run'))
+    # FIXME: Extra EV
+    depends_on('py-toml@0.7.1:', type=('build', 'run'), when='@2.5.0:')
+    depends_on('py-pytest-runner', type=('build', 'run'))

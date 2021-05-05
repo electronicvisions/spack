@@ -1,16 +1,14 @@
-# Copyright 2013-2019 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
-
-from spack import *
 
 
 class PyNotebook(PythonPackage):
     """Jupyter Interactive Notebook"""
 
     homepage = "https://github.com/jupyter/notebook"
-    url      = "https://pypi.io/packages/source/n/notebook/notebook-4.2.3.tar.gz"
+    pypi = "notebook/notebook-6.1.4.tar.gz"
 
     version('6.1.4', sha256='687d01f963ea20360c0b904ee7a37c3d8cda553858c8d6e33fd0afd13e89de32')
     version('6.0.3', sha256='47a9092975c9e7965ada00b9a20f0cf637d001db60d241d479f53c0be117ad48')
@@ -61,3 +59,18 @@ class PyNotebook(PythonPackage):
     depends_on('py-terminado@0.8.1:', type=('build', 'run'), when='@5.7.0:')
     depends_on('py-terminado@0.8.3:', type=('build', 'run'), when='@6.1:')
     depends_on('py-prometheus-client', type=('build', 'run'), when='@5.7.0:')
+
+    # old EV dependencies from before the merge in 2021-04, if things break try using these
+    # depends_on('py-jupyter-console@:5.999.999', type=('build', 'run'), when='^python@2.7:2.8,3.3:3.4.999')
+    # depends_on('py-jupyter-console@6:', type=('build', 'run'), when='^python@3.5:')
+
+    # # ipykernel 5.x and above (and ipython 6.x) only supports python 3.4 and later
+    # depends_on('py-ipykernel@:4.999.999', type=('build', 'run'), when='^python@2.7:2.8,3.3:3.3.999')
+    # depends_on('py-ipykernel@5:', type=('build', 'run'), when='^python@3.4:')
+
+    # depends_on('py-ipywidgets', when="+terminal", type=('build', 'run'))
+
+    # # requirements new in 5.7.0 they might have been introduced later than 5.0
+    # depends_on('py-ipaddress', when="@5:", type=('build', 'run'))
+    # depends_on('py-send2trash', when="@5:", type=('build', 'run'))
+    # depends_on('py-webencodings', when="@5:", type=('build', 'run'))

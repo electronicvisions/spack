@@ -1,18 +1,15 @@
-# Copyright 2013-2019 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
-import argparse
-import functools as ft
-import multiprocessing as mp
 import os
 import shutil
 import sys
 
 import llnl.util.tty as tty
+import spack.architecture
 import spack.binary_distribution as bindist
-from llnl.util.multiproc import NoDaemonPool
 import spack.cmd
 import spack.cmd.common.arguments as arguments
 import spack.environment as ev
@@ -29,6 +26,7 @@ import spack.util.url as url_util
 
 from spack.error import SpecError
 from spack.spec import Spec, save_dependency_spec_yamls
+from spack.util.string import plural
 
 from spack.cmd import display_specs
 
@@ -56,20 +54,36 @@ def setup_parser(subparser):
     create.add_argument('-k', '--key', metavar='key',
                         type=str, default=None,
                         help="Key for signing.")
-    create.add_argument('-d', '--directory', metavar='directory',
-                        type=str, default='.',
-                        help="directory in which to save the tarballs.")
-    create.add_argument('--no-rebuild-index', action='store_false',
-                        dest="rebuild_index",
-                        help="skip rebuilding index after "
-                             "building package(s)")
+    output = create.add_mutually_exclusive_group(required=True)
+    output.add_argument('-d', '--directory',
+                        metavar='directory',
+                        type=str,
+                        help="local directory where " +
+                             "buildcaches will be written.")
+    output.add_argument('-m', '--mirror-name',
+                        metavar='mirror-name',
+                        type=str,
+                        help="name of the mirror where " +
+                             "buildcaches will be written.")
+    output.add_argument('--mirror-url',
+                        metavar='mirror-url',
+                        type=str,
+                        help="URL of the mirror where " +
+                             "buildcaches will be written.")
+    create.add_argument('--rebuild-index', action='store_true',
+                        default=False, help="Regenerate buildcache index " +
+                                            "after building package(s)")
     create.add_argument('-y', '--spec-yaml', default=None,
                         help='Create buildcache entry for spec from yaml file')
-    create.add_argument(
-        'packages', nargs=argparse.REMAINDER,
-        help="specs of packages to create buildcache for")
-    create.add_argument('--no-deps', action='store_true', default='false',
-                        help='Create buildcache entry wo/ dependencies')
+    create.add_argument('--only', default='package,dependencies',
+                        dest='things_to_install',
+                        choices=['package', 'dependencies'],
+                        help=('Select the buildcache mode. the default is to'
+                              ' build a cache for the package along with all'
+                              ' its dependencies. Alternatively, one can'
+                              ' decide to build a cache for only the package'
+                              ' or only the dependencies'))
+    arguments.add_common_arguments(create, ['specs'])
     create.set_defaults(func=createtarball)
 
     install = subparsers.add_parser('install', help=installtarball.__doc__)
@@ -83,28 +97,12 @@ def setup_parser(subparser):
     install.add_argument('-u', '--unsigned', action='store_true',
                          help="install unsigned buildcache" +
                               " tarballs for testing")
-    install.add_argument(
-        'packages', nargs=argparse.REMAINDER,
-        help="specs of packages to install buildcache for")
+    install.add_argument('-o', '--otherarch', action='store_true',
+                         help="install specs from other architectures" +
+                              " instead of default platform and OS")
+
+    arguments.add_common_arguments(install, ['specs'])
     install.set_defaults(func=installtarball)
-
-    # set common arguments for create and install commands
-    for subparser in [create, install]:
-        subparser.add_argument(
-            '--only',
-            default='package,dependencies',
-            dest='target_type',
-            choices=['package', 'dependencies'],
-            help="Select the mode of operation. "
-                 "The default is to create/install the package along with all "
-                 "its dependencies. Alternatively one can decide to "
-                 "create/install only the package or only the dependencies.")
-
-        subparser.add_argument(
-            '-j', '--jobs', type=int, default=1,
-            help="number of jobs with which to install in parallel (defaults "
-                 "to 1). Values of 0 or less indicate to use all available "
-                 "cores.")
 
     listcache = subparsers.add_parser('list', help=listspecs.__doc__)
     arguments.add_common_arguments(listcache, ['long', 'very_long'])
@@ -112,11 +110,10 @@ def setup_parser(subparser):
                            action='store_true',
                            dest='variants',
                            help='show variants in output (can be long)')
-    listcache.add_argument('-f', '--force', action='store_true',
-                           help="force new download of specs")
-    listcache.add_argument(
-        'packages', nargs=argparse.REMAINDER,
-        help="specs of packages to search for")
+    listcache.add_argument('-a', '--allarch', action='store_true',
+                           help="list specs for all available architectures" +
+                                 " instead of default platform and OS")
+    arguments.add_common_arguments(listcache, ['specs'])
     listcache.set_defaults(func=listspecs)
 
     dlkeys = subparsers.add_parser('keys', help=getkeys.__doc__)
@@ -135,10 +132,9 @@ def setup_parser(subparser):
         help='analyzes an installed spec and reports whether '
              'executables and libraries are relocatable'
     )
-    preview_parser.add_argument(
-        'packages', nargs='+', help='list of installed packages'
-    )
+    arguments.add_common_arguments(preview_parser, ['installed_specs'])
     preview_parser.set_defaults(func=preview)
+
     # Check if binaries need to be rebuilt on remote mirror
     check = subparsers.add_parser('check', help=check_binaries.__doc__)
     check.add_argument(
@@ -235,6 +231,9 @@ def setup_parser(subparser):
         'update-index', help=buildcache_update_index.__doc__)
     update_index.add_argument(
         '-d', '--mirror-url', default=None, help='Destination mirror url')
+    update_index.add_argument(
+        '-k', '--keys', default=False, action='store_true',
+        help='If provided, key index will be updated as well as package index')
     update_index.set_defaults(func=buildcache_update_index)
 
 
@@ -243,8 +242,9 @@ def find_matching_specs(pkgs, allow_multiple_matches=False, env=None):
        concretized specs given from cli
 
     Args:
-        specs: list of specs to be matched against installed packages
-        allow_multiple_matches : if True multiple matches are admitted
+        pkgs (string): spec to be matched against installed packages
+        allow_multiple_matches (bool): if True multiple matches are admitted
+        env (Environment): active environment, or ``None`` if there is not one
 
     Return:
         list of specs
@@ -279,7 +279,8 @@ def find_matching_specs(pkgs, allow_multiple_matches=False, env=None):
     return specs_from_cli
 
 
-def match_downloaded_specs(pkgs, allow_multiple_matches=False, force=False):
+def match_downloaded_specs(pkgs, allow_multiple_matches=False, force=False,
+                           other_arch=False):
     """Returns a list of specs matching the not necessarily
        concretized specs given from cli
 
@@ -293,7 +294,12 @@ def match_downloaded_specs(pkgs, allow_multiple_matches=False, force=False):
     # List of specs that match expressions given via command line
     specs_from_cli = []
     has_errors = False
-    specs = bindist.get_specs(force)
+
+    specs = bindist.update_cache_and_get_specs()
+    if not other_arch:
+        arch = spack.architecture.default_arch().to_spec()
+        specs = [s for s in specs if s.satisfies(arch)]
+
     for pkg in pkgs:
         matches = []
         tty.msg("buildcache spec(s) matching %s \n" % pkg)
@@ -325,41 +331,37 @@ def match_downloaded_specs(pkgs, allow_multiple_matches=False, force=False):
     return specs_from_cli
 
 
-def createtarball(args):
-    """create a binary package from an existing install"""
-    if args.spec_yaml:
-        packages = set()
-        tty.msg('createtarball, reading spec from {0}'.format(args.spec_yaml))
-        with open(args.spec_yaml, 'r') as fd:
+def _createtarball(env, spec_yaml=None, packages=None, add_spec=True,
+                   add_deps=True, output_location=os.getcwd(),
+                   signing_key=None, force=False, make_relative=False,
+                   unsigned=False, allow_root=False, rebuild_index=False):
+    if spec_yaml:
+        with open(spec_yaml, 'r') as fd:
             yaml_text = fd.read()
             tty.debug('createtarball read spec yaml:')
             tty.debug(yaml_text)
             s = Spec.from_yaml(yaml_text)
-            packages.add('/{0}'.format(s.dag_hash()))
-    elif args.packages:
-        packages = args.packages
+            package = '/{0}'.format(s.dag_hash())
+            matches = find_matching_specs(package, env=env)
+
+    elif packages:
+        matches = find_matching_specs(packages, env=env)
+
+    elif env:
+        matches = [env.specs_by_hash[h] for h in env.concretized_order]
+
     else:
         tty.die("build cache file creation requires at least one" +
-                " installed package argument or else path to a" +
-                " yaml file containing a spec to install")
-    pkgs = set(packages)
+                " installed package spec, an active environment," +
+                " or else a path to a yaml file containing a spec" +
+                " to install")
     specs = set()
 
-    outdir = '.'
-    if args.directory:
-        outdir = args.directory
-
-    mirror = spack.mirror.MirrorCollection().lookup(outdir)
+    mirror = spack.mirror.MirrorCollection().lookup(output_location)
     outdir = url_util.format(mirror.push_url)
 
-    signkey = None
-    if args.key:
-        signkey = args.key
-
-    # restrict matching to current environment if one is active
-    env = ev.get_env(args, 'buildcache create')
-
-    matches = find_matching_specs(pkgs, env=env)
+    msg = 'Buildcache files will be output to %s/build_cache' % outdir
+    tty.msg(msg)
 
     if matches:
         tty.debug('Found at least one matching spec')
@@ -370,18 +372,35 @@ def createtarball(args):
             tty.debug('skipping external or virtual spec %s' %
                       match.format())
         else:
-            tty.debug('adding matching spec %s' % match.format())
-            if "package" in args.target_type:
+            lookup = spack.store.db.query_one(match)
+
+            if not add_spec:
+                tty.debug('skipping matching root spec %s' % match.format())
+            elif lookup is None:
+                tty.debug('skipping uninstalled matching spec %s' %
+                          match.format())
+            else:
+                tty.debug('adding matching spec %s' % match.format())
                 specs.add(match)
-            if "dependencies" not in args.target_type:
-                # if the user does not want dependencies, stop here
+
+            if not add_deps:
                 continue
+
             tty.debug('recursing dependencies')
             for d, node in match.traverse(order='post',
                                           depth=True,
                                           deptype=('link', 'run')):
+                # skip root, since it's handled above
+                if d == 0:
+                    continue
+
+                lookup = spack.store.db.query_one(node)
+
                 if node.external or node.virtual:
                     tty.debug('skipping external or virtual dependency %s' %
+                              node.format())
+                elif lookup is None:
+                    tty.debug('skipping uninstalled depenendency %s' %
                               node.format())
                 else:
                     tty.debug('adding dependency %s' % node.format())
@@ -389,161 +408,89 @@ def createtarball(args):
 
     tty.debug('writing tarballs to %s/build_cache' % outdir)
 
-    f_create = ft.partial(create_single_tarball,
-                          outdir=outdir,
-                          force=args.force,
-                          relative=args.rel,
-                          unsigned=args.unsigned,
-                          allow_root=args.allow_root,
-                          signkey=signkey,
-                          rebuild_index=args.rebuild_index
-                          and args.jobs == 1,
-                          catch_exceptions=args.jobs != 1)
-
-    # default behavior (early termination) for one job
-    if args.jobs == 1:
-        for spec in specs:
-            f_create(spec)
-
-    else:
-        # currently, specs cause an infinite recursion bug when pickled
-        # -> as multiprocessing uses pickle internally, we need to transform
-        #    specs prior to distributing the work via worker pool
-        # TODO: check if specs can be pickled
-        specs = [s.to_dict() for s in specs]
-
-        pool = NoDaemonPool(args.jobs if args.jobs > 1 else mp.cpu_count())
-        # chunksize=1 because we do not want to pre-allocate specs to workers
-        # (since each package will need a different amount of time to be
-        # compressed)
-        retvals = pool.map(f_create, specs, chunksize=1)
-
-        errors = [rv["error"] for rv in retvals if rv["error"] is not None]
-        list(map(tty.error, errors))
-        if len(errors) > 0:
-            sys.exit(1)
-
-        # perform rebuild of index unless user requested not to
-        if args.rebuild_index:
-            bindist.generate_package_index(outdir)
+    for spec in specs:
+        tty.debug('creating binary cache file for package %s ' % spec.format())
+        try:
+            bindist.build_tarball(spec, outdir, force, make_relative,
+                                  unsigned, allow_root, signing_key,
+                                  rebuild_index)
+        except bindist.NoOverwriteException as e:
+            tty.warn(e)
 
 
-def create_single_tarball(
-        spec, outdir, force, relative, unsigned, allow_root, signkey,
-        rebuild_index, catch_exceptions):
-    if isinstance(spec, dict):
-        spec = spack.spec.Spec.from_dict(spec)
-        spec.concretize()
+def createtarball(args):
+    """create a binary package from an existing install"""
 
-    tty.msg('creating binary cache file for package %s ' % spec.format())
-    # use return value dictionary in order to allow for additional return
-    # values in the future
-    retval = {"error": None}
-    try:
-        bindist.build_tarball(spec, outdir, force, relative,
-                              unsigned, allow_root, signkey,
-                              rebuild_index)
-    except spack.error.SpackError as e:
-        if catch_exceptions:
-            retval["error"] = "Spec %s: %s" % (spec.format(), str(e))
-        else:
-            # if we are not multiproccessing we can re-raise the exception
-            raise e
-    return retval
+    # restrict matching to current environment if one is active
+    env = ev.get_env(args, 'buildcache create')
+
+    output_location = None
+    if args.directory:
+        output_location = args.directory
+
+        # User meant to provide a path to a local directory.
+        # Ensure that they did not accidentally pass a URL.
+        scheme = url_util.parse(output_location, scheme='<missing>').scheme
+        if scheme != '<missing>':
+            raise ValueError(
+                '"--directory" expected a local path; got a URL, instead')
+
+        # User meant to provide a path to a local directory.
+        # Ensure that the mirror lookup does not mistake it for a named mirror.
+        output_location = 'file://' + output_location
+
+    elif args.mirror_name:
+        output_location = args.mirror_name
+
+        # User meant to provide the name of a preconfigured mirror.
+        # Ensure that the mirror lookup actually returns a named mirror.
+        result = spack.mirror.MirrorCollection().lookup(output_location)
+        if result.name == "<unnamed>":
+            raise ValueError(
+                'no configured mirror named "{name}"'.format(
+                    name=output_location))
+
+    elif args.mirror_url:
+        output_location = args.mirror_url
+
+        # User meant to provide a URL for an anonymous mirror.
+        # Ensure that they actually provided a URL.
+        scheme = url_util.parse(output_location, scheme='<missing>').scheme
+        if scheme == '<missing>':
+            raise ValueError(
+                '"{url}" is not a valid URL'.format(url=output_location))
+    add_spec = ('package' in args.things_to_install)
+    add_deps = ('dependencies' in args.things_to_install)
+
+    _createtarball(env, spec_yaml=args.spec_yaml, packages=args.specs,
+                   add_spec=add_spec, add_deps=add_deps,
+                   output_location=output_location, signing_key=args.key,
+                   force=args.force, make_relative=args.rel,
+                   unsigned=args.unsigned, allow_root=args.allow_root,
+                   rebuild_index=args.rebuild_index)
 
 
 def installtarball(args):
     """install from a binary package"""
-    if not args.packages:
+    if not args.specs:
         tty.die("build cache file installation requires" +
                 " at least one package spec argument")
-    pkgs = set(args.packages)
-    matches = match_downloaded_specs(pkgs, args.multiple, args.force)
+    pkgs = set(args.specs)
+    matches = match_downloaded_specs(pkgs, args.multiple, args.force,
+                                     args.otherarch)
 
-    if "dependencies" in args.target_type:
-        # if dependencies are to be included, include them right away so they
-        # can be distributed onto workers
-
-        # ensure specs are Specs and skip external and virtual packages
-        specs = list(filter(lambda s: not (s.external or s.virtual),
-                            map(spack.spec.Spec,
-                                matches)))
-
-        # iterate over copy
-        dependencies = []
-
-        def get_deps(spec):
-            for dep in spec.dependencies(deptype=('link', 'run')):
-                get_deps(dep)
-
-                if dep not in dependencies and dep not in matches:
-                    tty.msg("Installing buildcache for dependency spec %s"
-                            % dep)
-                    dependencies.append(dep)
-
-        list(map(get_deps, specs))
-    else:
-        dependencies = []
-
-    if "package" in args.target_type:
-        packages = matches
-    else:
-        packages = []
-
-    # prepend dependencies
-    packages_to_install = dependencies + packages
-
-    f_install = ft.partial(install_single_tarball, args=args,
-                           catch_exceptions=args.jobs == 1,
-                           perform_post_install=args.jobs == 1)
-
-    # default behavior (early termination) for one job
-    retvals = []
-    if args.jobs == 1:
-        for match in packages_to_install:
-            # will throw exceptions/call tty.die on its own with
-            # catch_exceptions==False
-            retvals.append(f_install(match))
-    else:
-        pool = NoDaemonPool(args.jobs if args.jobs > 1 else mp.cpu_count())
-        # chunksize=1 because we do not want to pre-allocate specs to workers
-        # (since each package will need a different amount of time to be
-        # extracted)
-        retvals = pool.map(f_install, packages_to_install, chunksize=1)
-
-        # has to be performed in order
-        list(map(spack.hooks.post_install, packages_to_install))
-
-    # extract discovered errors
-    errors = [rv["error"] for rv in retvals if rv["error"] is not None]
-    list(map(tty.error, errors))
-
-    # only reindex if there was at least one package installed from buildcache
-    if any(rv["reindex"] for rv in retvals):
-        spack.store.store.reindex()
-
-    if len(errors) > 0:
-        tty.die("Encountered {0} errors".format(len(errors)))
+    for match in matches:
+        install_tarball(match, args)
 
 
-def install_single_tarball(spec, args,
-                           catch_exceptions=False,
-                           perform_post_install=True):
-    """Install a single tarball for given spec.
-    NOTE: Does NOT install dependencies!"""
+def install_tarball(spec, args):
     s = Spec(spec)
-
-    # use return value dictionary in order to allow for additional return
-    # values in the future
-    retval = {
-        "reindex": False,
-        "error": None,
-    }
-
     if s.external or s.virtual:
         tty.warn("Skipping external or virtual package %s" % spec.format())
-        return retval
-
+        return
+    for d in s.dependencies(deptype=('link', 'run')):
+        tty.msg("Installing buildcache for dependency spec %s" % d)
+        install_tarball(d, args)
     package = spack.repo.get(spec)
     if s.concrete and package.installed and not args.force:
         tty.warn("Package for spec %s already installed." % spec.format())
@@ -551,40 +498,32 @@ def install_single_tarball(spec, args,
         tarball = bindist.download_tarball(spec)
         if tarball:
             tty.msg('Installing buildcache for spec %s' % spec.format())
-            try:
-                bindist.extract_tarball(spec, tarball, args.allow_root,
-                                        args.unsigned, args.force)
-                if perform_post_install:
-                    # In multiprocessing situations, post_install-hooks have to
-                    # be triggered after all tar balls have been extracted as
-                    # functionatility might depend on files being present
-                    # (i.e., extracted).
-                    spack.hooks.post_install(spec)
-                spack.store.db.add(spec, spack.store.layout)
-            except spack.error.SpackError as e:
-                if catch_exceptions:
-                    retval["error"] = "Spec %s: %s" % (spec.format(), str(e))
-                else:
-                    raise e
-            finally:
-                retval["reindex"] = True
+            bindist.extract_tarball(spec, tarball, args.allow_root,
+                                    args.unsigned, args.force)
+            spack.hooks.post_install(spec)
+            spack.store.db.add(spec, spack.store.layout)
         else:
-            retval["error"] = 'Download of binary cache file for spec '\
-                              '%s failed.' % spec.format()
-            if not catch_exceptions:
-                tty.die(retval["error"])
-    return retval
+            tty.die('Download of binary cache file for spec %s failed.' %
+                    spec.format())
 
 
 def listspecs(args):
     """list binary packages available from mirrors"""
-    specs = bindist.get_specs(args.force)
-    if args.packages:
-        pkgs = set(args.packages)
-        specs = [s for s in specs for p in pkgs if s.satisfies(p)]
-        display_specs(specs, args, all_headers=True)
-    else:
-        display_specs(specs, args, all_headers=True)
+    specs = bindist.update_cache_and_get_specs()
+    if not args.allarch:
+        arch = spack.architecture.default_arch().to_spec()
+        specs = [s for s in specs if s.satisfies(arch)]
+
+    if args.specs:
+        constraints = set(args.specs)
+        specs = [s for s in specs if any(s.satisfies(c) for c in constraints)]
+    if sys.stdout.isatty():
+        builds = len(specs)
+        tty.msg("%s." % plural(builds, 'cached build'))
+        if not builds and not args.allarch:
+            tty.msg("You can query all available architectures with:",
+                    "spack buildcache list --allarch")
+    display_specs(specs, args, all_headers=True)
 
 
 def getkeys(args):
@@ -599,7 +538,7 @@ def preview(args):
     Args:
         args: command line arguments
     """
-    specs = find_matching_specs(args.packages, allow_multiple_matches=True)
+    specs = find_matching_specs(args.specs, allow_multiple_matches=True)
 
     # Cycle over the specs that match
     for spec in specs:
@@ -643,6 +582,32 @@ def check_binaries(args):
         configured_mirrors, specs, args.output_file, args.rebuild_on_error))
 
 
+def download_buildcache_files(concrete_spec, local_dest, require_cdashid,
+                              mirror_url=None):
+    tarfile_name = bindist.tarball_name(concrete_spec, '.spack')
+    tarball_dir_name = bindist.tarball_directory_name(concrete_spec)
+    tarball_path_name = os.path.join(tarball_dir_name, tarfile_name)
+    local_tarball_path = os.path.join(local_dest, tarball_dir_name)
+
+    files_to_fetch = [
+        {
+            'url': tarball_path_name,
+            'path': local_tarball_path,
+            'required': True,
+        }, {
+            'url': bindist.tarball_name(concrete_spec, '.spec.yaml'),
+            'path': local_dest,
+            'required': True,
+        }, {
+            'url': bindist.tarball_name(concrete_spec, '.cdashid'),
+            'path': local_dest,
+            'required': require_cdashid,
+        },
+    ]
+
+    return bindist.download_buildcache_entry(files_to_fetch, mirror_url)
+
+
 def get_tarball(args):
     """Download buildcache entry from a remote mirror to local folder.  This
     command uses the process exit code to indicate its result, specifically,
@@ -659,34 +624,10 @@ def get_tarball(args):
         sys.exit(0)
 
     spec = get_concrete_spec(args)
+    result = download_buildcache_files(spec, args.path, args.require_cdashid)
 
-    tarfile_name = bindist.tarball_name(spec, '.spack')
-    tarball_dir_name = bindist.tarball_directory_name(spec)
-    tarball_path_name = os.path.join(tarball_dir_name, tarfile_name)
-    local_tarball_path = os.path.join(args.path, tarball_dir_name)
-
-    files_to_fetch = [
-        {
-            'url': tarball_path_name,
-            'path': local_tarball_path,
-            'required': True,
-        }, {
-            'url': bindist.tarball_name(spec, '.spec.yaml'),
-            'path': args.path,
-            'required': True,
-        }, {
-            'url': bindist.tarball_name(spec, '.cdashid'),
-            'path': args.path,
-            'required': args.require_cdashid,
-        },
-    ]
-
-    result = bindist.download_buildcache_entry(files_to_fetch)
-
-    if result:
-        sys.exit(0)
-
-    sys.exit(1)
+    if not result:
+        sys.exit(1)
 
 
 def get_concrete_spec(args):
@@ -700,7 +641,7 @@ def get_concrete_spec(args):
 
     if spec_str:
         try:
-            spec = Spec(spec_str)
+            spec = find_matching_specs(spec_str)[0]
             spec.concretize()
         except SpecError as spec_error:
             tty.error('Unable to concrectize spec {0}'.format(args.spec))
@@ -828,17 +769,28 @@ def buildcache_copy(args):
         shutil.copyfile(cdashid_src_path, cdashid_dest_path)
 
 
+def update_index(mirror_url, update_keys=False):
+    mirror = spack.mirror.MirrorCollection().lookup(mirror_url)
+    outdir = url_util.format(mirror.push_url)
+
+    bindist.generate_package_index(
+        url_util.join(outdir, bindist.build_cache_relative_path()))
+
+    if update_keys:
+        keys_url = url_util.join(outdir,
+                                 bindist.build_cache_relative_path(),
+                                 bindist.build_cache_keys_relative_path())
+
+        bindist.generate_key_index(keys_url)
+
+
 def buildcache_update_index(args):
     """Update a buildcache index."""
     outdir = '.'
     if args.mirror_url:
         outdir = args.mirror_url
 
-    mirror = spack.mirror.MirrorCollection().lookup(outdir)
-    outdir = url_util.format(mirror.push_url)
-
-    bindist.generate_package_index(
-        url_util.join(outdir, bindist.build_cache_relative_path()))
+    update_index(outdir, update_keys=args.keys)
 
 
 def buildcache(parser, args):

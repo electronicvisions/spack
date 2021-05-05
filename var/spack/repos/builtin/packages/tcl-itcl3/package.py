@@ -40,10 +40,9 @@ class TclItcl3(AutotoolsPackage):
     extends('tcl')
 
     def configure_args(self):
-        tcl_lib_dir = join_path(self.spec['tcl'].prefix, self.spec['tcl'].package.tcl_lib_dir)
         args = [
             '--enable-shared',
             '--enable-threads',
-            '--with-tcl={0}'.format(tcl_lib_dir),
+            '--with-tcl=' + self.spec['tcl'].libs.directories[0],
         ]
         return args

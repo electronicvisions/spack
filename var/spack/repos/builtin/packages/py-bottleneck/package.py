@@ -1,4 +1,4 @@
-# Copyright 2013-2019 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -8,8 +8,7 @@ from spack import *
 
 class PyBottleneck(PythonPackage):
     """A collection of fast NumPy array functions written in Cython."""
-    homepage = "https://pypi.python.org/pypi/Bottleneck/1.0.0"
-    url      = "https://pypi.io/packages/source/B/Bottleneck/Bottleneck-1.0.0.tar.gz"
+    pypi = "Bottleneck/Bottleneck-1.0.0.tar.gz"
 
     version('1.3.2', sha256='20179f0b66359792ea283b69aa16366419132f3b6cf3adadc0c48e2e8118e573')
     version('1.3.1', sha256='451586370462cb623d6ad604a545d1e97fb51d2ab5252b1ac57350a83e494a28')
@@ -19,4 +18,3 @@ class PyBottleneck(PythonPackage):
 
     depends_on('py-setuptools', type='build')
     depends_on('py-numpy', type=('build', 'run'))
-    depends_on('py-nose', type='test')

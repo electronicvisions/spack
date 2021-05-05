@@ -1,4 +1,4 @@
-# Copyright 2013-2019 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -10,7 +10,7 @@ class PyWerkzeug(PythonPackage):
     """The Swiss Army knife of Python web development"""
 
     homepage = "http://werkzeug.pocoo.org"
-    url      = "https://pypi.io/packages/source/W/Werkzeug/Werkzeug-0.16.0.tar.gz"
+    pypi = "Werkzeug/Werkzeug-0.16.0.tar.gz"
 
     version('0.16.0',  sha256='7280924747b5733b246fe23972186c6b348f9ae29724135a6dfc1e53cea433e7')
     version('0.15.6',  sha256='0a24d43be6a7dce81bae05292356176d6c46d63e42a0dd3f9504b210a9cfaa43')
@@ -25,6 +25,3 @@ class PyWerkzeug(PythonPackage):
 
     depends_on('python@2.7:2.8,3.4:', type=('build', 'run'))
     depends_on('py-setuptools', type='build')
-    depends_on('py-pytest', type='test')
-    depends_on('py-hypothesis', type='test')
-    depends_on('py-requests', type='test')

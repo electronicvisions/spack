@@ -1,4 +1,4 @@
-# Copyright 2013-2019 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -9,8 +9,7 @@ from spack import *
 class PyJupyterhub(PythonPackage):
     """Multi-user server for Jupyter notebooks."""
 
-    homepage = "https://pypi.org/project/jupyterhub"
-    url      = "https://pypi.io/packages/source/j/jupyterhub/jupyterhub-1.0.0.tar.gz"
+    pypi = "jupyterhub/jupyterhub-1.0.0.tar.gz"
 
     version('1.3.0',    sha256='05ff701209c340c792cd103606c448c52ace772ece858380905ddd1a2136ee8e')
     version('1.1.0',    sha256='852a70225a03abd631b36a207f3ffdf69326a0db4cef539825fde39ec1b713d7')
@@ -42,7 +41,8 @@ class PyJupyterhub(PythonPackage):
     depends_on('py-jupyter-telemetry@0.1.0:', when='@1.1.0:', type=('build', 'run'))
     depends_on('py-psutil@5.6.5:', type=('build', 'run'))
     # npm needed at runtime for configurable-http-proxy
-    depends_on('npm', when='@1.1.0:', type=('build', 'run'))
+    #depends_on('npm', when='@1.1.0:', type=('build', 'run'))
+    depends_on('node-js', when='@1.1.0:', type=('build', 'run'))
 
     @run_before('install')
     def install_npm_stuff(self):

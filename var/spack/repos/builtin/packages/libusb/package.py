@@ -1,12 +1,10 @@
-# Copyright 2013-2019 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
-from spack import *
 
-
-class Libusb(Package):
+class Libusb(AutotoolsPackage):
     """Library for USB device access."""
 
     homepage = "https://libusb.info/"
@@ -18,25 +16,27 @@ class Libusb(Package):
     version('1.0.21', sha256='7dce9cce9a81194b7065ee912bcd55eeffebab694ea403ffb91b67db66b1824b')
     version('1.0.20', sha256='cb057190ba0a961768224e4dc6883104c6f945b2bf2ef90d7da39e7c1834f7ff')
 
-    variant('udev', default=True, description='Enable libudev support')
+    variant('udev', default=True, description='Enable libudev support. Requires a system libudev.')
 
     depends_on('autoconf', type='build', when='@master')
     depends_on('automake', type='build', when='@master')
     depends_on('libtool',  type='build', when='@master')
 
-    phases = ['autogen', 'install']
+    @when('@master')
+    def patch(self):
+        mkdir('m4')
 
+    @when('@master')
     def autogen(self, spec, prefix):
-        if self.spec.satisfies('@master'):
-            autogen = Executable('./autogen.sh')
-            autogen()
+        autogen = Executable('./autogen.sh')
+        autogen()
 
-    def install(self, spec, prefix):
-        args = ['--disable-dependency-tracking',
-                '--prefix=%s' % self.spec.prefix]
+    def configure_args(self):
+        args = []
+        args.append('--disable-dependency-tracking')
+        # no libudev/systemd package currently in spack
         if '+udev' in self.spec:
             args.append('--enable-udev')
         else:
             args.append('--disable-udev')
-        configure(*args)
-        make('install')
+        return args

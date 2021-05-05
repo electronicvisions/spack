@@ -1,4 +1,4 @@
-# Copyright 2013-2019 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -39,7 +39,7 @@ class CbtfKrell(CMakePackage):
             description="Build mpi experiment collector for mpich MPI.")
     variant('runtime', default=False,
             description="build only the runtime libraries and collectors.")
-    variant('build_type', default='None', values=('None'),
+    variant('build_type', default='None', values=('None',),
             description='CMake build type')
     variant('cti', default=False,
             description="Build MRNet with the CTI startup option")
@@ -49,6 +49,12 @@ class CbtfKrell(CMakePackage):
 
     # Dependencies for cbtf-krell
     depends_on("cmake@3.0.2:", type='build')
+
+    # For rpcgen
+    depends_on("rpcsvc-proto")
+
+    # For rpc
+    depends_on("libtirpc", type='link')
 
     # For binutils
     depends_on("binutils")
@@ -94,10 +100,10 @@ class CbtfKrell(CMakePackage):
 
     # MPI Installations
     depends_on("openmpi", when='+openmpi')
-    depends_on("mpich", when='+mpich')
-    depends_on("mpich2", when='+mpich2')
-    depends_on("mvapich2", when='+mvapich2')
-    depends_on("mvapich", when='+mvapich')
+    depends_on("mpich@:1", when='+mpich')
+    depends_on("mpich@2:", when='+mpich2')
+    depends_on("mvapich2@2:", when='+mvapich2')
+    depends_on("mvapich2@:1", when='+mvapich')
     depends_on("mpt", when='+mpt')
 
     depends_on("python", when='@develop', type=('build', 'run'))
