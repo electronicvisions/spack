@@ -12,6 +12,7 @@ class PySphinx(PythonPackage):
     homepage = "https://sphinx-doc.org/"
     pypi = "Sphinx/Sphinx-3.2.0.tar.gz"
 
+    version('3.5.4', sha256='19010b7b9fa0dc7756a6e105b2aacd3a80f798af3c25c273be64d7beeb482cb1')
     version('3.2.0', sha256='cf2d5bc3c6c930ab0a1fbef3ad8a82994b1bf4ae923f8098a05c7e5516f07177')
     version('3.0.0', sha256='6a099e6faffdc3ceba99ca8c2d09982d43022245e409249375edf111caf79ed3')
     version('2.2.0', sha256='0d586b0f8c2fc3cc6559c5e8fd6124628110514fda0e5d7c82e682d749d2e845')
