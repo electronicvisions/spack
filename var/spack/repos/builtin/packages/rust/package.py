@@ -90,7 +90,10 @@ class Rust(Package):
     # The `x.py` bootstrapping script did not exist prior to Rust 1.17. It
     # would be possible to support both, but for simplicitly, we only support
     # Rust 1.17 and newer
-    version('1.51.0', sha256='7a6b9bafc8b3d81bbc566e7c0d1f17c9f499fd22b95142f7ea3a8e4d1f9eb847')
+    version('nightly.2021-05-25',  # needed for py-orjson, remove if https://github.com/ijl/orjson/issues/108 is solved
+            sha256='a9780c953dc9e6c23027e0b84639cdee10ae2519e3dfab468aa1ed707ba036e5',
+            url='https://static.rust-lang.org/dist/2021-05-25/rustc-nightly-src.tar.gz')
+    version('1.51.0', sha256='7a6b9bafc8b3d81bbc566e7c0d1f17c9f499fd22b95142f7ea3a8e4d1f9eb847', preferred=True)
     version('1.50.0', sha256='95978f8d02bb6175ae3238930baf03563c240aedf9a70bebdc3eaa2a8c3c5a5e')
     version('1.49.0', sha256='b50aefa8df1fdfc9bccafdbf37aee611c8dfe81bf5648d5f43699c50289dc779')
     version('1.48.0', sha256='0e763e6db47d5d6f91583284d2f989eacc49b84794d1443355b85c58d67ae43b')
@@ -143,6 +146,13 @@ class Rust(Package):
     # This dictionary contains a version: hash dictionary for each supported
     # Rust target.
     rust_releases = {
+        'nightly.2021-05-25': {
+            'url': 'https://static.rust-lang.org/dist/2021-05-25/rust-nightly-{target}.tar.gz',
+            'x86_64-unknown-linux-gnu':      '573ce364c14597bc8d2b7475d92877302e2ce2e321048d531aee554dc1cbfb4e',
+            'powerpc64le-unknown-linux-gnu': '0c92b28457b43ec83794a3c1baacc604e03b98ac493ffd724c423b339df51020',
+            'aarch64-unknown-linux-gnu':     '5a32fbb06ba27aa0cb5b664017a8b7a51d314d82e5fa11116faadea5567b7d42',
+            'x86_64-apple-darwin':           '6c1ea360657cc1078a9697c62983eea13e2eb270fdb6c67c0c1dd59814b370bf'
+        },
         '1.51.0': {
             'x86_64-unknown-linux-gnu':      '9e125977aa13f012a68fdc6663629c685745091ae244f0587dd55ea4e3a3e42f',
             'powerpc64le-unknown-linux-gnu': '7362f561104d7be4836507d3a53cd39444efcdf065813d559beb1f54ce9f7680',
@@ -460,6 +470,8 @@ class Rust(Package):
     # cross compiling. I'm not sure Spack provides a way to specify a
     # distinction in the when clause, though.
     for rust_version, rust_targets in iteritems(rust_releases):
+        rust_url = rust_targets.pop(
+            'url', 'https://static.rust-lang.org/dist/rust-{version}-{target}.tar.gz')
         for rust_target, rust_sha256 in iteritems(rust_targets):
             for rust_arch in rust_archs[rust_target]:
                 resource(
@@ -467,7 +479,7 @@ class Rust(Package):
                         version=rust_version,
                         target=rust_target
                     ),
-                    url='https://static.rust-lang.org/dist/rust-{version}-{target}.tar.gz'.format(
+                    url=rust_url.format(
                         version=rust_version,
                         target=rust_target
                     ),
