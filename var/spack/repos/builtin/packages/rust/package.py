@@ -59,10 +59,12 @@ class Rust(Package):
     )
 
     depends_on('python@2.7:', type='build')
-    depends_on('python@2.7:2.8', when='@:1.43', type='build')
+    # needs lower boundary to exclude pre-release versions:
+    depends_on('python@2.7:2.8', when='@0.0:1.43', type='build')
     depends_on('gmake@3.81:', type='build')
     depends_on('cmake@3.4.3:', type='build')
-    depends_on('ninja', when='@1.48.0:', type='build')
+    # explicitly include pre-release versions here:
+    depends_on('ninja', when='@1.48.0:,beta,nightly,master', type='build')
     depends_on('pkgconfig', type='build')
     depends_on('openssl')
     depends_on('libssh2')
@@ -416,7 +418,7 @@ class Rust(Package):
     }
 
     # Specifies the strings which represent a pre-release Rust version. These
-    # always bootstrap with the latest beta release.
+    # always bootstrap with the latest nightly build.
     #
     # NOTE: These are moving targets, and therefore have no stable checksum. Be
     # sure to specify "-n" or "--no-checksum" when installing these versions.
@@ -425,20 +427,22 @@ class Rust(Package):
     for prerelease_version in rust_prerelease_versions:
         for rust_target, rust_arch_list in iteritems(rust_archs):
             for rust_arch in rust_arch_list:
-                # All pre-release builds are built with the latest beta
+                # All pre-release builds are built with the latest nightly
                 # compiler.
                 resource(
-                    name='rust-beta-{target}'.format(
+                    name='rust-nightly-{target}'.format(
                         target=rust_target
                     ),
-                    url='https://static.rust-lang.org/dist/rust-beta-{target}.tar.gz'.format(
+                    url='https://static.rust-lang.org/dist/rust-nightly-{target}.tar.gz'.format(
                         target=rust_target
                     ),
                     # Fake SHA - checksums should never be checked for
                     # pre-release builds, anyway
                     sha256='0000000000000000000000000000000000000000000000000000000000000000',
                     destination='spack_bootstrap_stage',
-                    when='@{version} platform={platform} target={target}'\
+                    # Artificial version range as a workaround to match only not further specified
+                    # pre-release versions, this allows version pinning
+                    when='@{version}:{version}.0 platform={platform} target={target}'\
                     .format(
                         version=prerelease_version,
                         platform=rust_arch['platform'],
@@ -504,11 +508,11 @@ class Rust(Package):
         target = self.get_rust_target()
 
         # Bootstrapping compiler selection:
-        # Pre-release compilers use the latest beta release for the
+        # Pre-release compilers use the latest nightly build for the
         # bootstrapping compiler.
         # Versioned releases bootstrap themselves.
         if '@beta' in spec or '@nightly' in spec or '@master' in spec:
-            bootstrap_version = 'beta'
+            bootstrap_version = 'nightly'
         else:
             bootstrap_version = spec.version
         # See the NOTE above the resource loop - should be host architecture,
@@ -578,6 +582,13 @@ class Rust(Package):
         else:
             rustfmt_spec = ''
 
+        # The "channel" for the Rust build to produce.
+        # The nightly channel allows using nightly features
+        if '@nightly' in spec:
+            channel = "nightly"
+        else:
+            channel = "stable"
+
         with open('config.toml', 'w') as out_file:
             out_file.write("""\
 [build]
@@ -592,7 +603,7 @@ verbose = 2
 {rustfmt_spec}
 
 [rust]
-channel = "stable"
+channel = "{channel}"
 rpath = true
 {deny_warnings_spec}
 
@@ -605,6 +616,7 @@ sysconfdir = "etc"
                 cargo=join_path(boot_bin, 'cargo'),
                 rustc=join_path(boot_bin, 'rustc'),
                 prefix=prefix,
+                channel=channel,
                 deny_warnings_spec=deny_warnings_spec,
                 target_spec=target_spec,
                 target_specs=target_specs,
