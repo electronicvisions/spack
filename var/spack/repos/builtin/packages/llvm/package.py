@@ -172,17 +172,23 @@ class Llvm(CMakePackage, CudaPackage):
     patch('llvm7-0004-libclang-WIP-Allow-visiting-of-implicit-declarations.patch', when='@7.0:7.999 +visionary', level=2)
     patch('llvm7-0005-libclang-WIP-Fix-get_tokens-in-macro-expansion.patch',       when='@7.0:7.999 +visionary', level=2)
 
-    patch('llvm9-0001-Tooling-Fully-qualify-template-parameters-of-nested-.patch', when='@9.0:10.999 +visionary', level=2)
+    patch('llvm9-0001-Tooling-Fully-qualify-template-parameters-of-nested-.patch', when='@9.0.0:12.0.999 +visionary', level=2)
     patch('llvm9-0002-libclang-Add-support-for-obtaining-fully-qualified-n.patch', when='@9.0:10.999 +visionary', level=2)
     patch('llvm9-0003-libclang-Add-option-to-keep-whitespace-when-tokenizi.patch', when='@9.0:10.999 +visionary', level=2)
     patch('llvm9-0004-libclang-WIP-Allow-visiting-of-implicit-declarations.patch', when='@9.0:10.999 +visionary', level=2)
     patch('llvm9-0005-libclang-WIP-Fix-get_tokens-in-macro-expansion.patch',       when='@9.0:10.999 +visionary', level=2)
 
-    patch('llvm9-0001-Tooling-Fully-qualify-template-parameters-of-nested-.patch', when='@11.0:11.999 +visionary', level=2)
-    patch('llvm11-0002-libclang-Add-support-for-obtaining-fully-qualified-n.patch', when='@11.0:11.999 +visionary', level=2)
-    patch('llvm11-0003-libclang-Add-option-to-keep-whitespace-when-tokenizi.patch', when='@11.0:11.999 +visionary', level=2)
-    patch('llvm11-0004-libclang-WIP-Allow-visiting-of-implicit-declarations.patch', when='@11.0:11.999 +visionary', level=2)
-    patch('llvm11-0005-libclang-WIP-Fix-get_tokens-in-macro-expansion.patch',       when='@11.0:11.999 +visionary', level=2)
+    # 0001-Tooling-Fully-qualify-template-parameters-of-nested-.patch from above
+    patch('llvm11-0002-libclang-Add-support-for-obtaining-fully-qualified-n.patch', when='@11.0.0:11.0.999 +visionary', level=2)
+    patch('llvm11-0003-libclang-Add-option-to-keep-whitespace-when-tokenizi.patch', when='@11.0.0:11.0.999 +visionary', level=2)
+    patch('llvm11-0004-libclang-WIP-Allow-visiting-of-implicit-declarations.patch', when='@11.0.0:11.0.999 +visionary', level=2)
+    patch('llvm11-0005-libclang-WIP-Fix-get_tokens-in-macro-expansion.patch',       when='@11.0.0:12.0.999 +visionary', level=2)
+
+    # 0001-Tooling-Fully-qualify-template-parameters-of-nested-.patch from above
+    patch('llvm11_1-0002-libclang-Add-support-for-obtaining-fully-qualified-n.patch', when='@11.1.0:12.0.999 +visionary', level=2)
+    patch('llvm11_1-0003-libclang-Add-option-to-keep-whitespace-when-tokenizi.patch', when='@11.1.0:12.0.999 +visionary', level=2)
+    patch('llvm11_1-0004-libclang-WIP-Allow-visiting-of-implicit-declarations.patch', when='@11.1.0:12.0.999 +visionary', level=2)
+    # 0005-libclang-WIP-Fix-get_tokens-in-macro-expansion.patch from above
 
     # disable check for member `mode` size in `struct ipc_perm`; newer glibc changed width
     patch('llvm9-disable-check-for-ipc_perm-mode.patch', when='@9.0.0:9.0.999', level=2)
