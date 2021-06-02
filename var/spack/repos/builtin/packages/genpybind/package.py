@@ -42,7 +42,7 @@ class Genpybind(WafPackage):
     version('visions', branch='master', git='https://github.com/electronicvisions/genpybind')
 
     depends_on(
-            'llvm+clang+python+visionary@5.0.0:5.999.999,7.0.0:7.999.999,9.0.0:9.999.999',
+        'llvm+clang+python+visionary@5.0.0:5.999.999,7.0.0:7.999.999,9.0.0:',
         type=('build', 'link', 'run'))
     depends_on('binutils', type='build')
     depends_on('python@2.7:', type=('build', 'run'))
