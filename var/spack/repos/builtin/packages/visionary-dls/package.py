@@ -42,6 +42,7 @@ class VisionaryDls(Package):
     depends_on('py-seaborn')
     depends_on('py-soundfile')
     depends_on('py-sphinx')
+    depends_on('py-sphinx-rtd-theme')
     depends_on('py-sphinxcontrib-jupyter')
     depends_on('py-sqlalchemy')
     depends_on('py-tqdm')
