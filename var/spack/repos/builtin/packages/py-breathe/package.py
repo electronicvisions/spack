@@ -30,3 +30,5 @@ class PyBreathe(PythonPackage):
     depends_on('py-docutils @0.5:', type=('build', 'run'))
     depends_on('py-six@1.4:', type=('build', 'run'))
     depends_on('doxygen @1.8.4:')
+
+    patch('add-support-for-property.patch')
