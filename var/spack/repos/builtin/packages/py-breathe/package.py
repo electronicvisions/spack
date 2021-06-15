@@ -13,6 +13,7 @@ class PyBreathe(PythonPackage):
     homepage = "https://github.com/michaeljones/breathe"
     url      = "https://github.com/michaeljones/breathe/archive/v4.11.1.tar.gz"
 
+    version('4.30.0', sha256='540ca6d694aa2e194ba33265f58e0070465799f6feabb726d198cb039972a5a3')
     version('4.21.0', sha256='7f97756a1b7f7998377b1153a976bf0d2879bb3ca1cb7bc846f455d37ca87ead')
     version('4.11.1', sha256='84723eefc7cc05da6895e2dd6e7c72926c5fd88a67de57edce42d99c058c7e06')
     version('4.11.0', sha256='8c9f900560529ca2f589f26759be94c2accad14fd83fee34d353cf6f446e09f6')
@@ -28,7 +29,7 @@ class PyBreathe(PythonPackage):
     depends_on('py-setuptools', type='build')
     depends_on('py-sphinx @1.4:', type=('build', 'run'))
     depends_on('py-docutils @0.5:', type=('build', 'run'))
-    depends_on('py-six@1.4:', type=('build', 'run'))
+    depends_on('py-six@1.4:', when="@:4.29.0", type=('build', 'run'))  # not needed for >=4.29.1
     depends_on('doxygen @1.8.4:')
 
     patch('add-support-for-property.patch')
