@@ -55,7 +55,7 @@ def create_stage_root(path):
 
     # Obtain lists of ancestor and descendant paths of the $user node, if any.
     group_paths, user_node, user_paths = partition_path(path,
-                                                        getpass.getuser())
+                                                        sup._getuser_fallback_to_uid())
 
     for p in group_paths:
         if not os.path.exists(p):
@@ -138,7 +138,7 @@ def _resolve_paths(candidates):
     $user and appending $user if it is not present in the path.
     """
     temp_path = sup.canonicalize_path('$tempdir')
-    user = getpass.getuser()
+    user = sup._getuser_fallback_to_uid()
     tmp_has_usr = user in temp_path.split(os.path.sep)
 
     paths = []
