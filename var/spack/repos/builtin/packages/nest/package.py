@@ -14,10 +14,11 @@ class Nest(CMakePackage):
     than on the exact morphology of individual neurons."""
 
     homepage = "http://www.nest-simulator.org"
-    url      = "https://github.com/nest/nest-simulator/releases/download/v2.12.0/nest-2.12.0.tar.gz"
+    url      = "https://github.com/nest/nest-simulator/archive/refs/tags/v2.20.1.tar.gz"
     git      = "https://github.com/nest/nest-simulator.git"
 
     version('master', branch='master')
+    version('2.20.1', sha256='df3d32b5899d5d444f708037b290f889ac6ff8eae6b7be9e9faee2c0d660d8e5')
     version('2.20.0', sha256='40e33187c22d6e843d80095b221fa7fd5ebe4dbc0116765a91fc5c425dd0eca4')
     version('2.14.0', sha256='d6316d6c9153100a3220488abfa738958c4b65bf2622bd15540e4aa81e79f17f')
     version('2.12.0', sha256='bac578f38bb0621618ee9d5f2f1febfee60cddc000ff32e51a5f5470bb3df40d')
