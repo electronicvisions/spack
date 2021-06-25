@@ -400,8 +400,8 @@ def compute_spec_deps(spec_list, check_index_only=False):
 
         for s in spec.traverse(deptype=all):
             if s.external:
-                tty.msg('Will not stage external pkg: {0}'.format(s))
-                continue
+                tty.msg('Will ~~not~~ stage external pkg: {0}'.format(s))
+                #continue
 
             up_to_date_mirrors = bindist.get_mirrors_for_spec(
                 spec=s, full_hash_match=True, index_only=check_index_only)
@@ -416,8 +416,8 @@ def compute_spec_deps(spec_list, check_index_only=False):
             for d in s.dependencies(deptype=all):
                 dkey = spec_deps_key(d)
                 if d.external:
-                    tty.msg('Will not stage external dep: {0}'.format(d))
-                    continue
+                    tty.msg('Will ~~not~~ stage external dep: {0}'.format(d))
+                    #continue
 
                 append_dep(skey, dkey)
 
