@@ -9,12 +9,16 @@ from spack import *
 class Gtkplus(AutotoolsPackage):
     """The GTK+ 2 package contains libraries used for creating graphical user
        interfaces for applications."""
-    homepage = "http://www.gtk.org"
-    url = "http://ftp.gnome.org/pub/gnome/sources/gtk+/2.24/gtk+-2.24.31.tar.xz"
-    version('3.20.10', sha256='e81da1af1c5c1fee87ba439770e17272fa5c06e64572939814da406859e56b70')
-    version('2.24.32', sha256='b6c8a93ddda5eabe3bfee1eb39636c9a03d2a56c7b62828b359bf197943c582e')
-    version('2.24.31', sha256='68c1922732c7efc08df4656a5366dcc3afdc8791513400dac276009b40954658')
-    version('2.24.25', sha256='38af1020cb8ff3d10dda2c8807f11e92af9d2fa4045de61c62eedb7fbc7ea5b3')
+
+    homepage = "https://www.gtk.org/"
+    url      = "https://download.gnome.org/sources/gtk+/3.24/gtk+-3.24.26.tar.xz"
+
+    version('3.24.29', sha256='f57ec4ade8f15cab0c23a80dcaee85b876e70a8823d9105f067ce335a8268caa')
+    version('3.24.26', sha256='2cc1b2dc5cad15d25b6abd115c55ffd8331e8d4677745dd3ce6db725b4fff1e9')
+    version('3.20.10', sha256='e81da1af1c5c1fee87ba439770e17272fa5c06e64572939814da406859e56b70', deprecated=True)
+    version('2.24.32', sha256='b6c8a93ddda5eabe3bfee1eb39636c9a03d2a56c7b62828b359bf197943c582e', deprecated=True)
+    version('2.24.31', sha256='68c1922732c7efc08df4656a5366dcc3afdc8791513400dac276009b40954658', deprecated=True)
+    version('2.24.25', sha256='38af1020cb8ff3d10dda2c8807f11e92af9d2fa4045de61c62eedb7fbc7ea5b3', deprecated=True)
 
     variant('cups', default='False', description='enable cups support')
 
@@ -47,6 +51,11 @@ class Gtkplus(AutotoolsPackage):
         # remove disable deprecated flag.
         filter_file(r'CFLAGS="-DGDK_PIXBUF_DISABLE_DEPRECATED $CFLAGS"',
                     '', 'configure', string=True)
+
+        # https://gitlab.gnome.org/GNOME/gtk/-/issues/3776
+        if self.spec.satisfies('%gcc@11:'):
+            filter_file("    '-Werror=array-bounds',",
+                        '', 'meson.build', string=True)
 
     def setup_run_environment(self, env):
         env.prepend_path("GI_TYPELIB_PATH",

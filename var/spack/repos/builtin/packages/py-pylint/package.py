@@ -11,6 +11,7 @@ class PyPylint(PythonPackage):
 
     pypi = "pylint/pylint-1.6.5.tar.gz"
 
+    version('2.8.2', sha256='586d8fa9b1891f4b725f587ef267abe2a1bad89d6b184520c7f07a253dd6e217')
     version('2.5.3', sha256='7dd78437f2d8d019717dbf287772d0b2dbdfd13fc016aa7faa08d67bccc46adc')
     version('2.4.4', sha256='3db5468ad013380e987410a8d6956226963aed94ecb5f9d3a28acca6d9ac36cd')
     version('2.3.1', sha256='723e3db49555abaf9bf79dc474c6b9e2935ad82230b10c1138a71ea41ac0fff1')
@@ -23,23 +24,26 @@ class PyPylint(PythonPackage):
 
     extends('python', ignore=r'bin/pytest')
     depends_on('python@2.7:2.8,3.4:3.6', when='@:1', type=('build', 'run'))
-    depends_on('python@3.4:', when='@2:', type=('build', 'run'))
-    depends_on('python@3.5.0:', when='@2.4.0:')
+    depends_on('python@3.4:', when='@2:2.7.999', type=('build', 'run'))
+    depends_on('python@3.6:', when='@2.8.2:', type=('build', 'run'))
     depends_on('py-astroid', type=('build', 'run'))
     # note there is no working version of astroid for this
     depends_on('py-astroid@1.5.1:', type=('build', 'run'), when='@1.7:')
     depends_on('py-astroid@1.6:1.9', type=('build', 'run'), when='@1.9.4')
     depends_on('py-astroid@2.0:', type=('build', 'run'), when='@2.2.0:')
-    depends_on('py-astroid@2.2.0:2.999.999', type=('build', 'run'), when='@2.3.0:')
+    depends_on('py-astroid@2.2.0:2.999.999', type=('build', 'run'), when='@2.3.0:2.7.999')
     depends_on('py-astroid@2.3.0:2.3.999', type=('build', 'run'), when='@2.4.0:2.4.999')
-    depends_on('py-astroid@2.4.0:2.4.999', type=('build', 'run'), when='@2.5.0:')
-    depends_on('py-six', type=('build', 'run'), when='@1:')
+    depends_on('py-astroid@2.4.0:2.4.999', type=('build', 'run'), when='@2.5.0:2.7.999')
+    depends_on('py-astroid@2.5.6:2.6.999', type=('build', 'run'), when='@2.8.0:')
+
+    depends_on('py-six', type=('build', 'run'), when='@1:2.3.1')
     depends_on('py-isort@4.2.5:', type=('build', 'run'))
-    depends_on('py-isort@4.2.5:4.999', when='@2.3.1:', type=('build', 'run'))
+    depends_on('py-isort@4.2.5:5.999', when='@2.3.1:', type=('build', 'run'))
     depends_on('py-mccabe', type=('build', 'run'))
     depends_on('py-mccabe@0.6.0:0.6.999', when='@2.3.1:', type=('build', 'run'))
     depends_on('py-editdistance', type=('build', 'run'), when='@:1.7')
     depends_on('py-setuptools@17.1:', type='build')
+    depends_on('py-setuptools-scm', type='build', when='@2.8.2:')
     # depends_on('py-setuptools-scm@1.15.0:', type='build')
     depends_on('py-configparser', when='^python@:2.8', type=('build', 'run'))
     depends_on('py-backports-functools-lru-cache', when='^python@:2.8', type=('build', 'run'))

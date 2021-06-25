@@ -27,7 +27,7 @@ class PyJedi(PythonPackage):
     version('0.12.0', sha256='1972f694c6bc66a2fac8718299e2ab73011d653a6d8059790c3476d2353b99ad')
     version('0.10.2', sha256='7abb618cac6470ebbd142e59c23daec5e6e063bfcecc8a43a037d2ab57276f4e')
     version('0.10.1', sha256='2420daf6fd00e80caf1bc22903598b5bf5560c900113dcc120eaefc7b4d50e06')
-    # no source on pypi for v0.10.0
+    # unfortunately pypi.io only offers a .whl for 0.10.0
     version('0.10.0', sha256='d6a7344df9c80562c3f62199278004ccc7c5889be9f1a6aa5abde117ec085123',
             url='https://github.com/davidhalter/jedi/archive/v0.10.0.tar.gz')
     version('0.9.0', sha256='3b4c19fba31bdead9ab7350fb9fa7c914c59b0a807dcdd5c00a05feb85491d31')

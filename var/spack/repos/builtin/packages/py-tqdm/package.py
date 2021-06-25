@@ -13,6 +13,7 @@ class PyTqdm(PythonPackage):
     pypi = "tqdm/tqdm-4.45.0.tar.gz"
 
     version('4.59.0', sha256='d666ae29164da3e517fcf125e41d4fe96e5bb375cd87ff9763f6b38b5592fe33')
+    version('4.56.2', sha256='11d544652edbdfc9cc41aa4c8a5c166513e279f3f2d9f1a9e1c89935b51de6ff')
     version('4.45.0', sha256='00339634a22c10a7a22476ee946bbde2dbe48d042ded784e4d88e0236eca5d81')
     version('4.36.1', sha256='abc25d0ce2397d070ef07d8c7e706aede7920da163c64997585d42d3537ece3d')
     version('4.31.1', sha256='e22977e3ebe961f72362f6ddfb9197cc531c9737aaf5f607ef09740c849ecd05')

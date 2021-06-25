@@ -93,7 +93,7 @@ class Rust(Package):
     version('nightly.2021-05-25',  # needed for py-orjson, remove if https://github.com/ijl/orjson/issues/108 is solved
             sha256='a9780c953dc9e6c23027e0b84639cdee10ae2519e3dfab468aa1ed707ba036e5',
             url='https://static.rust-lang.org/dist/2021-05-25/rustc-nightly-src.tar.gz')
-    version('1.51.0', sha256='7a6b9bafc8b3d81bbc566e7c0d1f17c9f499fd22b95142f7ea3a8e4d1f9eb847', preferred=True)
+    version('1.51.0', sha256='7a6b9bafc8b3d81bbc566e7c0d1f17c9f499fd22b95142f7ea3a8e4d1f9eb847')
     version('1.50.0', sha256='95978f8d02bb6175ae3238930baf03563c240aedf9a70bebdc3eaa2a8c3c5a5e')
     version('1.49.0', sha256='b50aefa8df1fdfc9bccafdbf37aee611c8dfe81bf5648d5f43699c50289dc779')
     version('1.48.0', sha256='0e763e6db47d5d6f91583284d2f989eacc49b84794d1443355b85c58d67ae43b')
@@ -515,6 +515,14 @@ class Rust(Package):
             return True
 
         return '@{0}:'.format(version) in self.spec
+
+    def patch(self):
+        if self.spec.satisfies('@1.51.0'):
+            # see 31c93397bde7 upstream
+            filter_file('panic!(out);',
+                        'panic!("{}", out);',
+                        'src/bootstrap/builder.rs',
+                        string=True)
 
     def configure(self, spec, prefix):
         target = self.get_rust_target()
