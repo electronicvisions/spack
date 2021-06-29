@@ -10,8 +10,7 @@ class Log4cxx(AutotoolsPackage):
     """A C++ port of Log4j"""
 
     homepage = "https://logging.apache.org/log4cxx/latest_stable/"
-    url      = "http://mirror.netcologne.de/apache.org/logging/log4cxx/0.10.0/apache-log4cxx-0.10.0.tar.gz"
-
+    url      = "https://archive.apache.org/dist/logging/log4cxx/0.10.0/apache-log4cxx-0.10.0.tar.gz"
     version('0.10.0', sha256='0de0396220a9566a580166e66b39674cb40efd2176f52ad2c65486c99c920c8c')
 
     depends_on('apr-util')
