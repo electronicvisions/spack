@@ -65,7 +65,7 @@ class VisionaryDlsCore(Package):
     depends_on('python@3.7.0:')
 
     # xilinx runtime dependencies
-    depends_on('visionary-xilinx')
+    #depends_on('visionary-xilinx')
 
     def install(self, spec, prefix):
         mkdirp(prefix.etc)
