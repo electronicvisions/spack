@@ -29,7 +29,7 @@ class PyElephant(PythonPackage):
              url='http://www.borgelt.net/bin64/py3/fim.so',
              destination='.',
              placement='elephant/spade_src/fim364.so',
-             sha256='67d556ed8e5a56c7e295845a239fbf36f8499a4c7216de9cd677d75c03cf5d29',
+             sha256='4e4751f511d32c37f0feefec5ee3c566e8e31c3cc345e4add0d9fe3fd8747300',
              when='^python@3:',
              expand=False)
 
