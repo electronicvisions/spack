@@ -25,7 +25,7 @@ class PyLlvmlite(PythonPackage):
     variant('skipllvmcheck', default=True, description='skips the llvm version check for 0.31.0 to allow use of llvm@9')
 
     patch('https://github.com/jschueller/llvmlite/commit/7c14ef015f2f95f264f53404dfcea68b1214d6e9.patch',
-          sha256='586f594a850b314800737dff4b12d04d641a96eb94c0507140a50aea5ba2f80e')
+          sha256='586f594a850b314800737dff4b12d04d641a96eb94c0507140a50aea5ba2f80e', when='@:0.32.999')
 
     depends_on('py-setuptools', type='build')
     depends_on('python@2.6:2.8,3.4:', type=('build', 'run'))
