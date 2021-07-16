@@ -22,7 +22,7 @@ class PyLlvmlite(PythonPackage):
     version('0.23.0', sha256='bc8b1b46274d05b578fe9e980a6d98fa71c8727f6f9ed31d4d8468dce7aa5762')
     version('0.20.0', sha256='b2f174848df16bb9195a07fec102110a06d018da736bd9b3570a54d44c797c29')
 
-    variant('skipllvmcheck', default=True, description='skips the llvm version check for 0.31.0 to allow use of llvm@9')
+    variant('skipllvmcheck', default=False, description='skips the llvm version check')
 
     patch('https://github.com/jschueller/llvmlite/commit/7c14ef015f2f95f264f53404dfcea68b1214d6e9.patch',
           sha256='586f594a850b314800737dff4b12d04d641a96eb94c0507140a50aea5ba2f80e', when='@:0.32.999')
@@ -33,15 +33,16 @@ class PyLlvmlite(PythonPackage):
     depends_on('py-enum34', type=('build', 'run'), when='^python@:3.3.99')
 
     # llvmlite compatibility information taken from https://github.com/numba/llvmlite#compatibility
+    depends_on('llvm~flang', when='+skipllvmcheck')
     for t in ['arm:', 'ppc:', 'ppc64:', 'ppc64le:', 'ppcle:',
               'sparc:', 'sparc64:', 'x86:', 'x86_64:']:
-        depends_on('llvm@10.0:10.0.99~flang', when='@0.34.0: target={0}'.format(t))
-    depends_on('llvm@9.0:9.0.99~flang', when='@0.34.0: target=aarch64:')
-    depends_on('llvm@9.0:9.0.99~flang', when='@0.33.0:0.33.99')
-    depends_on('llvm@7.0:9.0.99~flang', when='@0.29.0:0.32.99')
-    depends_on('llvm@7.0:7.0.99~flang', when='@0.27.0:0.28.99')
-    depends_on('llvm@6.0:6.0.99~flang', when='@0.23.0:0.26.99')
-    depends_on('llvm@4.0:4.0.99~flang', when='@0.17.0:0.20.99')
+        depends_on('llvm@10.0:10.0.999~flang', when='@0.34.0:0.36.99 ~skipllvmcheck target={0}'.format(t))
+    depends_on('llvm@9.0:9.0.99~flang', when='@0.34.0:0.36.99 ~skipllvmcheck target=aarch64:')
+    depends_on('llvm@9.0:9.0.99~flang', when='@0.33.0:0.33.99 ~skipllvmcheck')
+    depends_on('llvm@7.0:9.0.99~flang', when='@0.29.0:0.32.99 ~skipllvmcheck')
+    depends_on('llvm@7.0:7.0.99~flang', when='@0.27.0:0.28.99 ~skipllvmcheck')
+    depends_on('llvm@6.0:6.0.99~flang', when='@0.23.0:0.26.99 ~skipllvmcheck')
+    depends_on('llvm@4.0:4.0.99~flang', when='@0.17.0:0.20.99 ~skipllvmcheck')
     depends_on('binutils', type='build')
 
     def setup_build_environment(self, env):
@@ -53,3 +54,5 @@ class PyLlvmlite(PythonPackage):
             env.set('CXX_FLTO_FLAGS', '-flto {0}'.format(
                 self.compiler.cxx_pic_flag))
             # env.set('CXXFLAGS', '-fPIC')
+        if self.spec.satisfies('@0.33.0: +skipllvmcheck'):
+            env.set('LLVMLITE_SKIP_LLVM_VERSION_CHECK', 1)
