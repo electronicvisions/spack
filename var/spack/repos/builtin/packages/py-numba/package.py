@@ -12,6 +12,10 @@ class PyNumba(PythonPackage):
     homepage = "https://numba.pydata.org/"
     pypi = "numba/numba-0.35.0.tar.gz"
 
+    version('0.54.1', sha256='f9dfc803c864edcc2381219b800abf366793400aea55e26d4d5b7d953e14f43f')
+    version('0.54.0', sha256='bad6bd98ab2e41c34aa9c80b8d9737e07d92a53df4f74d3ada1458b0b516ccff')
+    version('0.53.1', sha256='1e765b1a41535684bf3b0465c1d0a24dcbbff6af325270c8f4dad924c0940162')
+    version('0.52.0', sha256='44661c5bd85e3d3619be0a40eedee34e397e9ccb3d4c458b70e10bf95d1ce933')
     version('0.51.1', sha256='1e765b1a41535684bf3b0465c1d0a24dcbbff6af325270c8f4dad924c0940160')
     version('0.50.1', sha256='89e81b51b880f9b18c82b7095beaccc6856fcf84ba29c4f0ced42e4e5748a3a7')
     version('0.48.0', sha256='9d21bc77e67006b5723052840c88cc59248e079a907cc68f1a1a264e1eaba017')
@@ -25,7 +29,12 @@ class PyNumba(PythonPackage):
     depends_on('py-numpy@1.10:1.99', type=('build', 'run'))
     depends_on('py-setuptools', type=('build', 'run'))
 
-    depends_on('py-llvmlite@0.31:', type=('build', 'run'), when='@0.48.0:')
+    depends_on('py-llvmlite@0.37.0:0.37.999', type=('build', 'run'), when='@0.54.0:')
+    depends_on('py-llvmlite@0.36.0:0.36.999', type=('build', 'run'), when='@0.53.0:0.53.999')
+    depends_on('py-llvmlite@0.35.0:0.35.999', type=('build', 'run'), when='@0.52.0:0.52.999')
+    depends_on('py-llvmlite@0.33.0:0.33.999', type=('build', 'run'), when='@0.50.0:0.50.999')
+    depends_on('py-llvmlite@0.32.0:0.32.999', type=('build', 'run'), when='@0.49.0:0.49.999')
+    depends_on('py-llvmlite@0.31.0:0.31.999', type=('build', 'run'), when='@0.48.0:0.48.999')
     depends_on('py-llvmlite@0.25:', type=('build', 'run'), when='@0.40.1:0.47.99')
     # Note: As of 1 Nov 2018, 0.25 was the latest version of py-llvmlite.
     # That's why it was chosen as an upper bound in the following depends_on
