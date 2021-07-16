@@ -12,6 +12,9 @@ class PyLlvmlite(PythonPackage):
     homepage = "http://llvmlite.readthedocs.io/en/latest/index.html"
     pypi = "llvmlite/llvmlite-0.23.0.tar.gz"
 
+    version('0.37.0', sha256='6392b870cd018ec0c645d6bbb918d6aa0eeca8c62674baaee30862d6b6865b15')
+    version('0.36.0', sha256='765128fdf5f149ed0b889ffbe2b05eb1717f8e20a5c87fa2b4018fbcce0fcfc9')
+    version('0.35.0', sha256='80e51d5aa02ad72da9870e89d21f9b152b0220ca551b4596a6c0614bcde336fc')
     version('0.34.0', sha256='f03ee0d19bca8f2fe922bb424a909d05c28411983b0c2bc58b020032a0d11f63')
     version('0.33.0', sha256='9c8aae96f7fba10d9ac864b443d1e8c7ee4765c31569a2b201b3d0b67d8fc596')
     version('0.31.0', sha256='22ab2b9d7ec79fab66ac8b3d2133347de86addc2e2df1b3793e523ac84baa3c8')
@@ -33,7 +36,9 @@ class PyLlvmlite(PythonPackage):
     depends_on('py-enum34', type=('build', 'run'), when='^python@:3.3.99')
 
     # llvmlite compatibility information taken from https://github.com/numba/llvmlite#compatibility
+    #                                           and https://github.com/numba/llvmlite/blob/master/CHANGE_LOG
     depends_on('llvm~flang', when='+skipllvmcheck')
+    depends_on('llvm@11.0:11.1.999~flang', when='@0.37.0: ~skipllvmcheck')
     for t in ['arm:', 'ppc:', 'ppc64:', 'ppc64le:', 'ppcle:',
               'sparc:', 'sparc64:', 'x86:', 'x86_64:']:
         depends_on('llvm@10.0:10.0.999~flang', when='@0.34.0:0.36.99 ~skipllvmcheck target={0}'.format(t))
