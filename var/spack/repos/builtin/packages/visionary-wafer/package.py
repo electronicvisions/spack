@@ -63,16 +63,16 @@ class VisionaryWafer(Package):
     # if we want cuda we need to decide on the cuda_arch, cf. py-torch
     # depends_on('py-tensorflow~cuda~tensorrt~nccl', when='+tensorflow')
     depends_on('log4cxx')
-    depends_on('googletest +gmock')
+    depends_on('googletest@1.11.0:+gmock')
     depends_on('py-slurm-pipeline')
-    depends_on('nest@2.2.2+python')
-    depends_on('py-brian')
-    depends_on('py-brian2')
+    depends_on('nest@2.20.1+python')
+    #depends_on('py-brian')
+    #depends_on('py-brian2')
     depends_on('py-bokeh')
     depends_on('py-elephant')
     depends_on('py-notebook')
     depends_on('py-numba')
-    depends_on('py-pynn @0.7.5')
+    depends_on('py-pynn @0.9.6')
     depends_on('py-matplotlib')
     depends_on('py-numpy')
     depends_on('py-pandas @0.19.0:')
@@ -102,8 +102,11 @@ class VisionaryWafer(Package):
     ##################
     # intel-mkldnn depends on intel-mkl which also provides blas ->
     # concretization error -> reinvestigate when needed
-    # 1.4.1 is last py2 compatible version, not specifying breaks concretization
-    depends_on('py-torch@:1.4.1 ~mkldnn~mpi~tensorpipe~kineto~xnnpack~valgrind+caffe2')
+    # Our GPUs support
+    #   - cuda arch 6.1 (Geforce 1080)
+    #   - cuda arch 8.6 (GeForce RTX 3080)
+    # fix it up if you use other cards.
+    depends_on('py-torch ~mkldnn +fbgemm +distributed +mpi +tensorpipe +nccl +gloo +cuda cuda_arch=61,86')
 
     def install(self, spec, prefix):
         mkdirp(prefix.etc)
