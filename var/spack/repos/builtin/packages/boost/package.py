@@ -311,6 +311,13 @@ class Boost(Package):
     # and https://github.com/spack/spack/pull/21408
     patch("bootstrap-toolset.patch", when="@1.75")
 
+    # Patch problems with deprecation warnings when using gccxml.
+    # Newer boost versions use deprecation messages that are not
+    # supported by the gcc version used by gccxml used for
+    # generating bss1 python bindings.
+    # -> Check for gcc version and if necessary use old syntax.
+    patch('boost_1.76.0_deprecation_gccxml.patch', level=2, when='@1.76.0:')
+
     def patch(self):
         # Disable SSSE3 and AVX2 when using the NVIDIA compiler
         if self.spec.satisfies('%nvhpc'):

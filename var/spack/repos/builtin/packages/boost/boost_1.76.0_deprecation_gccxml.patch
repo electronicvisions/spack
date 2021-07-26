@@ -1,0 +1,17 @@
+diff --git a/spack-src/boost/system/detail/config.hpp b/spack-src/boost/system/detail/config.hpp
+index 296519b..c815759 100644
+--- a/spack-src/boost/system/detail/config.hpp
++++ b/spack-src/boost/system/detail/config.hpp
+@@ -54,7 +54,11 @@
+ # define BOOST_SYSTEM_DEPRECATED(msg) __attribute__((deprecated(msg)))
+ #elif defined(__GNUC__)
+ # if __GNUC__ * 100 + __GNUC_MINOR__ >= 405
+-#  define BOOST_SYSTEM_DEPRECATED(msg) __attribute__((deprecated(msg)))
++#  if defined(__GCCXML_GNUC__) && (__GCCXML_GNUC__ * 100 + __GCCXML_GNUC_MINOR__ < 405)
++#   define BOOST_SYSTEM_DEPRECATED(msg) __attribute__((deprecated))
++#  else
++#   define BOOST_SYSTEM_DEPRECATED(msg) __attribute__((deprecated(msg)))
++#  endif
+ # else
+ #  define BOOST_SYSTEM_DEPRECATED(msg) __attribute__((deprecated))
+ # endif
