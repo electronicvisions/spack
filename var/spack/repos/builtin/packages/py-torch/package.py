@@ -168,6 +168,11 @@ class PyTorch(PythonPackage, CudaPackage):
     depends_on('py-six', type='test')
     depends_on('py-psutil', type='test')
 
+    # Fixes compilation with CUDA 11.3
+    patch('https://github.com/pytorch/pytorch/commit/d966f3fb04129a1cf141cbee73afa6be1e746156.patch',
+          sha256='a451a7d01d2b5b880fcec5f7895983053cb2f87725738e7652d320bf2e403cd6',
+          when='@1.5:1.8.999+cuda^cuda@11.3:')
+
     # https://github.com/pytorch/pytorch/pull/35607
     # https://github.com/pytorch/pytorch/pull/37865
     # Fixes CMake configuration error when XNNPACK is disabled
