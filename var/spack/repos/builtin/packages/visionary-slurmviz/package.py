@@ -55,7 +55,7 @@ class VisionarySlurmviz(Package):
     depends_on('libtomlc99')
     depends_on('libtool')
     depends_on('lz4')
-    depends_on('munge')
+    depends_on('munge localstatedir="/opt/spack_views/visionary-slurmviz/var"')
     depends_on('openssl')
     # package is used to build slurmviz externally
     # -> need pkgconfig as non-build dependency
