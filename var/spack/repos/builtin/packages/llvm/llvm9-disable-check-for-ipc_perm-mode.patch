@@ -1,0 +1,11 @@
+--- spack-stage-llvm-9.0.1-yrm3zxxosstlzlp4fdvtouz6nelcrlta/spack-src/compiler-rt/lib/sanitizer_common/sanitizer_platform_limits_posix.cc	2019-12-11 20:15:30.000000000 +0100
++++ spack-stage-llvm-9.0.1-new/spack-src/compiler-rt/lib/sanitizer_common/sanitizer_platform_limits_posix.cc	2021-09-15 11:21:18.321423896 +0200
+@@ -1128,7 +1128,7 @@ CHECK_SIZE_AND_OFFSET(ipc_perm, cuid);
+ CHECK_SIZE_AND_OFFSET(ipc_perm, cgid);
+ #if !defined(__aarch64__) || !SANITIZER_LINUX || __GLIBC_PREREQ (2, 21)
+ /* On aarch64 glibc 2.20 and earlier provided incorrect mode field.  */
+-CHECK_SIZE_AND_OFFSET(ipc_perm, mode);
++//CHECK_SIZE_AND_OFFSET(ipc_perm, mode);
+ #endif
+ 
+ CHECK_TYPE_SIZE(shmid_ds);

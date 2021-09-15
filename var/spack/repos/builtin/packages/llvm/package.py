@@ -184,6 +184,9 @@ class Llvm(CMakePackage, CudaPackage):
     patch('llvm11-0004-libclang-WIP-Allow-visiting-of-implicit-declarations.patch', when='@11.0:11.999 +visionary', level=2)
     patch('llvm11-0005-libclang-WIP-Fix-get_tokens-in-macro-expansion.patch',       when='@11.0:11.999 +visionary', level=2)
 
+    # disable check for member `mode` size in `struct ipc_perm`; newer glibc changed width
+    patch('llvm9-disable-check-for-ipc_perm-mode.patch', when='@9.0.0:9.0.999', level=2)
+
     # Build dependency
     depends_on("cmake@3.4.3:", type="build")
     depends_on("python@2.7:2.8", when="@:4.999 ~python", type="build")
