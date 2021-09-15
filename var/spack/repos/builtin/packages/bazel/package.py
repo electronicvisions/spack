@@ -151,6 +151,9 @@ class Bazel(Package):
     patch('disabledepcheck.patch', when='@0.3.2:+nodepfail')
     patch('disabledepcheck_old.patch', when='@0.3.0:0.3.1+nodepfail')
 
+    # visionary (hack): when building on glibc >= 2.30 there's an overlapping function name
+    patch('rename-gettid-functions-0.25.patch', when='@0.25.2', level=0)
+
     phases = ['bootstrap', 'install']
 
     executables = ['^bazel$']
