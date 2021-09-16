@@ -267,8 +267,10 @@ class Gcc(AutotoolsPackage, GNUMirrorPackage):
     patch('glibc-2.31-libsanitizer-1.patch', when='@7.1.0:7.5.0,8.1.0:8.3.0,9.0.0:9.2.0')
     patch('glibc-2.31-libsanitizer-1-gcc-6.patch', when='@5.3.0:5.5.0,6.1.0:6.5.0')
     patch('glibc-2.31-libsanitizer-2.patch', when='@8.1.0:8.3.0,9.0.0:9.2.0')
+    patch('glibc-2.31-libsanitizer-2-gcc-4.patch', when='@4.9.2:4.9.999')
     patch('glibc-2.31-libsanitizer-2-gcc-6.patch', when='@5.3.0:5.5.0,6.1.0:6.5.0')
     patch('glibc-2.31-libsanitizer-2-gcc-7.patch', when='@7.1.0:7.5.0')
+    patch('glibc-2.31-libsanitizer-3-gcc-4.patch', when='@4.9.2:4.9.999')
     # Older versions do not compile with newer versions of glibc
     # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81712
     patch('ucontext_t.patch', when='@4.9,5.1:5.4,6.1:6.4,7.1')
