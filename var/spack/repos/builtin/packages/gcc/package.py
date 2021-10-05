@@ -25,20 +25,23 @@ class Gcc(AutotoolsPackage, GNUMirrorPackage):
     list_url = 'http://ftp.gnu.org/gnu/gcc/'
     list_depth = 1
 
-    maintainers = ['michaelkuhn']
+    maintainers = ['michaelkuhn', 'alalazo']
 
     version('master', branch='master')
 
+    version('11.2.0', sha256='d08edc536b54c372a1010ff6619dd274c0f1603aa49212ba20f7aa2cda36fa8b')
     version('11.1.0', sha256='4c4a6fb8a8396059241c2e674b85b351c26a5d678274007f076957afa1cc9ddf')
 
     version('10.3.0', sha256='64f404c1a650f27fc33da242e1f2df54952e3963a49e06e73f6940f3223ac344')
     version('10.2.0', sha256='b8dd4368bb9c7f0b98188317ee0254dd8cc99d1e3a18d0ff146c855fe16c1d8c')
     version('10.1.0', sha256='b6898a23844b656f1b68691c5c012036c2e694ac4b53a8918d4712ad876e7ea2')
 
+    version('9.4.0', sha256='c95da32f440378d7751dd95533186f7fc05ceb4fb65eb5b85234e6299eb9838e')
     version('9.3.0', sha256='71e197867611f6054aa1119b13a0c0abac12834765fe2d81f35ac57f84f742d1')
     version('9.2.0', sha256='ea6ef08f121239da5695f76c9b33637a118dcf63e24164422231917fa61fb206')
     version('9.1.0', sha256='79a66834e96a6050d8fe78db2c3b32fb285b230b855d0a66288235bc04b327a0')
 
+    version('8.5.0', sha256='d308841a511bb830a6100397b0042db24ce11f642dab6ea6ee44842e5325ed50')
     version('8.4.0', sha256='e30a6e52d10e1f27ed55104ad233c30bd1e99cfb5ff98ab022dc941edd1b2dd4')
     version('8.3.0', sha256='64baadfe6cc0f4947a84cb12d7f0dfaf45bb58b7e92461639596c21e02d97d2c')
     version('8.2.0', sha256='196c3c04ba2613f893283977e6011b2345d1cd1af9abeac58e916b1aab3e0080')
@@ -131,7 +134,7 @@ class Gcc(AutotoolsPackage, GNUMirrorPackage):
     depends_on('diffutils', type='build')
     depends_on('iconv', when='platform=darwin')
     depends_on('gnat', when='languages=ada')
-    depends_on('binutils+ld+plugins~libiberty', when='+binutils', type=('build', 'link', 'run'))
+    depends_on('binutils+gas+ld+plugins~libiberty', when='+binutils', type=('build', 'link', 'run'))
     depends_on('zip', type='build', when='languages=java')
     depends_on('cuda', when='+nvptx')
 
@@ -271,6 +274,9 @@ class Gcc(AutotoolsPackage, GNUMirrorPackage):
     patch('glibc-2.31-libsanitizer-2-gcc-6.patch', when='@5.3.0:5.5.0,6.1.0:6.5.0')
     patch('glibc-2.31-libsanitizer-2-gcc-7.patch', when='@7.1.0:7.5.0')
     patch('glibc-2.31-libsanitizer-3-gcc-4.patch', when='@4.9.2:4.9.999')
+    patch('https://gcc.gnu.org/git/?p=gcc.git;a=patch;h=2b40941d23b1570cdd90083b58fa0f66aa58c86e', sha256='b48e48736062e64a6da7cbe7e21a6c1c89422d1f49ef547c73b479a3f3f4935f', when='@6.5.0,7.4.0:7.5.0,8.2.0:9.3.0')
+    patch('https://gcc.gnu.org/git/?p=gcc.git;a=patch;h=745dae5923aba02982563481d75a21595df22ff8', sha256='eaa00c91e08a5e767f023911a49bc1b2d1a3eea38703b745ab260f90e8da41aa', when='@10.1.0:11.1.0')
+
     # Older versions do not compile with newer versions of glibc
     # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81712
     patch('ucontext_t.patch', when='@4.9,5.1:5.4,6.1:6.4,7.1')
@@ -286,6 +292,12 @@ class Gcc(AutotoolsPackage, GNUMirrorPackage):
 
     # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=95005
     patch('zstd.patch', when='@10')
+
+    # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100102
+    patch('https://gcc.gnu.org/git/?p=gcc.git;a=patch;h=fc930b3010bd0de899a3da3209eab20664ddb703',
+          sha256='28c5ab3b564d83dd7e6e35b9c683141a4cb57ee886c5367e54a0828538b3c789', when='@10.1:10.3')
+    patch('https://gcc.gnu.org/git/?p=gcc.git;a=patch;h=f1feb74046e0feb0596b93bbb822fae02940a90e',
+          sha256='3e5029489b79fc0d47fd6719f3d5c9d3bbc727a4a0cbff161a5517e8a3c98cb6',  when='@11.1')
 
     build_directory = 'spack-build'
 
@@ -510,6 +522,10 @@ class Gcc(AutotoolsPackage, GNUMirrorPackage):
         if spec.satisfies('+bootstrap'):
             options.extend([
                 '--enable-bootstrap',
+            ])
+        else:
+            options.extend([
+                '--disable-bootstrap',
             ])
 
         # Configure include and lib directories explicitly for these
