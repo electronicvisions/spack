@@ -187,6 +187,8 @@ class Llvm(CMakePackage, CudaPackage):
     # disable check for member `mode` size in `struct ipc_perm`; newer glibc changed width
     patch('llvm9-disable-check-for-ipc_perm-mode.patch', when='@9.0.0:9.0.999', level=2)
 
+    patch('llvm9-fix-build-gcc-11.patch', when='@9.0.0:11.999.999 %gcc@11.0.0:', level=0)
+
     # Build dependency
     depends_on("cmake@3.4.3:", type="build")
     depends_on("python@2.7:2.8", when="@:4.999 ~python", type="build")
