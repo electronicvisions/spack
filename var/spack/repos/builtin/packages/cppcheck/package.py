@@ -28,6 +28,8 @@ class Cppcheck(MakefilePackage):
     depends_on('py-pygments', when='+htmlreport', type='run')
     depends_on('pcre', when='+rules', type=('build', 'link'))
 
+    patch('cppcheck-2.1-fix-build-gcc-11.patch', when='@2.1 %gcc@11.0.0:', level=1)
+
     @property
     def build_targets(self):
         # recommended release build according to README
