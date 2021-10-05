@@ -154,6 +154,12 @@ class Bazel(Package):
     # visionary (hack): when building on glibc >= 2.30 there's an overlapping function name
     patch('rename-gettid-functions-0.25.patch', when='@0.25.2', level=0)
 
+    # visionary (hack): when building on newer gccs add missing include (min ranges)
+    patch('add-include-limits-0.25.patch', when='@0.25.2:3.6.999 %gcc@11.0.0:', level=0)
+
+    # visionary (hack): when building on newer gccs add missing include (min ranges)
+    patch('add-include-limits-zlib_client.patch', when='@0.25.2:3.6.999 %gcc@11.0.0:', level=0)
+
     phases = ['bootstrap', 'install']
 
     executables = ['^bazel$']
@@ -235,6 +241,11 @@ java_binary(
 
     def setup_dependent_package(self, module, dependent_spec):
         module.bazel = Executable('bazel')
+
+    # add <limits> header for gcc@11 and older bazel in dependent packages (not sure about ranges)
+    @when("@:4.0.0 %gcc@11.0.0:")
+    def setup_dependent_build_environment(self, env, dependent_spec):
+        env.append_flags('BAZEL_CXXOPTS', '-includelimits')
 
     @property
     def parallel(self):
