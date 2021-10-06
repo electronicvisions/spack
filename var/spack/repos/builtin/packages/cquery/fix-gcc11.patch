@@ -1,0 +1,11 @@
+diff -pur spack-src/src/import_manager.h spack-src/src/import_manager.h
+--- spack-src/src/import_manager.h	2021-10-06 10:15:41.762797461 +0200
++++ spack-src/src/import_manager.h	2021-10-06 10:15:32.987068525 +0200
+@@ -1,6 +1,7 @@
+ #pragma once
+ 
+ #include <iosfwd>
++#include <mutex>
+ #include <shared_mutex>
+ #include <string>
+ #include <unordered_map>
