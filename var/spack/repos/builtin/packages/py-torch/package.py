@@ -85,45 +85,45 @@ class PyTorch(PythonPackage, CudaPackage):
     conflicts('+mpi', when='~distributed')
     conflicts('+gloo', when='~distributed')
     conflicts('+tensorpipe', when='~distributed')
-    conflicts('+kineto', when='@:1.7')
-    conflicts('+valgrind', when='@:1.7')
-    conflicts('~caffe2', when='@0.4.0:1.6')  # no way to disable caffe2?
+    conflicts('+kineto', when='@:1.7.999')
+    conflicts('+valgrind', when='@:1.7.999')
+    conflicts('~caffe2', when='@0.4.0:1.6.999')  # no way to disable caffe2?
     conflicts('+caffe2', when='@:0.3.1')  # caffe2 did not yet exist?
-    conflicts('+tensorpipe', when='@:1.5')
-    conflicts('+xnnpack', when='@:1.4')
-    conflicts('~onnx_ml', when='@:1.4')  # no way to disable ONNX?
-    conflicts('+rocm', when='@:0.4')
-    conflicts('+cudnn', when='@:0.4')
-    conflicts('+fbgemm', when='@:0.4,1.4.0')
-    conflicts('+qnnpack', when='@:0.4')
-    conflicts('+mkldnn', when='@:0.4')
+    conflicts('+tensorpipe', when='@:1.5.999')
+    conflicts('+xnnpack', when='@:1.4.999')
+    conflicts('~onnx_ml', when='@:1.4.999')  # no way to disable ONNX?
+    conflicts('+rocm', when='@:0.4.999')
+    conflicts('+cudnn', when='@:0.4.999')
+    conflicts('+fbgemm', when='@:0.4.999,1.4.0')
+    conflicts('+qnnpack', when='@:0.4.999')
+    conflicts('+mkldnn', when='@:0.4.999')
 
     conflicts('cuda_arch=none', when='+cuda',
               msg='Must specify CUDA compute capabilities of your GPU, see '
               'https://developer.nvidia.com/cuda-gpus')
 
     # Required dependencies
-    depends_on('cmake@3.5:', type='build')
+    depends_on('cmake@3.5.0:', type='build')
     # Use Ninja generator to speed up build times, automatically used if found
-    depends_on('ninja@1.5:', when='@1.1.0:', type='build')
+    depends_on('ninja@1.5.0:', when='@1.1.0:', type='build')
     # See python_min_version in setup.py
     depends_on('python@3.6.2:', when='@1.7.1:', type=('build', 'link', 'run'))
     depends_on('python@3.6.1:', when='@1.6.0:1.7.0', type=('build', 'link', 'run'))
-    depends_on('python@3.5:', when='@1.5.0:1.5', type=('build', 'link', 'run'))
-    depends_on('python@2.7:2.8,3.5:', when='@1.4.0:1.4', type=('build', 'link', 'run'))
-    depends_on('python@2.7:2.8,3.5:3.7', when='@:1.3', type=('build', 'link', 'run'))
+    depends_on('python@3.5.0:', when='@1.5.0:1.5.999', type=('build', 'link', 'run'))
+    depends_on('python@2.7.0:2.8.999,3.5.0:', when='@1.4.0:1.4.999', type=('build', 'link', 'run'))
+    depends_on('python@2.7.0:2.8.999,3.5.0:3.7.999', when='@:1.3.999', type=('build', 'link', 'run'))
     depends_on('py-setuptools', type=('build', 'run'))
     depends_on('py-future', when='@1.5:', type=('build', 'run'))
-    depends_on('py-future', when='@1.1: ^python@:2', type=('build', 'run'))
+    depends_on('py-future', when='@1.1: ^python@:2.999.999', type=('build', 'run'))
     depends_on('py-pyyaml', type=('build', 'run'))
-    depends_on('py-typing', when='@0.4: ^python@:3.4', type=('build', 'run'))
+    depends_on('py-typing', when='@0.4: ^python@:3.4.999', type=('build', 'run'))
     depends_on('py-typing-extensions', when='@1.7:', type=('build', 'run'))
     depends_on('py-pybind11@master', when='@master', type=('build', 'link', 'run'))
-    depends_on('py-pybind11@2.6.2', when='@1.8.0:1.9', type=('build', 'link', 'run'))
-    depends_on('py-pybind11@2.3.0', when='@1.1.0:1.7', type=('build', 'link', 'run'))
-    depends_on('py-pybind11@2.2.4', when='@1.0.0:1.0', type=('build', 'link', 'run'))
-    depends_on('py-pybind11@2.2.2', when='@0.4.0:0.4', type=('build', 'link', 'run'))
-    depends_on('py-dataclasses', when='@1.7: ^python@3.6.0:3.6', type=('build', 'run'))
+    depends_on('py-pybind11@2.6.2', when='@1.8.0:1.9.999', type=('build', 'link', 'run'))
+    depends_on('py-pybind11@2.3.0:2.5.999', when='@1.1.0:1.7.999', type=('build', 'link', 'run'))
+    depends_on('py-pybind11@2.2.4', when='@1.0.0:1.0.999', type=('build', 'link', 'run'))
+    depends_on('py-pybind11@2.2.2', when='@0.4.0:0.4.999', type=('build', 'link', 'run'))
+    depends_on('py-dataclasses', when='@1.7.0: ^python@3.6.0:3.6.999', type=('build', 'run'))
     depends_on('py-tqdm', type='run')
     depends_on('py-protobuf', when='@0.4:', type=('build', 'run'))
     depends_on('protobuf', when='@0.4:')
@@ -143,9 +143,9 @@ class PyTorch(PythonPackage, CudaPackage):
     # depends_on('fp16@master', when='@master')
     # depends_on('fp16@2020-05-14', when='@1.6.0:1.9')
     depends_on('pthreadpool@master', when='@master')
-    depends_on('pthreadpool@2021-04-13', when='@1.9.0:1.9')
-    depends_on('pthreadpool@2020-10-05', when='@1.8.0:1.8')
-    depends_on('pthreadpool@2020-06-15', when='@1.6.0:1.7')
+    depends_on('pthreadpool@2021-04-13', when='@1.9.0:1.9.999')
+    depends_on('pthreadpool@2020-10-05', when='@1.8.0:1.8.999')
+    depends_on('pthreadpool@2020-06-15', when='@1.6.0:1.7.999')
     depends_on('psimd@master', when='@master')
     depends_on('psimd@2020-05-17', when='@1.6.0:1.9')
     depends_on('fxdiv@master', when='@master')
@@ -156,8 +156,8 @@ class PyTorch(PythonPackage, CudaPackage):
     depends_on('cuda@7.5:', when='+cuda', type=('build', 'link', 'run'))
     depends_on('cuda@9:', when='@1.1:+cuda', type=('build', 'link', 'run'))
     depends_on('cuda@9.2:', when='@1.6:+cuda', type=('build', 'link', 'run'))
-    depends_on('cudnn@6.0:7', when='@:1.0+cudnn')
-    depends_on('cudnn@7.0:7', when='@1.1.0:1.5+cudnn')
+    depends_on('cudnn@6.0:7.999', when='@:1.0.999+cudnn')
+    depends_on('cudnn@7.0:7.999', when='@1.1.0:1.5.999+cudnn')
     depends_on('cudnn@7.0:', when='@1.6.0:+cudnn')
     depends_on('magma', when='+magma')
     depends_on('nccl', when='+nccl')
@@ -200,29 +200,51 @@ class PyTorch(PythonPackage, CudaPackage):
     # Fixes CMake configuration error when XNNPACK is disabled
     # https://github.com/pytorch/pytorch/pull/35607
     # https://github.com/pytorch/pytorch/pull/37865
-    patch('xnnpack.patch', when='@1.5.0:1.5')
+    patch('xnnpack.patch', when='@1.5.0:1.5.999')
 
     # Fixes build error when ROCm is enabled for pytorch-1.5 release
-    patch('rocm.patch', when='@1.5.0:1.5+rocm')
+    patch('rocm.patch', when='@1.5.0:1.5.999+rocm')
 
     # Fixes fatal error: sleef.h: No such file or directory
     # https://github.com/pytorch/pytorch/pull/35359
     # https://github.com/pytorch/pytorch/issues/26555
-    # patch('sleef.patch', when='@1.0.0:1.5')
+    # patch('sleef.patch', when='@1.0.0:1.5.999')
 
     # Fixes compilation with Clang 9.0.0 and Apple Clang 11.0.3
     # https://github.com/pytorch/pytorch/pull/37086
     patch('https://github.com/pytorch/pytorch/commit/e921cd222a8fbeabf5a3e74e83e0d8dfb01aa8b5.patch',
           sha256='17561b16cd2db22f10c0fe1fdcb428aecb0ac3964ba022a41343a6bb8cba7049',
-          when='@1.1:1.5')
+          when='@1.1.0:1.5.999')
 
     # Removes duplicate definition of getCusparseErrorString
     # https://github.com/pytorch/pytorch/issues/32083
-    patch('cusparseGetErrorString.patch', when='@0.4.1:1.0^cuda@10.1.243:')
+    patch('cusparseGetErrorString.patch', when='@0.4.1:1.0.999^cuda@10.1.243:')
 
     # Fixes 'FindOpenMP.cmake'
     # to detect openmp settings used by Fujitsu compiler.
     patch('detect_omp_of_fujitsu_compiler.patch', when='%fj')
+
+    # This package depends on pybind11 -> do not install
+    # third_party version of pybind11.
+    patch('no-install-pybind11-1.3.1.patch', level=2, when='@1.3.1:1.6.99')
+
+    # In 1.3.x torch.save is not saving source files, this is fixed in 1.4.0
+    patch('fix-serialization.patch', when='@1.3.1')
+
+    # 1.4.1 does not build on gcc 9 without these patches, see
+    # https://github.com/pytorch/pytorch/issues/32277
+    patch('gcc9_PR30332.patch', when='@1.4.0:1.4.1')
+    patch('gcc9_PR30333.patch', when='@1.4.0:1.4.1')
+
+    # Fix for cuda@11.4:
+    patch('fix_c10-1.9.patch', level=1, when='@1.9.0: ^cuda@11.4:')
+    patch('fix_c10-1.8.patch', level=1, when='@1.8.0:1.8.999 ^cuda@11.4:')
+
+    # More fixes for modern gcc
+    patch('benchmark-gcc11.patch', working_dir='third_party/benchmark', level=1, when='@1.0.0: %gcc@11:')
+
+    # More fixes for modern gcc
+    patch('xnnpack-gcc11.patch', working_dir='third_party/XNNPACK', level=1, when='@1.8.0: %gcc@11:')
 
     # Both build and install run cmake/make/make install
     # Only run once to speed up build times

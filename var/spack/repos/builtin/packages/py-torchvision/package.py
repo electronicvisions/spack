@@ -38,7 +38,7 @@ class PyTorchvision(PythonPackage):
 
     # https://github.com/pytorch/vision#installation
     depends_on('python@3.6:', when='@0.7:', type=('build', 'link', 'run'))
-    depends_on('python@3.5:', when='@0.6.0:0.6', type=('build', 'link', 'run'))
+    depends_on('python@3.5:', when='@0.6.0:0.6.999', type=('build', 'link', 'run'))
     depends_on('python@2.7:2.8,3.5:3.8', when='@0.5.0', type=('build', 'link', 'run'))
     depends_on('python@2.7:2.8,3.5:3.7', when='@:0.4', type=('build', 'link', 'run'))
 
@@ -79,6 +79,10 @@ class PyTorchvision(PythonPackage):
 
     depends_on('ffmpeg@3.1:', when='@0.4.2:')
 
+    # FIXME: Extra EV
+    depends_on('py-pillow@4.1.1:', type=('build', 'run'))  # or py-pillow-simd
+    depends_on('py-pybind11', type=('build', 'link', 'run'))
+
     conflicts('backend=png', when='@:0.7')
     conflicts('backend=jpeg', when='@:0.7')
 
@@ -88,6 +92,11 @@ class PyTorchvision(PythonPackage):
         for dep in self.spec.dependencies(deptype='link'):
             query = self.spec[dep.name]
             include.extend(query.headers.directories)
+            if 'py-pybind11' in dep:
+                # py-pybind11 does not provide any libraries for spack to
+                # find, this raises an error -> fix on py-pybind11 side
+                # at some point in the future
+                continue
             library.extend(query.libs.directories)
 
         # README says to use TORCHVISION_INCLUDE and TORCHVISION_LIBRARY,

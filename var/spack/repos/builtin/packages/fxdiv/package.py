@@ -21,6 +21,9 @@ class Fxdiv(CMakePackage):
     depends_on('ninja', type='build')
     depends_on('python', type='build')
 
+    # add missing include for modern gcc
+    patch('benchmark-gcc11.patch', level=1, when='%gcc@11:')
+
     generator = 'Ninja'
 
     resource(

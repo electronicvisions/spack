@@ -19,7 +19,7 @@ class PyTorchmetrics(PythonPackage):
 
     depends_on('python@3.6:', type=('build', 'run'))
     depends_on('py-setuptools', type='build')
-    depends_on('py-numpy@1.17.2:', when='@0.4:', type=('build', 'run'))
-    depends_on('py-numpy', when='@0.3:', type=('build', 'run'))
+    depends_on('py-numpy@1.17.2:', when='@0.4.0:', type=('build', 'run'))
+    depends_on('py-numpy', when='@0.3.0:', type=('build', 'run'))
     depends_on('py-torch@1.3.1:', type=('build', 'run'))
-    depends_on('py-packaging', when='@0.3:', type=('build', 'run'))
+    depends_on('py-packaging', when='@0.3.0:', type=('build', 'run'))

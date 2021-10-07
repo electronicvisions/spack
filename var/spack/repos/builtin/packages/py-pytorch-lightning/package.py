@@ -28,7 +28,7 @@ class PyPytorchLightning(PythonPackage):
     depends_on('py-pyyaml@5.1:', when='@1.4:', type=('build', 'run'))
     depends_on('py-pyyaml@5.1:5.4.1', when='@1.3', type=('build', 'run'))
     depends_on('py-pyyaml@5.1:5.3,5.5:', when='@:1.2', type=('build', 'run'))
-    depends_on('py-fsspec@2021.05.0:2021.05,2021.06.1:+http', when='@1.3:', type=('build', 'run'))
+    depends_on('py-fsspec@2021.05.0:2021.05.999,2021.06.1:+http', when='@1.3:', type=('build', 'run'))
     depends_on('py-fsspec@0.8.1:+http', when='@:1.2', type=('build', 'run'))
     depends_on('py-tensorboard@2.2.0:2.4,2.5.1:', type=('build', 'run'))
     depends_on('py-torchmetrics@0.4.0:', when='@1.4:', type=('build', 'run'))
