@@ -45,6 +45,9 @@ class PyGrpcio(PythonPackage):
     depends_on('zlib')
     depends_on('c-ares')
 
+    # visionary (hack): when building on newer gccs add missing include
+    patch('add-include-limits-1.32.0.patch', when='@1.32.0 %gcc@11.0.0:', level=0)
+
     def setup_build_environment(self, env):
         env.set('GRPC_PYTHON_BUILD_WITH_CYTHON', True)
         env.set('GRPC_PYTHON_BUILD_SYSTEM_OPENSSL', True)
