@@ -30,7 +30,7 @@ class VisionaryDlsCore(Package):
     depends_on('doxygen+graphviz')
     depends_on('genpybind@visions')
     depends_on('gflags')
-    depends_on('googletest+gmock')
+    depends_on('googletest@1.11.0:+gmock')
     # depends_on('icarus')
     depends_on('intel-tbb')  # ppu gdbserver
     depends_on('libelf')
