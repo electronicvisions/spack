@@ -28,7 +28,7 @@ class VisionaryDlsCore(Package):
     depends_on('cereal')
     depends_on('cppcheck')
     depends_on('doxygen+graphviz')
-    depends_on('genpybind@visions')
+    depends_on('genpybind')
     depends_on('gflags')
     depends_on('googletest@1.11.0:+gmock')
     # depends_on('icarus')
