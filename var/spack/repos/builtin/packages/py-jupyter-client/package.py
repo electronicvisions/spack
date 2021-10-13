@@ -10,7 +10,7 @@ class PyJupyterClient(PythonPackage):
     homepage = "https://github.com/jupyter/jupyter_client"
     pypi = "jupyter-client/jupyter_client-6.1.7.tar.gz"
 
-    version('6.1.11', sha256='7a318b26b5e7aaece370f58c4a107d3ba35b01063f0668ec2e44939847a03177')
+    version('6.1.11', sha256='649ca3aca1e28f27d73ef15868a7c7f10d6e70f761514582accec3ca6bb13085')
     version('6.1.7', sha256='49e390b36fe4b4226724704ea28d9fb903f1a3601b6882ce3105221cd09377a1')
     version('5.3.4', sha256='2af6f0e0e4d88009b11103490bea0bfb405c1c470e226c2b7b17c10e5dda9734')
     version('5.3.3', sha256='9d76231da1b4969afc762896fa79f0135f9f650cab2c1fc6526941d20d9aa8c9')
