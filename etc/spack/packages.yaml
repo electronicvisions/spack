@@ -19,7 +19,7 @@ packages:
   bazel:
     version: [0.25.2]
   binutils:
-    variants: [+gold+plugins]
+    variants: [+ld+gold+plugins]
   cairo:
     variants: [+X]
   cppcheck:
