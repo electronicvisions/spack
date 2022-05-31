@@ -4,20 +4,21 @@ from spack import *
 class PySbs(PythonPackage):
     """Spike based Sampling framework"""
 
-    homepage = "https://gitviz.kip.uni-heidelberg.de"
-    url      = "https://gitviz.kip.uni-heidelberg.de"
+    homepage = "https://github.com/electronicvisions/spike-based-sampling.git"
+    url      = "https://github.com/electronicvisions/spike-based-sampling.git"
+    git      = "https://github.com/electronicvisions/spike-based-sampling.git"
 
-    version('master', git='git@gitviz.kip.uni-heidelberg.de:model-nmsampling-sbs.git')
-    version('1.8.1', git='git@gitviz.kip.uni-heidelberg.de:model-nmsampling-sbs.git', commit='aa8a9d9ab9985fe62f819e7837ea313a1b52ec83')
-    version('1.8.0', git='git@gitviz.kip.uni-heidelberg.de:model-nmsampling-sbs.git', commit='45ad25018f91a0d03391621eaece507df92f8c87')
-    version('1.7.2', git='git@gitviz.kip.uni-heidelberg.de:model-nmsampling-sbs.git', commit='c4fcb563c580af9ff7b132295fe1620b31ab3829')
-    version('1.7.1', git='git@gitviz.kip.uni-heidelberg.de:model-nmsampling-sbs.git', commit='d5a97cfd8c0cd6ec9f98b0bfbd1f0a284eaf569e')
-    version('1.6.5', git='git@gitviz.kip.uni-heidelberg.de:model-nmsampling-sbs.git', commit='3ce21de823b7df37fb83b87ec7f9607e781aaa1a')
-    version('1.6.2', git='git@gitviz.kip.uni-heidelberg.de:model-nmsampling-sbs.git', commit='318ed67dbf6330323c4eb398219701c14eb7a945')
-    version('1.5.2', git='git@gitviz.kip.uni-heidelberg.de:model-nmsampling-sbs.git', commit='c0adeed57a467b4edaa399a623fb2865ac2a06c6')
-    version('1.4.1', git='git@gitviz.kip.uni-heidelberg.de:model-nmsampling-sbs.git', commit='655c930dc07efec01ffe02e44fcc99660e4c96c3')
-    version('1.4.0', git='git@gitviz.kip.uni-heidelberg.de:model-nmsampling-sbs.git', commit='68889dbd832cb6b8bf17f38684634e3126adac1f')
-    version('1.3.2', git='git@gitviz.kip.uni-heidelberg.de:model-nmsampling-sbs.git', commit='87bb9787b4bdc741e349ad17191165a496e85042')
+    version('master')
+    version('1.8.1', commit='aa8a9d9ab9985fe62f819e7837ea313a1b52ec83')
+    version('1.8.0', commit='45ad25018f91a0d03391621eaece507df92f8c87')
+    version('1.7.2', commit='c4fcb563c580af9ff7b132295fe1620b31ab3829')
+    version('1.7.1', commit='d5a97cfd8c0cd6ec9f98b0bfbd1f0a284eaf569e')
+    version('1.6.5', commit='3ce21de823b7df37fb83b87ec7f9607e781aaa1a')
+    version('1.6.2', commit='318ed67dbf6330323c4eb398219701c14eb7a945')
+    version('1.5.2', commit='c0adeed57a467b4edaa399a623fb2865ac2a06c6')
+    version('1.4.1', commit='655c930dc07efec01ffe02e44fcc99660e4c96c3')
+    version('1.4.0', commit='68889dbd832cb6b8bf17f38684634e3126adac1f')
+    version('1.3.2', commit='87bb9787b4bdc741e349ad17191165a496e85042')
 
     depends_on('pkgconfig', type="build")
     depends_on('py-setuptools', type="build")
