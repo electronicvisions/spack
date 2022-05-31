@@ -31,7 +31,7 @@ class VisionaryDeepLoop(Package):
     url = "https://localhost/123"
     version('0.1')
 
-    depends_on("py-elephant")
+    #depends_on("py-elephant")
     depends_on("py-ipython")
     depends_on("py-matplotlib backend=tkagg")
     depends_on("py-numpy")
