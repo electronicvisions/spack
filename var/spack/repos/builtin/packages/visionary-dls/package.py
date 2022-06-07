@@ -37,7 +37,8 @@ class VisionaryDls(Package):
     depends_on('py-pandas')
     depends_on('py-python-socketio')
     depends_on('py-pytorch-ignite')
-    depends_on('py-pytorch-lightning')
+    # removed due to build fails of py-tensorboard dependency
+    # depends_on('py-pytorch-lightning')
     depends_on('py-sacred')
     depends_on('py-scikit-learn')
     depends_on('py-seaborn')
