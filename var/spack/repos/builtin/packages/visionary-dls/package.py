@@ -28,7 +28,8 @@ class VisionaryDls(Package):
     depends_on('py-brian2')
     depends_on('py-flask')
     depends_on('py-h5py')
-    depends_on('py-ipycanvas')
+    # removed due to build fails of maturin dependency
+    # depends_on('py-ipycanvas')
     depends_on('py-ipywidgets')
     depends_on('py-lxml')  # collab tests
     depends_on('py-myst-parser')
