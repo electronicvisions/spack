@@ -791,6 +791,20 @@ class Llvm(CMakePackage, CudaPackage):
         with working_dir(self.build_directory):
             install_tree("bin", join_path(self.prefix, "libexec", "llvm"))
 
+    def add_files_to_view(self, view, merge_map):
+        # we remove libgomp-related files from views as they conflict with
+        # gcc-ones
+        ignore_file_paths = [
+            join_path(self.prefix, "lib", "libgomp.so"),
+        ]
+
+        if self.spec.satisfies('~force_full_view'):
+            for path in ignore_file_paths:
+                if path in merge_map:
+                    del merge_map[path]
+
+        super(Llvm, self).add_files_to_view(view, merge_map)
+
     def llvm_config(self, *args, **kwargs):
         lc = Executable(self.prefix.bin.join('llvm-config'))
         if not kwargs.get('output'):

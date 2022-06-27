@@ -148,8 +148,8 @@ if sys.version_info[0] == 2:
                 # SyntaxError strips the path from the filename, so we need to
                 # manually construct the error message in order to give the
                 # user the correct package.py where the syntax error is located
-                msg = 'invalid syntax in {0:}, line {1:}'
-                raise SyntaxError(msg.format(self.package_py, e.lineno))
+                msg = 'invalid syntax in {0:}/{1:}, line {2:}'
+                raise SyntaxError(msg.format(self.fullname, self.package_py, e.lineno))
 
             module.__package__ = self.repo.full_namespace
             module.__loader__ = self

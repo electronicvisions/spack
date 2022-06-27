@@ -98,7 +98,12 @@ class Rust(Package):
     # Rust 1.17 and newer
     version('1.60.0', sha256='20ca826d1cf674daf8e22c4f8c4b9743af07973211c839b85839742314c838b7')
     version('1.58.1', sha256='a839afdd3625d6f3f3c4c10b79813675d1775c460d14be1feaf33a6c829c07c7')
+    version('nightly.2021-05-25',  # needed for py-orjson, remove if https://github.com/ijl/orjson/issues/108 is solved
+            sha256='a9780c953dc9e6c23027e0b84639cdee10ae2519e3dfab468aa1ed707ba036e5',
+            url='https://static.rust-lang.org/dist/2021-05-25/rustc-nightly-src.tar.gz')
     version('1.51.0', sha256='7a6b9bafc8b3d81bbc566e7c0d1f17c9f499fd22b95142f7ea3a8e4d1f9eb847')
+    version('1.50.0', sha256='95978f8d02bb6175ae3238930baf03563c240aedf9a70bebdc3eaa2a8c3c5a5e')
+    version('1.49.0', sha256='b50aefa8df1fdfc9bccafdbf37aee611c8dfe81bf5648d5f43699c50289dc779')
     version('1.48.0', sha256='0e763e6db47d5d6f91583284d2f989eacc49b84794d1443355b85c58d67ae43b')
     version('1.47.0', sha256='3185df064c4747f2c8b9bb8c4468edd58ff4ad6d07880c879ac1b173b768d81d')
     version('1.46.0', sha256='2d6a3b7196db474ba3f37b8f5d50a1ecedff00738d7846840605b42bfc922728')
@@ -161,11 +166,30 @@ class Rust(Package):
             'aarch64-unknown-linux-gnu':     'ce557516593e4526709b0f33c2e1d7c932b3ddf76af94c2417d8d667921ce90c',
             'x86_64-apple-darwin':           'd0044680fc132a721481b130a0a4282a444867f423efdb890fe13e447966412f'
         },
+        'nightly.2021-05-25': {
+            'url': 'https://static.rust-lang.org/dist/2021-05-25/rust-nightly-{target}.tar.gz',
+            'x86_64-unknown-linux-gnu':      '573ce364c14597bc8d2b7475d92877302e2ce2e321048d531aee554dc1cbfb4e',
+            'powerpc64le-unknown-linux-gnu': '0c92b28457b43ec83794a3c1baacc604e03b98ac493ffd724c423b339df51020',
+            'aarch64-unknown-linux-gnu':     '5a32fbb06ba27aa0cb5b664017a8b7a51d314d82e5fa11116faadea5567b7d42',
+            'x86_64-apple-darwin':           '6c1ea360657cc1078a9697c62983eea13e2eb270fdb6c67c0c1dd59814b370bf'
+        },
         '1.51.0': {
             'x86_64-unknown-linux-gnu':      '9e125977aa13f012a68fdc6663629c685745091ae244f0587dd55ea4e3a3e42f',
             'powerpc64le-unknown-linux-gnu': '7362f561104d7be4836507d3a53cd39444efcdf065813d559beb1f54ce9f7680',
             'aarch64-unknown-linux-gnu':     'fd31c78fffad52c03cac5a7c1ee5db3f34b2a77d7bc862707c0f71e209180a84',
             'x86_64-apple-darwin':           '765212098a415996b767d1e372ce266caf94027402b269fec33291fffc085ca4'
+        },
+        '1.50.0': {
+            'x86_64-unknown-linux-gnu':      'fa889b53918980aea2dea42bfae4e858dcb2104c6fdca6e4fe359f3a49767701',
+            'powerpc64le-unknown-linux-gnu': 'e0472589d3f9ba7ebf27f033af320e0d5cfb70222955bd8ed73ce2c9a70ae535',
+            'aarch64-unknown-linux-gnu':     '1db7a4fbddc68cd29eb9bca9fa7d0d2d9e3d59ede7ddaad66222fb4336a6bacf',
+            'x86_64-apple-darwin':           '1bf5a7ecf6468ce1bf9fe49c8083b3f648b40c16fbfb7539d106fe28eb0e792e'
+        },
+        '1.49.0': {
+            'x86_64-unknown-linux-gnu':      '8b14446df82f3707d69cf58fed92f18e0bff91621c62baf89288ef70e3e92981',
+            'powerpc64le-unknown-linux-gnu': '365d7721dd2521e5dad12aa73651bad2be375e798e443636d2c523cad5b54359',
+            'aarch64-unknown-linux-gnu':     'b551bd482041307fa3373a687d6d6a2c4c0931c2e0a68b8b75dc80bc5cf5f002',
+            'x86_64-apple-darwin':           'fe3e248bc4b0ee0a2595693687ad845c8a8bda824a56c9321520bcca02433716'
         },
         '1.48.0': {
             'x86_64-unknown-linux-gnu':      '950420a35b2dd9091f1b93a9ccd5abc026ca7112e667f246b1deb79204e2038b',

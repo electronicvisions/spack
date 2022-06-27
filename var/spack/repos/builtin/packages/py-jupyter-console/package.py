@@ -15,6 +15,7 @@ class PyJupyterConsole(PythonPackage):
     version('6.4.3', sha256='55f32626b0be647a85e3217ddcdb22db69efc79e8b403b9771eb9ecc696019b5')
     version('6.4.0', sha256='242248e1685039cd8bff2c2ecb7ce6c1546eb50ee3b08519729e6e881aec19c7')
     version('6.1.0', sha256='6f6ead433b0534909df789ea64f0a14cdf9b6b2360757756f08182be4b9e431b')
+    version('6.0.0', sha256='5cafb1a3b845dbab143c182f270f66396e1ef6a322c6bee7e6f4b0bf85fcf69e')
     version('5.2.0', sha256='545dedd3aaaa355148093c5609f0229aeb121b4852995c2accfa64fe3e0e55cd')
     version('5.0.0', sha256='7ddfc8cc49921b0ed852500928922e637f9188358c94b5c76339a5a8f9ac4c11')
     version('4.1.1', sha256='d754cfd18d258fa9e7dde39a36e589c4a7241075b5d0f420691fa3d50e4c4ae3')

@@ -49,7 +49,7 @@ from spack.resource import Resource
 from spack.version import Version, VersionChecksumError
 
 __all__ = ['DirectiveError', 'DirectiveMeta', 'version', 'conflicts', 'depends_on',
-           'extends', 'provides', 'patch', 'variant', 'resource']
+           'extends', 'provides', 'patch', 'variant', 'resource', 'same_version_as']
 
 #: These are variant names used by Spack internally; packages can't use them
 reserved_names = ['patches', 'dev_path']

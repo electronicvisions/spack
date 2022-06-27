@@ -57,21 +57,6 @@ class PyElephant(PythonPackage):
              when='^python@:2.8',
              expand=False)
 
-    @run_before('build')
-    def ensure_library(self):
-        if not self.spec.satisfies('+spade'):
-            return
-        if self.spec.satisfies('^python@:2.8'):
-            if sys.maxsize > 2**32:
-                install('elephant/spade_src/fim264.so/fim.so', 'elephant/spade_src/fim.so')
-            else:
-                install('elephant/spade_src/fim232.so/fim.so', 'elephant/spade_src/fim.so')
-        else:
-            if sys.maxsize > 2**32:
-                install('elephant/spade_src/fim364.so/fim.so', 'elephant/spade_src/fim.so')
-            else:
-                install('elephant/spade_src/fim332.so/fim.so', 'elephant/spade_src/fim.so')
-
     depends_on('py-setuptools',         type='build')
     depends_on('py-neo@0.3.4:',         type=('build', 'run'))  # > 0.3.3 ?
     depends_on('py-numpy@1.8.2:',       type=('build', 'run'))

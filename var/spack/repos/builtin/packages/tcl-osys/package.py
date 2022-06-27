@@ -32,6 +32,7 @@ class TclOsys(Package):
 
     homepage = "http://unihd-cag.github.io/odfi-rfg"
     url      = "https://github.com/unihd-cag/odfi-rfg.git"
+    git      = "https://github.com/unihd-cag/odfi-rfg.git"
 
     version('master', git='https://github.com/unihd-cag/odfi-rfg.git')
     version('890eafffbda95b58a472a2005c3cb9e90fd22ff6', git='https://github.com/unihd-cag/odfi-rfg.git', commit='890eafffbda95b58a472a2005c3cb9e90fd22ff6')
