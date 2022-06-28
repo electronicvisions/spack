@@ -239,6 +239,13 @@ class PyTorch(PythonPackage, CudaPackage):
     patch('https://github.com/pytorch/pytorch/commit/c74c0c571880df886474be297c556562e95c00e0.patch?full_index=1',
           sha256='8ff7d285e52e4718bad1ca01ceb3bb6471d7828329036bb94222717fcaa237da', when='@:1.9.1 ^cuda@11.4.100:')
 
+    @when('@1.9')
+    def patch(self):
+        # visionary fix
+        filter_file(r'sizeof\(TensorImpl\) == sizeof\(int64_t\) \* 23',
+                    'sizeof(TensorImpl) <= sizeof(int64_t) * 25',
+                    'c10/core/TensorImpl.h')
+
     @property
     def libs(self):
         # TODO: why doesn't `python_platlib` work here?

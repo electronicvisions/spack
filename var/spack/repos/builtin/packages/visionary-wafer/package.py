@@ -85,14 +85,12 @@ class VisionaryWafer(Package):
     ##################
     # Current fixups #
     ##################
-    # intel-mkldnn depends on intel-mkl which also provides blas ->
-    # concretization error -> reinvestigate when needed
     # Our GPUs support
-    #   - cuda arch 6.1 (Geforce 1080)
-    #   - cuda arch 8.6 (GeForce RTX 3080)
-    # fix it up if you use other cards.
-    # depends_on('py-torch ~mkldnn +fbgemm +distributed +mpi +tensorpipe +nccl +gloo +cuda cuda_arch=61,86')
-    # set in etc/spack/packages.yaml
+    #   - cuda arch 6.1 (NVIDIA Geforce 1080)
+    #   - cuda arch 8.0 (NVIDIA A100)
+    #   - cuda arch 8.6 (NVIDIA GeForce RTX 3080)
+    # We want to set defaults in packages.yaml, but it's ignored?
+    depends_on('py-torch@1.9.1 ~caffe2 ~xnnpack ~mkldnn ~cudnn ~magma ~nnpack ~qnnpack ~test +cuda cuda_arch=61,80,86')
 
     def install(self, spec, prefix):
         mkdirp(prefix.etc)
