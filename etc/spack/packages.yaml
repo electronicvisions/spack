@@ -17,7 +17,7 @@ packages:
     variants: [~distributed]
   py-torch:
     version: [1.9.1]
-    variants: ['+cuda cuda_arch=61,86']
+    variants: ['+cuda cuda_arch=61,80,86']
   binutils:
     variants: [+ld+gold+plugins]
   cairo:
@@ -44,7 +44,7 @@ packages:
   openblas:
     variants: [cpu_target=NEHALEM]
   nccl:
-    variants: ['+cuda cuda_arch=61,86']
+    variants: ['+cuda cuda_arch=61,80,86']
   nest:
     variants: [~mpi+python]
   pango:

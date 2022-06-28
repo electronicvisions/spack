@@ -28,8 +28,7 @@ class VisionaryDls(Package):
     depends_on('py-brian2')
     depends_on('py-flask')
     depends_on('py-h5py')
-    # removed due to build fails of maturin dependency
-    # depends_on('py-ipycanvas')
+    depends_on('py-ipycanvas')
     depends_on('py-ipywidgets')
     depends_on('py-lxml')  # collab tests
     depends_on('py-myst-parser')
@@ -38,8 +37,7 @@ class VisionaryDls(Package):
     depends_on('py-pandas')
     depends_on('py-python-socketio')
     depends_on('py-pytorch-ignite')
-    # removed due to build fails of py-tensorboard dependency
-    # depends_on('py-pytorch-lightning')
+    depends_on('py-pytorch-lightning')
     depends_on('py-sacred')
     depends_on('py-scikit-learn')
     depends_on('py-seaborn')
