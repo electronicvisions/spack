@@ -672,7 +672,7 @@ class Gcc(AutotoolsPackage, GNUMirrorPackage):
         return options
 
     def setup_build_environment(self, env):
-        if self.spec.satisfies('@4.9.0:4.9.999 %gcc@11.0.0:'):
+        if self.spec.satisfies('@:4.9 %gcc@11:'):
             # fixes problem of operator++ on bool forbidden in C++17
             env.append_flags('CXXFLAGS', '-std=gnu++11')
 
