@@ -31,14 +31,15 @@ class TclOsys(Package):
     """
 
     homepage = "http://unihd-cag.github.io/odfi-rfg"
-    url      = "https://github.com/unihd-cag/odfi-rfg.git"
+    url      = "https://github.com/unihd-cag/odfi-rfg"
     git      = "https://github.com/unihd-cag/odfi-rfg.git"
 
-    version('master', git='https://github.com/unihd-cag/odfi-rfg.git')
-    version('890eafffbda95b58a472a2005c3cb9e90fd22ff6', git='https://github.com/unihd-cag/odfi-rfg.git', commit='890eafffbda95b58a472a2005c3cb9e90fd22ff6')
+    version('master', branch='master')
+    version('1.1.1-post1', commit='890eafffbda95b58a472a2005c3cb9e90fd22ff6')
 
     extends('tcl')
-    depends_on('tcl-odfi@legacy')
+    depends_on('tcl-odfi')
+    depends_on('tcl-odfi@legacy', when='@1.1.1-post1')
 
     def install(self, spec, prefix):
         install_tree('bin', spec.prefix.bin)

@@ -29,7 +29,7 @@ class VisionaryNest(CMakePackage):
     """This repository contains many NEST models developed within the
     Electronic Vision(s) group, compiled into a single nest module."""
 
-    url = "https://brainscales-r.kip.uni-heidelberg.de/projects/model-visionary-nest"
+    # url = "https://brainscales-r.kip.uni-heidelberg.de/projects/model-visionary-nest"
     homepage = "https://brainscales-r.kip.uni-heidelberg.de/projects/model-visionary-nest"
 
     version('1.2',

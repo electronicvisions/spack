@@ -106,7 +106,7 @@ class PyTorch(PythonPackage, CudaPackage):
     depends_on('py-future', when='@1.1: ^python@:2.999.999', type=('build', 'run'))
     depends_on('py-pyyaml', type=('build', 'run'))
     depends_on('py-typing', when='^python@:3.4', type=('build', 'run'))
-    depends_on('py-pybind11@2.6.2', when='@1.8:', type=('build', 'link', 'run'))
+    depends_on('py-pybind11@2.6.2:', when='@1.8:', type=('build', 'link', 'run'))
     depends_on('py-pybind11@2.3.0', when='@1.1:1.7', type=('build', 'link', 'run'))
     depends_on('py-pybind11@2.2.4', when='@:1.0', type=('build', 'link', 'run'))
     depends_on('py-dataclasses', when='@1.7: ^python@3.6', type=('build', 'run'))

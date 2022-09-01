@@ -1,28 +1,31 @@
 modules:
-  enable:
-    - tcl
   prefix_inspections:
     bin:
-      - PATH
+    - PATH
     man:
-      - MANPATH
+    - MANPATH
     share/man:
-      - MANPATH
+    - MANPATH
     share/aclocal:
-      - ACLOCAL_PATH
+    - ACLOCAL_PATH
+    share/pkgconfig:
+    - PKG_CONFIG_PATH
     lib:
-      - LIBRARY_PATH
-      - LD_LIBRARY_PATH
+    - LIBRARY_PATH
+    - LD_LIBRARY_PATH
     lib64:
-      - LIBRARY_PATH
-      - LD_LIBRARY_PATH
+    - LIBRARY_PATH
+    - LD_LIBRARY_PATH
     include:
-      - CPATH
-      - C_INCLUDE_PATH
-      - CPLUS_INCLUDE_PATH
+    - CPATH
+    - C_INCLUDE_PATH
+    - CPLUS_INCLUDE_PATH
     lib/pkgconfig:
-      - PKG_CONFIG_PATH
+    - PKG_CONFIG_PATH
     lib64/pkgconfig:
-      - PKG_CONFIG_PATH
-    '':
-      - CMAKE_PREFIX_PATH
+    - PKG_CONFIG_PATH
+    ? ''
+    : - CMAKE_PREFIX_PATH
+  default:
+    enable:
+    - tcl

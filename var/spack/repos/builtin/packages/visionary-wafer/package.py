@@ -1,28 +1,10 @@
-##############################################################################
-# Copyright (c) 2013-2016, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
+# Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
-# This file is part of Spack.
-# Created by Todd Gamblin, tgamblin@llnl.gov, All rights reserved.
-# LLNL-CODE-647188
-#
-# For details, see https://github.com/llnl/spack
-# Please also see the LICENSE file for our notice and the LGPL.
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License (as
-# published by the Free Software Foundation) version 2.1, February 1999.
-#
-# This program is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the terms and
-# conditions of the GNU Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public
-# License along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-##############################################################################
+# SPDX-License-Identifier: (Apache-2.0 OR MIT)
+
 from spack import *
+from spack.pkg.builtin.boost import Boost
 
 
 class VisionaryWafer(Package):
@@ -41,7 +23,8 @@ class VisionaryWafer(Package):
     depends_on('visionary-dev-tools', when='+dev')
 
     # conflicts('python@3:')
-    depends_on('python@:2.7.99')
+    # depends_on('python@:2.7.99')
+    depends_on('python@3:')
 
     variant('tensorflow', default=False)
 
@@ -59,6 +42,7 @@ class VisionaryWafer(Package):
     depends_on('pkg-config')
     depends_on('py-lxml') # collab tests
     depends_on('xerces-c')
+    depends_on(Boost.with_default_variants)
     depends_on('boost@1.69.0: +graph+icu+mpi+python+numpy cxxstd=17')
     # we didn't introduce cuda support at all, upstream defaults to it
     # if we want cuda we need to decide on the cuda_arch, cf. py-torch
@@ -89,7 +73,7 @@ class VisionaryWafer(Package):
     depends_on('py-yccp@1.0.0:', when="^python@3:")          #TODO remove constraints once concretizer fixed
 
     # hmf-fpga register file requires:
-    depends_on('tcl-osys@890eafffbda95b58a472a2005c3cb9e90fd22ff6')
+    depends_on('tcl-osys@1.1.1-post1')
     # annotations for the concretiser, otherwise it is unable to detect the tk
     # restrictions correctly -> should be removable in the future
     depends_on('tk@8.5.19')
@@ -108,6 +92,7 @@ class VisionaryWafer(Package):
     #   - cuda arch 8.6 (GeForce RTX 3080)
     # fix it up if you use other cards.
     # depends_on('py-torch ~mkldnn +fbgemm +distributed +mpi +tensorpipe +nccl +gloo +cuda cuda_arch=61,86')
+    # set in etc/spack/packages.yaml
 
     def install(self, spec, prefix):
         mkdirp(prefix.etc)

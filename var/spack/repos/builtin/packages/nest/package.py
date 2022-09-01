@@ -50,6 +50,7 @@ class Nest(CMakePackage):
     conflicts('+optimize +debug', when='@:2.10.99',
               msg="Optimized debug build not available for ancient versions.")
 
+    depends_on('python@3.8:',       when='+python @3:', type=('build', 'run'))
     depends_on('python@2.6:',       when='+python', type=('build', 'run'))
     depends_on('py-numpy',          when='+python', type=('build', 'run'))
     depends_on('py-scipy',          when='+python', type=('run'))

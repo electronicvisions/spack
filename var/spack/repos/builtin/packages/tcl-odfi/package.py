@@ -32,11 +32,11 @@ class TclOdfi(Package):
     """
 
     homepage = "https://github.com/unihd-cag/odfi-dev-tcl"
-    url      = "https://github.com/unihd-cag/odfi-dev-tcl.git"
+    url      = "https://github.com/unihd-cag/odfi-dev-tcl"
+    git      = "https://github.com/unihd-cag/odfi-dev-tcl.git"
 
-    version('master', git='https://github.com/unihd-cag/odfi-dev-tcl.git')
-    version('legacy', git='https://github.com/unihd-cag/odfi-dev-tcl.git',
-            commit='a5dd21226f71e8550632357d5fbaf6dfec188d6b')
+    version('master', branch='master')
+    version('legacy', commit='a5dd21226f71e8550632357d5fbaf6dfec188d6b')
 
     extends('tcl')
     depends_on('tcl@8.5.0:8.5.999')

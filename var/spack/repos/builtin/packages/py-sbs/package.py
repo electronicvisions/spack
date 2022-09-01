@@ -21,6 +21,7 @@ class PySbs(PythonPackage):
     version('1.3.2', commit='87bb9787b4bdc741e349ad17191165a496e85042')
 
     depends_on('pkgconfig', type="build")
+    depends_on('python@:2.8', type=("build", "run"))
     depends_on('py-setuptools', type="build")
     depends_on('py-cython', type='build')
     depends_on('py-numpy', type=("build", "link", "run"))

@@ -12,6 +12,7 @@ class PyGitReview(PythonPackage):
     homepage = "https://docs.openstack.org/infra/git-review"
     pypi = "git-review/git-review-1.25.0.tar.gz"
 
+    version('2.3.1',  sha256='24e938136eecb6e6cbb38b5e2b034a286b70b5bb8b5a2853585c9ed23636014f')
     version('2.1.0',  sha256='3a6c775645b1fa8c40c49fbfce6f8d7e225a1e797a0aa92912607b1d97e61ed6')
     version('2.0.0',  sha256='6e6c86b61334526c5c0f200fdf61957310b0c32208339a38c890db7fe0de5452')
     version('1.28.0', sha256='8e3aabb7b9484063e49c2504d137609401e32ad5128ff2a5cf43e98d5d3dc15a')

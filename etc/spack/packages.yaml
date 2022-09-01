@@ -9,35 +9,25 @@ packages:
       pil: [py-pillow]
       java: [openjdk]
       pkgconfig: [pkg-config]
+  bazel:
+    # TODO: update (4.0.0 failed), 3.6.0 worked before
+    # 3.7: for py-tensorboard (via lightning)
+    version: [3.7.2]
   dask:
     variants: [~distributed]
-  ncurses:
-    version: [6.1]
-    variants: [+termlib]
   py-torch:
-    variants: [~binary~caffe2~cuda~cudnn~distributed~fbgemm~ffmpeg~gloo~leveldb~lmdb~magma~miopen~mkldnn~nccl~nnpack~opencv+openmp~qnnpack~redis~tbb~test~zstd]
-  bazel:
-    version: [0.25.2]
+    version: [1.9.1]
+    variants: ['+cuda cuda_arch=61,86']
   binutils:
     variants: [+ld+gold+plugins]
   cairo:
     variants: [+X]
   cppcheck:
     variants: [+htmlreport]
-  doxygen:
-    # always build with graphviz to help concretizer
-    variants: +graphviz
-    # newer version requires meson, requires python3, requires pain
-  gdb:
-    version: [8.3]
-  gdk-pixbuf:
-    version: [2.31.2]
-  gtkplus:
-    version: [2.24.32]
-  atk:
-    version: [2.20.0]
   gcc:
-    compiler: [gcc@4.9.2]
+    compiler: [gcc@11.2.0]
+  genpybind:
+    version: ['ebrains']
   hdf5:
     variants: [~mpi+hl]
   libusb:
@@ -46,24 +36,30 @@ packages:
     - spec: libusb@1.0.22
       prefix: /usr
   llvm:
+    version: [11.1.0]
     variants: [~shared_libs+visionary+python~libcxx build_type=Release]
+  mesa:
+    # mesa via ghostscript -> libepoxy+glx, but doesn't build with llvm@11.1.0
+    variants: [~llvm]
   openblas:
     variants: [cpu_target=NEHALEM]
+  nccl:
+    variants: ['+cuda cuda_arch=61,86']
   nest:
     variants: [~mpi+python]
-  node-js:
-    version: [8.15.0]
   pango:
     variants: [+X]
   pcre:
     variants: [+jit]
-  py-astroid:
-    # newer version require py3
-    version: [1.6.6]
   py-h5py:
     variants: [~mpi]
+  # otherwise -simulation prefers 2.0.2 -> bug?
+  py-matplotlib:
+    version: [2.2.5]
   py-tables:
     variants: [~auto~avx2+sse2]
+  python:
+    version: [3.8.2]
   ruby:
     variants: [~openssl]
   tk:

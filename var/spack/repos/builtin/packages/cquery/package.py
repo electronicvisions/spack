@@ -21,6 +21,9 @@ class Cquery(CMakePackage):
     # trivial patch (missing header) by mueller@kip.uni-heidelberg.de
     patch('fix-gcc10.patch', level=0, when='%gcc@10.0:')
 
+    # trivial patch (missing header) by mueller@kip.uni-heidelberg.de
+    patch('fix-gcc11.patch', level=1, when='%gcc@11.0:')
+
     def cmake_args(self):
         args = ['-DCMAKE_EXPORT_COMPILE_COMMANDS=YES',
                 '-DSYSTEM_CLANG=ON']

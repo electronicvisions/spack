@@ -59,6 +59,7 @@ class PyNbconvert(PythonPackage):
     depends_on('py-pandocfilters@1.4.1:', type=('build', 'run'), when='@5.5.0:')
     depends_on('py-defusedxml', type=('build', 'run'), when='@5:')
     depends_on('py-testpath', type=('build', 'run'), when='@5:')
+    depends_on('py-beautifulsoup4', type=('build', 'run'), when='@6.5.0:')
 
     def patch(self):
         # We bundle this with the spack package so that the installer

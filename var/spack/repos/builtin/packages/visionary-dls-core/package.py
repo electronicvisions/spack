@@ -1,9 +1,10 @@
-# Copyright 2013-2019 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
 from spack import *
+from spack.pkg.builtin.boost import Boost
 
 
 class VisionaryDlsCore(Package):
@@ -24,6 +25,7 @@ class VisionaryDlsCore(Package):
     # depends_on('libusb-1.0')  external dependency
     depends_on('bear')
     depends_on('bitsery')
+    depends_on(Boost.with_default_variants)
     depends_on('boost@1.69.0: +graph+icu+mpi+python+numpy+coroutine+context+valgrind cxxstd=17')
     depends_on('cereal')
     depends_on('cppcheck')
@@ -63,7 +65,8 @@ class VisionaryDlsCore(Package):
     #   - cuda arch 6.1 (Geforce 1080)
     #   - cuda arch 8.6 (GeForce RTX 3080)
     # fix it up if you use other cards.
-    # depends_on('py-torch ~mkldnn +fbgemm +distributed +mpi +tensorpipe +nccl +gloo +cuda cuda_arch=61,86')
+    # done in packages.yaml
+    # depends_on('py-torch ~mkldnn +fbgemm +distributed +mpi +tensorpipe +nccl +gloo +cuda cuda_arch="61,86"')
 
     # we only support Python 3.7+!
     depends_on('python@3.7.0:')
