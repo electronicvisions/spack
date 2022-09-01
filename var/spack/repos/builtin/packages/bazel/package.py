@@ -5,6 +5,8 @@
 
 import re
 
+from spack.package import *
+
 
 class Bazel(Package):
     """Bazel is an open-source build and test tool similar to Make, Maven, and
@@ -154,6 +156,15 @@ class Bazel(Package):
 
     patch('disabledepcheck.patch', when='@0.3.2:+nodepfail')
     patch('disabledepcheck_old.patch', when='@0.3.0:0.3.1+nodepfail')
+
+    # visionary (hack): when building on glibc >= 2.30 there's an overlapping function name
+    patch('rename-gettid-functions-0.25.patch', when='@0.25.2', level=0)
+
+    # visionary (hack): when building on newer gccs add missing include (min ranges)
+    patch('add-include-limits-0.25.patch', when='@0.25.2:3.7.999 %gcc@11.0.0:', level=0)
+
+    # visionary (hack): when building on newer gccs add missing include (min ranges)
+    patch('add-include-limits-zlib_client.patch', when='@0.25.2:3.7.999 %gcc@11.0.0:', level=0)
 
     executables = ['^bazel$']
 
