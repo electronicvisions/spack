@@ -21,6 +21,7 @@ class JsonGlib(MesonPackage):
     version('1.3.2', sha256='f6a80f42e63a3267356f20408bf91a1696837aa66d864ac7de2564ecbd332a7c', deprecated=True)
     version('1.2.8', sha256='fd55a9037d39e7a10f0db64309f5f0265fa32ec962bf85066087b83a2807f40a', deprecated=True)
 
+    depends_on('pkgconfig', type='build')
     depends_on('glib')
 
     @when('@:1.5')
