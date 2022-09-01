@@ -63,7 +63,7 @@ class VisionaryDlsCore(Package):
     #   - cuda arch 6.1 (Geforce 1080)
     #   - cuda arch 8.6 (GeForce RTX 3080)
     # fix it up if you use other cards.
-    depends_on('py-torch ~mkldnn +fbgemm +distributed +mpi +tensorpipe +nccl +gloo +cuda cuda_arch=61,86')
+    # depends_on('py-torch ~mkldnn +fbgemm +distributed +mpi +tensorpipe +nccl +gloo +cuda cuda_arch=61,86')
 
     # we only support Python 3.7+!
     depends_on('python@3.7.0:')

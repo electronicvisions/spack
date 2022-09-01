@@ -40,7 +40,8 @@ class VisionaryWafer(Package):
 
     depends_on('visionary-dev-tools', when='+dev')
 
-    conflicts('python@3:')
+    # conflicts('python@3:')
+    depends_on('python@:2.7.99')
 
     variant('tensorflow', default=False)
 
@@ -106,7 +107,7 @@ class VisionaryWafer(Package):
     #   - cuda arch 6.1 (Geforce 1080)
     #   - cuda arch 8.6 (GeForce RTX 3080)
     # fix it up if you use other cards.
-    depends_on('py-torch ~mkldnn +fbgemm +distributed +mpi +tensorpipe +nccl +gloo +cuda cuda_arch=61,86')
+    # depends_on('py-torch ~mkldnn +fbgemm +distributed +mpi +tensorpipe +nccl +gloo +cuda cuda_arch=61,86')
 
     def install(self, spec, prefix):
         mkdirp(prefix.etc)

@@ -87,7 +87,7 @@ class VisionaryDevTools(Package):
     depends_on('units')
     depends_on('valgrind')
     depends_on('verilator')
-    depends_on('vim +python +ruby +perl +cscope +huge +x')
+    depends_on('vim +python +ruby +perl +cscope +x')
     depends_on('visionary-xilinx')
     depends_on('wget')
     depends_on('yaml-cpp+shared')

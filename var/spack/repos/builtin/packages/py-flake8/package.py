@@ -51,7 +51,8 @@ class PyFlake8(PythonPackage):
 
     # Flake8 3.7.X
     # FIXME @0.3.0:0.3 causes concretization to hang
-    depends_on('py-entrypoints@0.3',           when='@3.7.0:3.8', type=('build', 'run'))
+    #depends_on('py-entrypoints@0.3',           when='@3.7.0:3.8', type=('build', 'run'))
+    depends_on('py-entrypoints',           when='@3.7.0:3.8', type=('build', 'run'))
     depends_on('py-pyflakes@2.1.0:2.1',    when='@3.7.0:3.7', type=('build', 'run'))
     depends_on('py-pycodestyle@2.5.0:2.5', when='@3.7.0:3.7', type=('build', 'run'))
     depends_on('py-mccabe@0.6.0:0.6',      when='@3.7.0:', type=('build', 'run'))

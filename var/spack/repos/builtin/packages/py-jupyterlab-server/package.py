@@ -24,7 +24,7 @@ class PyJupyterlabServer(PythonPackage):
     # depends_on('py-jupyter-packaging@0.9:0', type='build')
 
     depends_on('py-babel', when='@2.5.1:', type=('build', 'run'))
-    depends_on('py-entrypoints@0.2.2:', when='@2.7:', type=('build', 'run'))
+    # depends_on('py-entrypoints@0.2.2:', when='@2.7:', type=('build', 'run'))
     depends_on('py-jinja2@2.10:', type=('build', 'run'))
     depends_on('py-json5', type=('build', 'run'))
     depends_on('py-jsonschema@3.0.1:', type=('build', 'run'))

@@ -20,33 +20,32 @@ class PyNumba(PythonPackage):
     version('0.40.1', sha256='52d046c13bcf0de79dbfb936874b7228f141b9b8e3447cc35855e9ad3e12aa33')
     version('0.35.0', sha256='11564937757605bee590c5758c73cfe9fd6d569726b56d970316a6228971ecc3')
 
-    depends_on('python@3.7:3.10', type=('build', 'run'), when='@0.55.0:')
-    depends_on('python@3.7:3.9', type=('build', 'run'), when='@0.54')
-    depends_on('python@3.6:3.9', type=('build', 'run'), when='@0.53')
-    depends_on('python@3.6:3.8', type=('build', 'run'), when='@0.52')
-    # set upper bound for python the same as newer release
-    depends_on('python@3.6:3.8', type=('build', 'run'), when='@0.48:0.51')
-    depends_on('python@3.3:3.7', type=('build', 'run'), when='@0.40.1:0.47')
-    depends_on('python@3.3:3.6', type=('build', 'run'), when='@:0.35.0')
-    depends_on('py-numpy@1.18:1.21', type=('build', 'run'), when='@0.55.0:')
-    depends_on('py-numpy@1.17:1.20', type=('build', 'run'), when='@0.54')
-    # set upper bound for py-numpy the same as newer release
-    depends_on('py-numpy@1.15:1.20', type=('build', 'run'), when='@0.48:0.53')
-    depends_on('py-numpy@1.10:1.20', type=('build', 'run'), when='@:0.47')
+    depends_on('python@3.6:', type=('build', 'run'), when='@0.48.0:')
+    depends_on('python@2.7:2.8,3.3:3.7.9999', type=('build', 'run'), when='@0.40.1') 
+    depends_on('python@2.7:2.8,3.3:3.6.9999', type=('build', 'run'), when='@:0.35.0')
+    depends_on('py-numpy@1.15:', type=('build', 'run'), when='@0.48.0:')
+    depends_on('py-numpy@1.10:1.99', type=('build', 'run'))
     depends_on('py-setuptools', type=('build', 'run'))
 
-    depends_on('py-llvmlite@0.38', type=('build', 'run'), when='@0.55.1')
-    depends_on('py-llvmlite@0.37', type=('build', 'run'), when='@0.54.0')
-    depends_on('py-llvmlite@0.34', type=('build', 'run'), when='@0.51.1')
-    depends_on('py-llvmlite@0.33', type=('build', 'run'), when='@0.50.1')
-    depends_on('py-llvmlite@0.31', type=('build', 'run'), when='@0.47,0.48')
-    depends_on('py-llvmlite@0.25', type=('build', 'run'), when='@0.40')
-    depends_on('py-llvmlite@0.20:0.25', type=('build', 'run'), when='@0.35.1')
-
-    depends_on('py-argparse', type=('build', 'run'), when='^python@:2.6,3.0:3.1')
-    depends_on('py-funcsigs', type=('build', 'run'), when='@:0.47 ^python@:3.2')
-    depends_on('py-enum34', type=('build', 'run'), when='@:0.47 ^python@:3.3')
-    depends_on('py-singledispatch', type=('build', 'run'), when='@:0.47 ^python@:3.3')
+    depends_on('py-llvmlite@0.37.0:0.37.999', type=('build', 'run'), when='@0.54.0:')
+    depends_on('py-llvmlite@0.36.0:0.36.999', type=('build', 'run'), when='@0.53.0:0.53.999')
+    depends_on('py-llvmlite@0.35.0:0.35.999', type=('build', 'run'), when='@0.52.0:0.52.999')
+    depends_on('py-llvmlite@0.33.0:0.33.999', type=('build', 'run'), when='@0.50.0:0.50.999')
+    depends_on('py-llvmlite@0.32.0:0.32.999', type=('build', 'run'), when='@0.49.0:0.49.999')
+    depends_on('py-llvmlite@0.31.0:0.31.999', type=('build', 'run'), when='@0.48.0:0.48.999')
+    depends_on('py-llvmlite@0.25:', type=('build', 'run'), when='@0.40.1:0.47.99')
+    # Note: As of 1 Nov 2018, 0.25 was the latest version of py-llvmlite.
+    # That's why it was chosen as an upper bound in the following depends_on
+    # calls.  If newer versions maintain backwards compatibility, the calls
+    # can be updated accordingly.
+    depends_on('py-llvmlite@0.34.0:0.34.999', type=('build', 'run'), when='@0.51.1')
+    depends_on('py-llvmlite@0.33.0:0.33.999', type=('build', 'run'), when='@0.50.1')
+    depends_on('py-llvmlite@0.31.0:0.31.999', type=('build', 'run'), when='@0.48.0')
+    depends_on('py-llvmlite@0.25.0:',         type=('build', 'run'), when='@0.40.1')
+    depends_on('py-llvmlite@0.20:0.25',       type=('build', 'run'), when='@0.35.1')
+    depends_on('py-argparse', type=('build', 'run'), when='^python@:2.6')
+    depends_on('py-funcsigs', type=('build', 'run'), when='^python@:3.3.99')
+    depends_on('py-singledispatch', type=('build', 'run'), when='^python@:3.3.99')
 
     depends_on('py-scipy@1.0.0:', when='@0.48.0:')
 

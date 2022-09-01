@@ -16,9 +16,15 @@ class Log4cxx(CMakePackage):
 
     version('0.12.1', sha256='7bea5cb477f0e31c838f0e1f4f498cc3b30c2eae74703ddda923e7e8c2268d22')
     version('0.12.0', sha256='bd5b5009ca914c8fa7944b92ea6b4ca6fb7d146f65d526f21bf8b3c6a0520e44')
+    version('0.10.0', sha256='0de0396220a9566a580166e66b39674cb40efd2176f52ad2c65486c99c920c8c')
 
     variant('cxxstd', default='17', description='C++ standard',
             values=('11', '17'), multi=False)
+
+    # patches from https://aur.archlinux.org/packages/log4cxx/
+    patch('log4cxx-0.10.0-missing_includes.patch', when='@0.10.0')
+    patch('log4cxx-0.10.0-narrowing-fixes-from-upstream.patch', when='@0.10.0')
+    patch('log4cxx-0.10.0-llvm-libcxx.patch', when='@0.10.0%clang')
 
     depends_on('cmake@3.13:', type='build')
 
