@@ -26,7 +26,7 @@ class Gccxml(CMakePackage):
     patch('add-missing-gcc-builtin-bswap16.patch')
 
     # last supported version seems to be 4.9.3
-    depends_on('gcc@:4.9.3', type='run')
+    depends_on('gcc@:4.9.3~bootstrap', type='run')
 
     @run_after('install')
     def fix_path_to_gcc(self):
