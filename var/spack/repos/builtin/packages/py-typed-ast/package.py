@@ -1,4 +1,4 @@
-# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -12,13 +12,13 @@ class PyTypedAst(PythonPackage):
     homepage = "https://github.com/python/typed_ast"
     pypi = "typed-ast/typed_ast-1.4.0.tar.gz"
 
+    version('1.4.3', sha256='fb1bbeac803adea29cedd70781399c99138358c26d05fcbd23c13016b7f5ec65')
+    version('1.4.2', sha256='9fc0b3cb5d1720e7141d103cf4819aea239f7d136acf9ee4a69b047b7986175a')
+    version('1.4.1', sha256='8c8aaad94455178e3187ab22c8b01a3837f8ee50e09cf31f1ba129eb293ec30b')
     version('1.4.0', sha256='66480f95b8167c9c5c5c87f32cf437d585937970f3fc24386f313a4c97b44e34')
     version('1.3.5', sha256='5315f4509c1476718a4825f45a203b82d7fdf2a6f5f0c8f166435975b1c9f7d4',
-            url="https://files.pythonhosted.org/packages/d3/b1/959c3ed4a9cc100feba7ad1a7d6336d8888937ee89f4a577f7698e09decd/typed-ast-1.3.5.tar.gz")
-    version('1.2.0', sha256='b4726339a4c180a8b6ad9d8b50d2b6dc247e1b79b38fe2290549c98e82e4fd15',
-            url="https://files.pythonhosted.org/packages/00/be/c3769a5d6a179c42eba04186dc7efeb165edf92f7b1582ccfe81cb17d7f9/typed-ast-1.2.0.tar.gz")
-    version('1.1.2', sha256='4304399ff89452871348f6fb7a7112454cd508fbe3eb49b5ed711cce9b99fe9e',
-            url="https://files.pythonhosted.org/packages/68/72/96ba023d854ce8b3bf11cf261e4b2774787768834c9e30b77a94d02c98ad/typed-ast-1.1.2.tar.gz")
+            url='https://files.pythonhosted.org/packages/source/t/typed-ast/typed-ast-1.3.5.tar.gz')
 
-    depends_on('python@3.3:', type=('build', 'run'))
+    depends_on('python@3.3:', type=('build', 'link', 'run'))
+    depends_on('python@:3.8', when="@:1.4.0")  # build errors with 3.9 until 1.4.1
     depends_on('py-setuptools', type='build')

@@ -1,21 +1,25 @@
-# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
-import re
 import os
+import re
+import sys
 from itertools import product
+
 from spack.util.executable import which
 
 # Supported archive extensions.
 PRE_EXTS   = ["tar", "TAR"]
 EXTS       = ["gz", "bz2", "xz", "Z"]
-NOTAR_EXTS = ["zip", "tgz", "tbz2", "txz"]
+NOTAR_EXTS = ["zip", "tgz", "tbz", "tbz2", "txz"]
 
 # Add PRE_EXTS and EXTS last so that .tar.gz is matched *before* .tar or .gz
 ALLOWED_ARCHIVE_TYPES = [".".join(ext) for ext in product(
     PRE_EXTS, EXTS)] + PRE_EXTS + EXTS + NOTAR_EXTS
+
+is_windows = sys.platform == 'win32'
 
 
 def allowed_archive(path):
@@ -38,13 +42,30 @@ def _gunzip(archive_file):
             f_out.write(f_in.read())
 
 
+def _unzip(archive_file):
+    """Try to use Python's zipfile, but extract in the current working
+    directory instead of in-place.
+
+    If unavailable, search for 'unzip' executable on system and use instead
+
+    Args:
+        archive_file (str): absolute path of the file to be decompressed
+    """
+    exe = 'unzip'
+    arg = '-q'
+    if is_windows:
+        exe = 'tar'
+        arg = '-xf'
+    unzip = which(exe, required=True)
+    unzip.add_default_arg(arg)
+    unzip(archive_file)
+
+
 def decompressor_for(path, extension=None):
     """Get the appropriate decompressor for a path."""
     if ((extension and re.match(r'\.?zip$', extension)) or
             path.endswith('.zip')):
-        unzip = which('unzip', required=True)
-        unzip.add_default_arg('-q')
-        return unzip
+        return _unzip
     if extension and re.match(r'gz', extension):
         return _gunzip
     if extension and re.match(r'bz2', extension):

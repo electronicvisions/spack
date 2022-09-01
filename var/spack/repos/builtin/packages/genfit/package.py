@@ -1,4 +1,4 @@
-# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -26,6 +26,7 @@ class Genfit(CMakePackage):
     depends_on('root')
     depends_on('root@:6.16.00', when='@b496504a')
     depends_on('eigen')
+    depends_on('googletest')
 
     def cmake_args(self):
         args = []

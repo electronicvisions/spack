@@ -1,4 +1,4 @@
-# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -7,14 +7,16 @@ from spack import *
 
 
 class RChipseq(RPackage):
-    """A package for analyzing chipseq data"""
+    """A package for analyzing chipseq data,
 
-    homepage = "https://bioconductor.org/packages/release/bioc/html/chipseq.html"
-    url      = "https://bioconductor.org/packages/release/bioc/src/contrib/chipseq_1.40.0.tar.gz"
+    Tools for helping process short read data for chipseq experiments"""
+
+    bioc = "chipseq"
 
     maintainers = ['dorton21']
 
-    version('1.40.0', sha256='5b48721a9eae6ebaf57a57af13f76eb887925ea1a02906abeb6f67a588c0ff8a')
+    version('1.44.0', commit='b64d0d28e9fcf0fdab9a7f9c521baf729426a594')
+    version('1.40.0', commit='84bcbc0b7ad732730b5989a308f1624a6a358df1')
 
     depends_on('r@2.10:', type=('build', 'run'))
     depends_on('r-biocgenerics@0.1.0:', type=('build', 'run'))

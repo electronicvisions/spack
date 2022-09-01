@@ -1,4 +1,4 @@
-# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -23,6 +23,5 @@ class PyConfigargparse(PythonPackage):
     version('1.2.3', sha256='0f1144a204e3b896d6ac900e151c1d13bde3103d6b7d541e3bb57514a94083bf')
     version('0.14.0', sha256='b52a859838c90f4d662f824e4b2dc25395cd32abab9bc8f4c4d64725197dd517')
 
-    depends_on('python@2.2:2.999,3.5:', type=('build', 'run'))
+    depends_on('python@2.2:2,3.5:', type=('build', 'run'))
     depends_on('py-setuptools', type='build')
-    depends_on('py-pyyaml',     type=('build', 'run'))

@@ -1,4 +1,4 @@
-# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -36,7 +36,8 @@ class Elmerfem(CMakePackage):
     depends_on('blas')
     depends_on('lapack')
     depends_on('scalapack', when='+mpi')
-    depends_on('mumps', when='+mumps')
+    depends_on('mumps+openmp', when='+mumps+openmp')
+    depends_on('mumps~openmp', when='+mumps~openmp')
     depends_on('hypre', when='+hypre')
     depends_on('trilinos~hypre~zoltan~zoltan2', when='+trilinos')
     depends_on('zoltan+fortran', when='+zoltan')

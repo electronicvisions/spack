@@ -1,9 +1,12 @@
-# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
+import os
+
 from spack import *
+from spack.pkg.builtin.boost import Boost
 
 # typical working line with extrae 3.0.1
 # ./configure
@@ -48,7 +51,11 @@ class Extrae(AutotoolsPackage):
 
     depends_on("mpi")
     depends_on("libunwind")
-    depends_on("boost")
+
+    # TODO: replace this with an explicit list of components of Boost,
+    # for instance depends_on('boost +filesystem')
+    # See https://github.com/spack/spack/pull/22303 for reference
+    depends_on(Boost.with_default_variants)
     depends_on("libdwarf")
     depends_on("papi")
     depends_on("elf", type="link")
@@ -67,9 +74,21 @@ class Extrae(AutotoolsPackage):
     variant('papi', default=True, description="Use PAPI to collect performance counters")
     depends_on('papi', when='+papi')
 
+    variant('cuda', default=False, description="Enable support for tracing CUDA")
+    depends_on('cuda', when='+cuda')
+
+    variant('cupti', default=False, description='Enable CUPTI support')
+    depends_on('cuda', when='+cupti')
+    conflicts('+cupti', when='~cuda', msg='CUPTI requires CUDA')
+
     def configure_args(self):
         spec = self.spec
-        args = ["--with-mpi=%s" % spec['mpi'].prefix,
+        if '^intel-oneapi-mpi' in spec:
+            mpiroot = spec['mpi'].component_path
+        else:
+            mpiroot = spec['mpi'].prefix
+
+        args = ["--with-mpi=%s" % mpiroot,
                 "--with-unwind=%s" % spec['libunwind'].prefix,
                 "--with-boost=%s" % spec['boost'].prefix,
                 "--with-dwarf=%s" % spec['libdwarf'].prefix,
@@ -85,13 +104,29 @@ class Extrae(AutotoolsPackage):
                  if '+dyninst' in self.spec else
                  ["--without-dyninst"])
 
+        args += (["--with-cuda=%s" % spec['cuda'].prefix]
+                 if '+cuda' in self.spec else
+                 ["--without-cuda"])
+
+        if '+cupti' in self.spec:
+            cupti_h = find_headers('cupti', spec['cuda'].prefix,
+                                   recursive=True)
+            cupti_dir = os.path.dirname(os.path.dirname(cupti_h[0]))
+
+        args += (["--with-cupti=%s" % cupti_dir]
+                 if '+cupti' in self.spec else
+                 ["--without-cupti"])
+
         if spec.satisfies("^dyninst@9.3.0:"):
             make.add_default_arg("CXXFLAGS=%s" % self.compiler.cxx11_flag)
             args.append("CXXFLAGS=%s" % self.compiler.cxx11_flag)
 
-        # This was added due to configure failure
+        # This was added due to:
+        # - configure failure
         # https://www.gnu.org/software/gettext/FAQ.html#integrating_undefined
-        args.append('LDFLAGS=-lintl')
+        # - linking error
+        # https://github.com/bsc-performance-tools/extrae/issues/57
+        args.append('LDFLAGS=-lintl -pthread')
 
         return(args)
 

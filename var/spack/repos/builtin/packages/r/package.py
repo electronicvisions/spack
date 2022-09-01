@@ -1,4 +1,4 @@
-# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -23,6 +23,10 @@ class R(AutotoolsPackage):
 
     maintainers = ['glennpj']
 
+    version('4.1.3', sha256='15ff5b333c61094060b2a52e9c1d8ec55cc42dd029e39ca22abdaa909526fed6')
+    version('4.1.2', sha256='2036225e9f7207d4ce097e54972aecdaa8b40d7d9911cd26491fac5a0fab38af')
+    version('4.1.1', sha256='515e03265752257d0b7036f380f82e42b46ed8473f54f25c7b67ed25bbbdd364')
+    version('4.1.0', sha256='e8e68959d7282ca147360fc9644ada9bd161bab781bab14d33b8999a95182781')
     version('4.0.5', sha256='0a3ee079aa772e131fe5435311ab627fcbccb5a50cabc54292e6f62046f1ffef')
     version('4.0.4', sha256='523f27d69744a08c8f0bd5e1e6c3d89a4db29ed983388ba70963a3cd3a4a802e')
     version('4.0.3', sha256='09983a8a78d5fb6bc45d27b1c55f9ba5265f78fa54a55c13ae691f87c5bb9e0d')
@@ -66,7 +70,7 @@ class R(AutotoolsPackage):
     depends_on('blas', when='+external-lapack')
     depends_on('lapack', when='+external-lapack')
     depends_on('bzip2')
-    depends_on('curl')
+    depends_on('curl+libidn2')
     depends_on('icu4c')
     depends_on('java')
     depends_on('ncurses')
@@ -74,6 +78,7 @@ class R(AutotoolsPackage):
     depends_on('pcre2', when='@4:')
     depends_on('readline')
     depends_on('xz')
+    depends_on('which', type=('build', 'run'))
     depends_on('zlib@1.2.5:')
     depends_on('cairo+X+gobject+pdf', when='+X')
     depends_on('pango+X', when='+X')
@@ -108,17 +113,12 @@ class R(AutotoolsPackage):
     def etcdir(self):
         return join_path(prefix, 'rlib', 'R', 'etc')
 
-    @run_after('build')
-    def build_rmath(self):
-        if '+rmath' in self.spec:
-            with working_dir('src/nmath/standalone'):
-                make()
-
     @run_after('install')
     def install_rmath(self):
         if '+rmath' in self.spec:
             with working_dir('src/nmath/standalone'):
-                make('install')
+                make()
+                make('install', parallel=False)
 
     def configure_args(self):
         spec   = self.spec
@@ -224,12 +224,14 @@ class R(AutotoolsPackage):
                 dependent_spec.prefix, self.r_lib_dir))
 
     def setup_run_environment(self, env):
-        env.prepend_path('LIBRARY_PATH',
-                         join_path(self.prefix, 'rlib', 'R', 'lib'))
         env.prepend_path('LD_LIBRARY_PATH',
                          join_path(self.prefix, 'rlib', 'R', 'lib'))
-        env.prepend_path('CPATH',
-                         join_path(self.prefix, 'rlib', 'R', 'include'))
+        env.prepend_path('PKG_CONFIG_PATH',
+                         join_path(self.prefix, 'rlib', 'pkgconfig'))
+
+        if '+rmath' in self.spec:
+            env.prepend_path('LD_LIBRARY_PATH',
+                             join_path(self.prefix, 'rlib'))
 
     def setup_dependent_package(self, module, dependent_spec):
         """Called before R modules' install() methods. In most cases,

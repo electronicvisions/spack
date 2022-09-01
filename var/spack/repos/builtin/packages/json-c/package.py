@@ -1,4 +1,4 @@
-# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -41,3 +41,15 @@ class JsonC(CMakePackage):
     @when('@:0.13.1')
     def install(self, spec, prefix):
         make('install')
+
+    @when('%cce@11.0.3:')
+    def patch(self):
+        filter_file('-Werror',
+                    '',
+                    'CMakeLists.txt')
+
+    @run_after('install')
+    def darwin_fix(self):
+        # The shared library is not installed correctly on Darwin; fix this
+        if 'platform=darwin' in self.spec:
+            fix_darwin_install_name(self.prefix.lib)

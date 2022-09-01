@@ -1,10 +1,12 @@
-# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
+import glob
 import os
-import sys
 import platform
+import shutil
+import sys
 
 import py
 import pytest
@@ -18,14 +20,19 @@ import spack.repo
 import spack.store
 import spack.util.gpg
 import spack.util.web as web_util
-
-from spack.directory_layout import YamlDirectoryLayout
+from spack.directory_layout import DirectoryLayout
+from spack.paths import test_path
 from spack.spec import Spec
+
+pytestmark = pytest.mark.skipif(sys.platform == "win32",
+                                reason="does not run on windows")
 
 mirror_cmd = spack.main.SpackCommand('mirror')
 install_cmd = spack.main.SpackCommand('install')
 uninstall_cmd = spack.main.SpackCommand('uninstall')
 buildcache_cmd = spack.main.SpackCommand('buildcache')
+
+legacy_mirror_dir = os.path.join(test_path, 'data', 'mirrors', 'legacy_yaml')
 
 
 @pytest.fixture(scope='function')
@@ -56,18 +63,28 @@ def test_mirror(mirror_dir):
     mirror_cmd('rm', '--scope=site', 'test-mirror-func')
 
 
+@pytest.fixture(scope='function')
+def test_legacy_mirror(mutable_config, tmpdir):
+    mirror_dir = tmpdir.join('legacy_yaml_mirror')
+    shutil.copytree(legacy_mirror_dir, mirror_dir.strpath)
+    mirror_url = 'file://%s' % mirror_dir
+    mirror_cmd('add', '--scope', 'site', 'test-legacy-yaml', mirror_url)
+    yield mirror_dir
+    mirror_cmd('rm', '--scope=site', 'test-legacy-yaml')
+
+
 @pytest.fixture(scope='module')
 def config_directory(tmpdir_factory):
     tmpdir = tmpdir_factory.mktemp('test_configs')
     # restore some sane defaults for packages and config
     config_path = py.path.local(spack.paths.etc_path)
-    modules_yaml = config_path.join('spack', 'defaults', 'modules.yaml')
-    os_modules_yaml = config_path.join('spack', 'defaults', '%s' %
+    modules_yaml = config_path.join('defaults', 'modules.yaml')
+    os_modules_yaml = config_path.join('defaults', '%s' %
                                        platform.system().lower(),
                                        'modules.yaml')
-    packages_yaml = config_path.join('spack', 'defaults', 'packages.yaml')
-    config_yaml = config_path.join('spack', 'defaults', 'config.yaml')
-    repos_yaml = config_path.join('spack', 'defaults', 'repos.yaml')
+    packages_yaml = config_path.join('defaults', 'packages.yaml')
+    config_yaml = config_path.join('defaults', 'config.yaml')
+    repos_yaml = config_path.join('defaults', 'repos.yaml')
     tmpdir.ensure('site', dir=True)
     tmpdir.ensure('user', dir=True)
     tmpdir.ensure('site/%s' % platform.system().lower(), dir=True)
@@ -138,7 +155,7 @@ def install_dir_default_layout(tmpdir):
     real_store, real_layout = spack.store.store, spack.store.layout
     opt_dir = tmpdir.join('opt')
     spack.store.store = spack.store.Store(str(opt_dir))
-    spack.store.layout = YamlDirectoryLayout(str(opt_dir), path_scheme=scheme)
+    spack.store.layout = DirectoryLayout(str(opt_dir), path_scheme=scheme)
     try:
         yield spack.store
     finally:
@@ -156,7 +173,7 @@ def install_dir_non_default_layout(tmpdir):
     real_store, real_layout = spack.store.store, spack.store.layout
     opt_dir = tmpdir.join('opt')
     spack.store.store = spack.store.Store(str(opt_dir))
-    spack.store.layout = YamlDirectoryLayout(str(opt_dir), path_scheme=scheme)
+    spack.store.layout = DirectoryLayout(str(opt_dir), path_scheme=scheme)
     try:
         yield spack.store
     finally:
@@ -183,12 +200,14 @@ def test_default_rpaths_create_install_default_layout(mirror_dir):
     into the default directory layout scheme.
     """
     gspec, cspec = Spec('garply').concretized(), Spec('corge').concretized()
+    sy_spec = Spec('symly').concretized()
 
     # Install 'corge' without using a cache
     install_cmd('--no-cache', cspec.name)
+    install_cmd('--no-cache', sy_spec.name)
 
     # Create a buildache
-    buildcache_cmd('create', '-au', '-d', mirror_dir, cspec.name)
+    buildcache_cmd('create', '-au', '-d', mirror_dir, cspec.name, sy_spec.name)
     # Test force overwrite create buildcache (-f option)
     buildcache_cmd('create', '-auf', '-d', mirror_dir, cspec.name)
 
@@ -202,7 +221,7 @@ def test_default_rpaths_create_install_default_layout(mirror_dir):
     uninstall_cmd('-y', '--dependents', gspec.name)
 
     # Test installing from build caches
-    buildcache_cmd('install', '-au', cspec.name)
+    buildcache_cmd('install', '-au', cspec.name, sy_spec.name)
 
     # This gives warning that spec is already installed
     buildcache_cmd('install', '-au', cspec.name)
@@ -230,10 +249,12 @@ def test_default_rpaths_install_nondefault_layout(mirror_dir):
     into the non-default directory layout scheme.
     """
     cspec = Spec('corge').concretized()
+    # This guy tests for symlink relocation
+    sy_spec = Spec('symly').concretized()
 
     # Install some packages with dependent packages
     # test install in non-default install path scheme
-    buildcache_cmd('install', '-au', cspec.name)
+    buildcache_cmd('install', '-au', cspec.name, sy_spec.name)
 
     # Test force install in non-default install path scheme
     buildcache_cmd('install', '-auf', cspec.name)
@@ -317,8 +338,6 @@ def test_relative_rpaths_install_nondefault(mirror_dir):
     buildcache_cmd('install', '-auf', cspec.name)
 
 
-@pytest.mark.skipif(not spack.util.gpg.has_gpg(),
-                    reason='This test requires gpg')
 def test_push_and_fetch_keys(mock_gnupghome):
     testpath = str(mock_gnupghome)
 
@@ -332,7 +351,7 @@ def test_push_and_fetch_keys(mock_gnupghome):
 
     # dir 1: create a new key, record its fingerprint, and push it to a new
     #        mirror
-    with spack.util.gpg.gnupg_home_override(gpg_dir1):
+    with spack.util.gpg.gnupghome_override(gpg_dir1):
         spack.util.gpg.create(name='test-key',
                               email='fake@test.key',
                               expires='0',
@@ -346,7 +365,7 @@ def test_push_and_fetch_keys(mock_gnupghome):
 
     # dir 2: import the key from the mirror, and confirm that its fingerprint
     #        matches the one created above
-    with spack.util.gpg.gnupg_home_override(gpg_dir2):
+    with spack.util.gpg.gnupghome_override(gpg_dir2):
         assert len(spack.util.gpg.public_keys()) == 0
 
         bindist.get_keys(mirrors=mirrors, install=True, trust=True, force=True)
@@ -372,31 +391,12 @@ def test_built_spec_cache(mirror_dir):
 
     gspec, cspec = Spec('garply').concretized(), Spec('corge').concretized()
 
-    full_hash_map = {
-        'garply': gspec.full_hash(),
-        'corge': cspec.full_hash(),
-    }
-
-    gspec_results = bindist.get_mirrors_for_spec(gspec)
-
-    gspec_mirrors = {}
-    for result in gspec_results:
-        s = result['spec']
-        assert(s._full_hash == full_hash_map[s.name])
-        assert(result['mirror_url'] not in gspec_mirrors)
-        gspec_mirrors[result['mirror_url']] = True
-
-    cspec_results = bindist.get_mirrors_for_spec(cspec, full_hash_match=True)
-
-    cspec_mirrors = {}
-    for result in cspec_results:
-        s = result['spec']
-        assert(s._full_hash == full_hash_map[s.name])
-        assert(result['mirror_url'] not in cspec_mirrors)
-        cspec_mirrors[result['mirror_url']] = True
+    for s in [gspec, cspec]:
+        results = bindist.get_mirrors_for_spec(s)
+        assert(any([r['spec'] == s for r in results]))
 
 
-def fake_full_hash(spec):
+def fake_dag_hash(spec):
     # Generate an arbitrary hash that is intended to be different than
     # whatever a Spec reported before (to test actions that trigger when
     # the hash changes)
@@ -408,7 +408,7 @@ def fake_full_hash(spec):
     'test_mirror'
 )
 def test_spec_needs_rebuild(monkeypatch, tmpdir):
-    """Make sure needs_rebuild properly compares remote full_hash
+    """Make sure needs_rebuild properly compares remote hash
     against locally computed one, avoiding unnecessary rebuilds"""
 
     # Create a temp mirror directory for buildcache usage
@@ -423,16 +423,55 @@ def test_spec_needs_rebuild(monkeypatch, tmpdir):
     # Put installed package in the buildcache
     buildcache_cmd('create', '-u', '-a', '-d', mirror_dir.strpath, s.name)
 
-    rebuild = bindist.needs_rebuild(s, mirror_url, rebuild_on_errors=True)
+    rebuild = bindist.needs_rebuild(s, mirror_url)
 
     assert not rebuild
 
-    # Now monkey patch Spec to change the full hash on the package
-    monkeypatch.setattr(spack.spec.Spec, 'full_hash', fake_full_hash)
+    # Now monkey patch Spec to change the hash on the package
+    monkeypatch.setattr(spack.spec.Spec, 'dag_hash', fake_dag_hash)
 
-    rebuild = bindist.needs_rebuild(s, mirror_url, rebuild_on_errors=True)
+    rebuild = bindist.needs_rebuild(s, mirror_url)
 
     assert rebuild
+
+
+@pytest.mark.usefixtures(
+    'install_mockery_mutable_config', 'mock_packages', 'mock_fetch',
+)
+def test_generate_index_missing(monkeypatch, tmpdir, mutable_config):
+    """Ensure spack buildcache index only reports available packages"""
+
+    # Create a temp mirror directory for buildcache usage
+    mirror_dir = tmpdir.join('mirror_dir')
+    mirror_url = 'file://{0}'.format(mirror_dir.strpath)
+    spack.config.set('mirrors', {'test': mirror_url})
+
+    s = Spec('libdwarf').concretized()
+
+    # Install a package
+    install_cmd('--no-cache', s.name)
+
+    # Create a buildcache and update index
+    buildcache_cmd('create', '-uad', mirror_dir.strpath, s.name)
+    buildcache_cmd('update-index', '-d', mirror_dir.strpath)
+
+    # Check package and dependency in buildcache
+    cache_list = buildcache_cmd('list', '--allarch')
+    assert 'libdwarf' in cache_list
+    assert 'libelf' in cache_list
+
+    # Remove dependency from cache
+    libelf_files = glob.glob(
+        os.path.join(mirror_dir.join('build_cache').strpath, '*libelf*'))
+    os.remove(*libelf_files)
+
+    # Update index
+    buildcache_cmd('update-index', '-d', mirror_dir.strpath)
+
+    # Check dependency not in buildcache
+    cache_list = buildcache_cmd('list', '--allarch')
+    assert 'libdwarf' in cache_list
+    assert 'libelf' not in cache_list
 
 
 def test_generate_indices_key_error(monkeypatch, capfd):
@@ -517,7 +556,7 @@ def test_update_sbang(tmpdir, test_mirror):
     # Switch the store to the new install tree locations
     newtree_dir = tmpdir.join('newtree')
     s = spack.store.Store(str(newtree_dir))
-    s.layout = YamlDirectoryLayout(str(newtree_dir), path_scheme=scheme)
+    s.layout = DirectoryLayout(str(newtree_dir), path_scheme=scheme)
 
     with spack.store.use_store(s):
         new_spec = Spec('old-sbang')
@@ -552,3 +591,54 @@ def test_update_sbang(tmpdir, test_mirror):
             open(str(installed_script_style_2_path)).read()
 
         uninstall_cmd('-y', '/%s' % new_spec.dag_hash())
+
+
+# Need one where the platform has been changed to the test platform.
+def test_install_legacy_yaml(test_legacy_mirror, install_mockery_mutable_config,
+                             mock_packages):
+    install_cmd('--no-check-signature', '--cache-only', '-f', legacy_mirror_dir
+                + '/build_cache/test-debian6-core2-gcc-4.5.0-zlib-' +
+                '1.2.11-t5mczux3tfqpxwmg7egp7axy2jvyulqk.spec.yaml')
+    uninstall_cmd('-y', '/t5mczux3tfqpxwmg7egp7axy2jvyulqk')
+
+
+def test_install_legacy_buildcache_layout(install_mockery_mutable_config):
+    """Legacy buildcache layout involved a nested archive structure
+    where the .spack file contained a repeated spec.json and another
+    compressed archive file containing the install tree.  This test
+    makes sure we can still read that layout."""
+    legacy_layout_dir = os.path.join(test_path, 'data', 'mirrors', 'legacy_layout')
+    mirror_url = "file://{0}".format(legacy_layout_dir)
+    filename = ("test-debian6-core2-gcc-4.5.0-archive-files-2.0-"
+                "l3vdiqvbobmspwyb4q2b62fz6nitd4hk.spec.json")
+    spec_json_path = os.path.join(legacy_layout_dir, 'build_cache', filename)
+    mirror_cmd('add', '--scope', 'site', 'test-legacy-layout', mirror_url)
+    output = install_cmd(
+        '--no-check-signature', '--cache-only', '-f', spec_json_path, output=str)
+    mirror_cmd('rm', '--scope=site', 'test-legacy-layout')
+    expect_line = ("Extracting archive-files-2.0-"
+                   "l3vdiqvbobmspwyb4q2b62fz6nitd4hk from binary cache")
+    assert(expect_line in output)
+
+
+def test_FetchCacheError_only_accepts_lists_of_errors():
+    with pytest.raises(TypeError, match="list"):
+        bindist.FetchCacheError("error")
+
+
+def test_FetchCacheError_pretty_printing_multiple():
+    e = bindist.FetchCacheError([RuntimeError("Oops!"), TypeError("Trouble!")])
+    str_e = str(e)
+    print("'" + str_e + "'")
+    assert "Multiple errors" in str_e
+    assert "Error 1: RuntimeError: Oops!" in str_e
+    assert "Error 2: TypeError: Trouble!" in str_e
+    assert str_e.rstrip() == str_e
+
+
+def test_FetchCacheError_pretty_printing_single():
+    e = bindist.FetchCacheError([RuntimeError("Oops!")])
+    str_e = str(e)
+    assert "Multiple errors" not in str_e
+    assert "RuntimeError: Oops!" in str_e
+    assert str_e.rstrip() == str_e

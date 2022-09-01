@@ -1,4 +1,4 @@
-# Copyright 2013-2019 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -11,10 +11,11 @@ class PyBatchspawner(PythonPackage):
     installations on clusters using batch scheduling software."""
 
     homepage = "https://github.com/jupyterhub/batchspawner"
-    url      = "https://pypi.io/packages/source/b/batchspawner/batchspawner-1.0.1.tar.gz"
+    pypi     = "batchspawner/batchspawner-1.1.0.tar.gz"
 
-    version('1.0.1', sha256='b96ab7e1eb3b69e0863ebf045b960a4d074935a8a8fbfd0369b5d1af5b1bab8d')
+    version('1.1.0',      sha256='9bae72f7c1bd9bb11aa58ecc3bc9fae5475a10fdd92dc0c0d67fa7eb95c9dd3a')
 
+    depends_on('python@3.3:3', type=('build', 'run'))
     depends_on('py-setuptools',           type='build')
     depends_on('py-async-generator@1.8:', type=('build', 'run'))
     depends_on('py-jinja2',               type=('build', 'run'))

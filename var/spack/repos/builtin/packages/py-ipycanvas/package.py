@@ -1,4 +1,4 @@
-# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -7,17 +7,20 @@ from spack import *
 
 
 class PyIpycanvas(PythonPackage):
-    """Interactive widgets library exposing the browser's Canvas API"""
+    """Interactive Canvas in Jupyter."""
 
     homepage = "https://github.com/martinRenou/ipycanvas"
-    pypi     = "ipycanvas/ipycanvas-0.8.2.tar.gz"
+    pypi     = "ipycanvas/ipycanvas-0.9.0.tar.gz"
 
-    version('0.8.2', sha256='45ca524d90d158a5e884e146a10885f853d5a352e547e7b1eb5329230c9eff02')
+    version('0.10.2', sha256='a02c494834cb3c60509801172e7429beae837b3cb6c61d3becf8b586c5a66004')
+    version('0.9.0', sha256='f29e56b93fe765ceace0676c3e75d44e02a3ff6c806f3b7e5b869279f470cc43')
 
     depends_on('python@3.5:', type=('build', 'run'))
-    depends_on('py-setuptools', type='build')
-    depends_on('py-jupyter-packaging', type='build')
-    depends_on('py-ipywidgets@7.6.0:', type=('build', 'run'))
-    depends_on('py-pillow@6.0:', type=('build', 'run'))
+    depends_on('py-setuptools@40.8:', type='build')
+    # TODO: replace this after concretizer learns how to concretize separate build deps
+    depends_on('py-jupyter-packaging7', type='build')
+    # depends_on('py-jupyter-packaging@0.7.0:0.7', type='build')
+    depends_on('py-jupyterlab@3.0:3', type='build')
+    depends_on('py-ipywidgets@7.6:', type=('build', 'run'))
+    depends_on('pil@6:', type=('build', 'run'))
     depends_on('py-numpy', type=('build', 'run'))
-    depends_on('py-orjson', type=('build', 'run'))

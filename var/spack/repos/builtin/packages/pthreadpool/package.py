@@ -1,9 +1,8 @@
-# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
-import os.path
 from spack import *
 
 
@@ -42,7 +41,7 @@ class Pthreadpool(CMakePackage):
         placement='googletest',
     )
     resource(
-        name='googlebenchmark',
+        name='googlebenchark',
         url='https://github.com/google/benchmark/archive/v1.5.3.zip',
         sha256='bdefa4b03c32d1a27bd50e37ca466d8127c1688d834800c38f3c587a396188ee',
         destination='deps',
@@ -58,13 +57,6 @@ class Pthreadpool(CMakePackage):
                         join_path(self.stage.source_path, 'deps', 'googletest')),
             self.define('GOOGLEBENCHMARK_SOURCE_DIR',
                         join_path(self.stage.source_path, 'deps', 'googlebenchmark')),
+            self.define('PTHREADPOOL_BUILD_TESTS', self.run_tests),
+            self.define('PTHREADPOOL_BUILD_BENCHMARKS', self.run_tests),
         ]
-
-    # the package installs some headers from dependencies (gtest/gmock, google
-    # benchmark and fxdiv); don't add those to the view but only the package
-    # contents as the dependencies should be available in reasonable views; a
-    # better fix would be to avoid vendoring of the dependencies
-    def add_files_to_view(self, view, merge_map):
-        for src, dst in merge_map.items():
-            if 'pthreadpool' in os.path.basename(src):
-                view.link(src, dst, spec=self.spec)

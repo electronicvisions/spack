@@ -1,10 +1,11 @@
-# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
-from spack import *
 import platform
+
+from spack import *
 
 _versions = {
     'v5.2.1': {
@@ -26,6 +27,6 @@ class Hyperscan(CMakePackage):
         if pkg:
             version(ver, sha256=pkg[0], url=pkg[1])
 
-    depends_on('boost')
+    depends_on('boost+exception+serialization+random+graph+container')
     depends_on('pcre')
     depends_on('ragel', type='build')

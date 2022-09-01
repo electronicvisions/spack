@@ -1,4 +1,4 @@
-# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -11,6 +11,7 @@ import spack.cmd
 import spack.cmd.common.arguments as arguments
 import spack.config
 import spack.environment as ev
+import spack.main
 
 
 @pytest.fixture()
@@ -44,21 +45,22 @@ def test_negative_integers_not_allowed_for_parallel_jobs(job_parser):
     assert 'expected a positive integer' in str(exc_info.value)
 
 
-@pytest.mark.parametrize('specs,expected_variants,unexpected_variants', [
-    (['coreutils', 'cflags=-O3 -g'], [], ['g']),
-    (['coreutils', 'cflags=-O3', '-g'], ['g'], []),
+@pytest.mark.parametrize('specs,cflags,negated_variants', [
+    (['coreutils cflags="-O3 -g"'], ['-O3', '-g'], []),
+    (['coreutils', 'cflags=-O3 -g'], ['-O3'], ['g']),
+    (['coreutils', 'cflags=-O3', '-g'], ['-O3'], ['g']),
 ])
 @pytest.mark.regression('12951')
-def test_parse_spec_flags_with_spaces(
-        specs, expected_variants, unexpected_variants
-):
+def test_parse_spec_flags_with_spaces(specs, cflags, negated_variants):
     spec_list = spack.cmd.parse_specs(specs)
     assert len(spec_list) == 1
 
     s = spec_list.pop()
 
-    assert all(x not in s.variants for x in unexpected_variants)
-    assert all(x in s.variants for x in expected_variants)
+    assert s.compiler_flags['cflags'] == cflags
+    assert list(s.variants.keys()) == negated_variants
+    for v in negated_variants:
+        assert '~{0}'.format(v) in s
 
 
 @pytest.mark.usefixtures('config')
@@ -90,9 +92,40 @@ def test_multiple_env_match_raises_error(mock_packages, mutable_mock_env_path):
     e.add('a foobar=fee')
     e.concretize()
     with e:
-        with pytest.raises(
-                spack.environment.SpackEnvironmentError) as exc_info:
-
+        with pytest.raises(ev.SpackEnvironmentError) as exc_info:
             spack.cmd.matching_spec_from_env(spack.cmd.parse_specs(['a'])[0])
 
     assert 'matches multiple specs' in exc_info.value.message
+
+
+@pytest.mark.usefixtures('config')
+def test_root_and_dep_match_returns_root(mock_packages, mutable_mock_env_path):
+    e = ev.create('test')
+    e.add('b@0.9')
+    e.add('a foobar=bar')  # Depends on b, should choose b@1.0
+    e.concretize()
+    with e:
+        # This query matches the root b and b as a dependency of a. In that
+        # case the root instance should be preferred.
+        env_spec1 = spack.cmd.matching_spec_from_env(
+            spack.cmd.parse_specs(['b'])[0])
+        assert env_spec1.satisfies('@0.9')
+
+        env_spec2 = spack.cmd.matching_spec_from_env(
+            spack.cmd.parse_specs(['b@1.0'])[0])
+        assert env_spec2
+
+
+def test_concretizer_arguments(mutable_config, mock_packages):
+    """Ensure that ConfigSetAction is doing the right thing."""
+    spec = spack.main.SpackCommand("spec")
+
+    assert spack.config.get("concretizer:reuse", None) is None
+
+    spec("--reuse", "zlib")
+
+    assert spack.config.get("concretizer:reuse", None) is True
+
+    spec("--fresh", "zlib")
+
+    assert spack.config.get("concretizer:reuse", None) is False

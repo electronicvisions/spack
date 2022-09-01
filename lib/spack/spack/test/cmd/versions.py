@@ -1,13 +1,19 @@
-# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
+import sys
+
 import pytest
 
 from spack.main import SpackCommand
+from spack.version import Version
 
 versions = SpackCommand('versions')
+
+pytestmark = pytest.mark.skipif(sys.platform == "win32",
+                                reason="does not run on windows")
 
 
 def test_safe_only_versions():
@@ -37,12 +43,32 @@ def test_remote_versions_only():
     versions('--remote', 'zlib')
 
 
-@pytest.mark.maybeslow
 @pytest.mark.usefixtures('mock_packages')
-def test_new_versions_only():
+def test_new_versions_only(monkeypatch):
     """Test a package for which new versions should be available."""
+    from spack.pkg.builtin.mock.brillig import Brillig  # type: ignore[import]
 
-    versions('--new', 'brillig')
+    def mock_fetch_remote_versions(*args, **kwargs):
+        mock_remote_versions = {
+            # new version, we expect this to be in output:
+            Version('99.99.99'): {},
+            # some packages use '3.2' equivalently to '3.2.0'
+            # thus '3.2.1' is considered to be a new version
+            # and expected in the output also
+            Version('3.2.1'): {},  # new version, we expect this to be in output
+            Version('3.2'): {},
+            Version('1.0.0'): {},
+        }
+        return mock_remote_versions
+    mock_versions = {
+        # already checksummed versions:
+        Version('3.2'): {},
+        Version('1.0.0'): {},
+    }
+    monkeypatch.setattr(Brillig, 'versions', mock_versions)
+    monkeypatch.setattr(Brillig, 'fetch_remote_versions', mock_fetch_remote_versions)
+    v = versions('--new', 'brillig')
+    assert(v.strip(' \n\t') == "99.99.99\n  3.2.1")
 
 
 @pytest.mark.maybeslow

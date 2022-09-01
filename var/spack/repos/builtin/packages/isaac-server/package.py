@@ -1,4 +1,4 @@
-# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -9,7 +9,7 @@ from spack import *
 class IsaacServer(CMakePackage):
     """In Situ Animation of Accelerated Computations: Server"""
 
-    homepage = "http://computationalradiationphysics.github.io/isaac/"
+    homepage = "https://computationalradiationphysics.github.io/isaac/"
     url      = "https://github.com/ComputationalRadiationPhysics/isaac/archive/v1.3.0.tar.gz"
     git      = "https://github.com/ComputationalRadiationPhysics/isaac.git"
 
@@ -33,7 +33,7 @@ class IsaacServer(CMakePackage):
     depends_on('jpeg', type='link')
     depends_on('jansson@:2.9', type='link', when='@:1.5.1')
     depends_on('jansson', type='link')
-    depends_on('boost@1.56.0:', type='link')
+    depends_on('boost@1.56.0:+serialization', type='link')
     depends_on('libwebsockets@2.1.1:', type='link')
     # depends_on('gstreamer@1.0', when='+gstreamer')
 

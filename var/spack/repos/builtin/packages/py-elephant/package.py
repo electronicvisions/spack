@@ -1,4 +1,4 @@
-# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -11,7 +11,7 @@ class PyElephant(PythonPackage):
     """Elephant is a package for analysis of electrophysiology data in Python
     """
 
-    homepage = "http://neuralensemble.org/elephant"
+    homepage = "https://neuralensemble.org/elephant"
     pypi = "elephant/elephant-0.3.0.tar.gz"
 
     version('0.5.0', sha256='eeedc58f49200b158a9be329015c8dd562450b3c2aa01fdcd92375aca80e461c')
@@ -79,6 +79,5 @@ class PyElephant(PythonPackage):
     depends_on('py-scipy@0.14.0:',      type=('build', 'run'))
     depends_on('py-six@1.10.0:',        type=('build', 'run'))
     depends_on('py-pandas@0.14.1:',     type=('build', 'run'), when='+pandas')
-    depends_on('py-scikit-learn',       type=('build', 'run'), when='+scikit')
     depends_on('py-numpydoc@0.5:',      type=('build', 'run'), when='+doc')
     depends_on('py-sphinx@1.2.2:',      type=('build', 'run'), when='+doc')

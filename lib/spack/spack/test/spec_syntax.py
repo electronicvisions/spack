@@ -1,28 +1,35 @@
-# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 import itertools
 import os
-import pytest
 import shlex
+
+import pytest
 
 import llnl.util.filesystem as fs
 
 import spack.hash_types as ht
 import spack.repo
-import spack.store
 import spack.spec as sp
+import spack.store
 from spack.parse import Token
-from spack.spec import Spec
-from spack.spec import SpecParseError, RedundantSpecError
-from spack.spec import AmbiguousHashError, InvalidHashError, NoSuchHashError
-from spack.spec import DuplicateArchitectureError
-from spack.spec import DuplicateDependencyError, DuplicateCompilerSpecError
-from spack.spec import SpecFilenameError, NoSuchSpecFileError
-from spack.spec import MultipleVersionError
+from spack.spec import (
+    AmbiguousHashError,
+    DuplicateArchitectureError,
+    DuplicateCompilerSpecError,
+    DuplicateDependencyError,
+    InvalidHashError,
+    MultipleVersionError,
+    NoSuchHashError,
+    NoSuchSpecFileError,
+    RedundantSpecError,
+    Spec,
+    SpecFilenameError,
+    SpecParseError,
+)
 from spack.variant import DuplicateVariantError
-
 
 # Sample output for a complex lexing.
 complex_lex = [Token(sp.ID, 'mvapich_foo'),
@@ -118,7 +125,6 @@ class TestSpecSyntax(object):
     def _check_raises(self, exc_type, items):
         for item in items:
             with pytest.raises(exc_type):
-                print("CHECKING: ", item, "=======================")
                 Spec(item)
 
     # ========================================================================
@@ -492,7 +498,7 @@ class TestSpecSyntax(object):
         specfile = tmpdir.join('libdwarf.yaml')
 
         with specfile.open('w') as f:
-            f.write(s.to_yaml(hash=ht.build_hash))
+            f.write(s.to_yaml(hash=ht.dag_hash))
 
         # Check an absolute path to spec.yaml by itself:
         #     "spack spec /path/to/libdwarf.yaml"
@@ -515,7 +521,7 @@ class TestSpecSyntax(object):
         # write the file to the current directory to make sure it exists,
         # and that we still do not parse the spec as a file.
         with specfile.open('w') as f:
-            f.write(s.to_yaml(hash=ht.build_hash))
+            f.write(s.to_yaml(hash=ht.dag_hash))
 
         # Check the spec `libelf.yaml` in the working directory, which
         # should evaluate to a spec called `yaml` in the `libelf`
@@ -555,7 +561,7 @@ class TestSpecSyntax(object):
         specfile = tmpdir.join('libelf.yaml')
 
         with specfile.open('w') as f:
-            f.write(s['libelf'].to_yaml(hash=ht.build_hash))
+            f.write(s['libelf'].to_yaml(hash=ht.dag_hash))
 
         # Make sure we can use yaml path as dependency, e.g.:
         #     "spack spec libdwarf ^ /path/to/libelf.yaml"
@@ -570,7 +576,7 @@ class TestSpecSyntax(object):
         specfile = tmpdir.join('libdwarf.yaml')
 
         with specfile.open('w') as f:
-            f.write(s.to_yaml(hash=ht.build_hash))
+            f.write(s.to_yaml(hash=ht.dag_hash))
 
         file_name = specfile.basename
         parent_dir = os.path.basename(specfile.dirname)
@@ -605,7 +611,7 @@ class TestSpecSyntax(object):
         specfile = tmpdir.mkdir('subdir').join('libdwarf.yaml')
 
         with specfile.open('w') as f:
-            f.write(s.to_yaml(hash=ht.build_hash))
+            f.write(s.to_yaml(hash=ht.dag_hash))
 
         file_name = specfile.basename
 
@@ -625,7 +631,7 @@ class TestSpecSyntax(object):
         specfile = tmpdir.join('libelf.yaml')
 
         with specfile.open('w') as f:
-            f.write(s['libelf'].to_yaml(hash=ht.build_hash))
+            f.write(s['libelf'].to_yaml(hash=ht.dag_hash))
 
         file_name = specfile.basename
         parent_dir = os.path.basename(specfile.dirname)
@@ -684,7 +690,7 @@ class TestSpecSyntax(object):
         specfile = tmpdir.join('a.yaml')
 
         with specfile.open('w') as f:
-            f.write(s.to_yaml(hash=ht.build_hash))
+            f.write(s.to_yaml(hash=ht.dag_hash))
 
         with pytest.raises(RedundantSpecError):
             # Trying to change a variant on a concrete spec is an error

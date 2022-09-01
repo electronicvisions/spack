@@ -1,22 +1,35 @@
-# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
 import os
-from spack import *
+
+from spack.pkg.builtin.lua import LuaImplPackage
+from spack.pkgkit import *
 
 
-class LuaLuajit(MakefilePackage):
+class LuaLuajit(LuaImplPackage):
     """Flast flexible JITed lua"""
-    homepage = "http://www.luajit.org"
-    url      = "http://luajit.org/download/LuaJIT-2.0.5.tar.gz"
+    homepage = "https://www.luajit.org"
+    url      = "https://luajit.org/download/LuaJIT-2.0.5.tar.gz"
 
     version('2.1.0-beta3', sha256='1ad2e34b111c802f9d0cdf019e986909123237a28c746b21295b63c9e785d9c3')
     version('2.0.5', sha256='874b1f8297c697821f561f9b73b57ffd419ed8f4278c82e05b48806d30c1e979', preferred=True)
     version('2.0.4', sha256='620fa4eb12375021bef6e4f237cbd2dd5d49e56beb414bee052c746beef1807d')
 
     conflicts('@:2.0.5', when='target=aarch64:')
+
+    variant('lualinks', default=True, description="add symlinks to make lua-luajit a drop-in lua replacement")
+
+    provides("lua-lang@5.1", when="+lualinks")
+    conflicts("lua", when="+lualinks")
+    provides("luajit")
+    lua_version_override = "5.1"
+
+    @run_after("install")
+    def install_links(self):
+        self.symlink_luajit()
 
     @property
     def headers(self):

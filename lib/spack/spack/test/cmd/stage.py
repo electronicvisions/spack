@@ -1,14 +1,17 @@
-# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
+import os
+import sys
+
 import pytest
-from spack.main import SpackCommand
+
 import spack.environment as ev
 import spack.repo
+from spack.main import SpackCommand
 from spack.version import Version
-
 
 stage = SpackCommand('stage')
 env = SpackCommand('env')
@@ -16,6 +19,7 @@ env = SpackCommand('env')
 pytestmark = pytest.mark.usefixtures('install_mockery', 'mock_packages')
 
 
+@pytest.mark.skipif(sys.platform == 'win32', reason="not implemented on windows")
 def test_stage_spec(monkeypatch):
     """Verify that staging specs works."""
 
@@ -31,29 +35,33 @@ def test_stage_spec(monkeypatch):
     assert len(expected) == 0
 
 
-def test_stage_path(monkeypatch):
-    """Verify that --path only works with single specs."""
+@pytest.fixture(scope='function')
+def check_stage_path(monkeypatch, tmpdir):
+    expected_path = os.path.join(str(tmpdir), 'x')
 
     def fake_stage(pkg, mirror_only=False):
-        assert pkg.path == 'x'
+        assert pkg.path == expected_path
 
     monkeypatch.setattr(spack.package.PackageBase, 'do_stage', fake_stage)
 
-    stage('--path=x', 'trivial-install-test-package')
+    return expected_path
 
 
-def test_stage_path_errors_multiple_specs(monkeypatch):
+@pytest.mark.skipif(sys.platform == 'win32', reason="PermissionError")
+def test_stage_path(check_stage_path):
     """Verify that --path only works with single specs."""
+    stage('--path={0}'.format(check_stage_path), 'trivial-install-test-package')
 
-    def fake_stage(pkg, mirror_only=False):
-        pass
 
-    monkeypatch.setattr(spack.package.PackageBase, 'do_stage', fake_stage)
-
+def test_stage_path_errors_multiple_specs(check_stage_path):
+    """Verify that --path only works with single specs."""
     with pytest.raises(spack.main.SpackCommandError):
-        stage('--path=x', 'trivial-install-test-package', 'mpileaks')
+        stage('--path={0}'.format(check_stage_path),
+              'trivial-install-test-package',
+              'mpileaks')
 
 
+@pytest.mark.skipif(sys.platform == 'win32', reason="not implemented on windows")
 def test_stage_with_env_outside_env(mutable_mock_env_path, monkeypatch):
     """Verify that stage concretizes specs not in environment instead of erroring."""
 
@@ -71,6 +79,7 @@ def test_stage_with_env_outside_env(mutable_mock_env_path, monkeypatch):
         stage('trivial-install-test-package')
 
 
+@pytest.mark.skipif(sys.platform == 'win32', reason="not implemented on windows")
 def test_stage_with_env_inside_env(mutable_mock_env_path, monkeypatch):
     """Verify that stage filters specs in environment instead of reconcretizing."""
 
@@ -88,6 +97,7 @@ def test_stage_with_env_inside_env(mutable_mock_env_path, monkeypatch):
         stage('mpileaks')
 
 
+@pytest.mark.skipif(sys.platform == 'win32', reason="not implemented on windows")
 def test_stage_full_env(mutable_mock_env_path, monkeypatch):
     """Verify that stage filters specs in environment."""
 

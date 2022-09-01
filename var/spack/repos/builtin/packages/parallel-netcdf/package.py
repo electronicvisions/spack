@@ -1,10 +1,11 @@
-# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
-from spack import *
 import os
+
+from spack import *
 
 
 class ParallelNetcdf(AutotoolsPackage):
@@ -20,6 +21,8 @@ class ParallelNetcdf(AutotoolsPackage):
 
     maintainers = ['skosukhin']
 
+    tags = ['e4s']
+
     test_requires_compiler = True
 
     def url_for_version(self, version):
@@ -31,6 +34,7 @@ class ParallelNetcdf(AutotoolsPackage):
         return url.format(version.dotted)
 
     version('master', branch='master')
+    version('1.12.2', sha256='3ef1411875b07955f519a5b03278c31e566976357ddfc74c2493a1076e7d7c74')
     version('1.12.1', sha256='56f5afaa0ddc256791c405719b6436a83b92dcd5be37fe860dea103aee8250a2')
     version('1.11.2', sha256='d2c18601b364c35b5acb0a0b46cd6e14cae456e0eb854e5c789cf65f3cd6a2a7')
     version('1.11.1', sha256='0c587b707835255126a23c104c66c9614be174843b85b897b3772a590be45779')
@@ -173,7 +177,7 @@ class ParallelNetcdf(AutotoolsPackage):
 
         return args
 
-    examples_src_dir = 'examples/CXX'
+    examples_src_dir = join_path('examples', 'CXX')
 
     @run_after('install')
     def cache_test_sources(self):
@@ -182,19 +186,24 @@ class ParallelNetcdf(AutotoolsPackage):
         self.cache_extra_test_sources([self.examples_src_dir])
 
     def test(self):
-        test_dir = join_path(self.install_test_root, self.examples_src_dir)
+        test_dir = join_path(self.test_suite.current_test_cache_dir,
+                             self.examples_src_dir)
         # pnetcdf has many examples to serve as a suitable smoke check.
         # column_wise was chosen based on the E4S test suite. Other
         # examples should work as well.
         test_exe = 'column_wise'
-        options = ['{0}.cpp'.format(test_exe), '-o', test_exe, '-lpnetcdf']
+        options = ['{0}.cpp'.format(test_exe), '-o', test_exe, '-lpnetcdf',
+                   '-L{0}'.format(self.prefix.lib),
+                   '-I{0}'.format(self.prefix.include)]
         reason = 'test: compiling and linking pnetcdf example'
         self.run_test(self.spec['mpi'].mpicxx, options, [],
                       installed=False, purpose=reason, work_dir=test_dir)
-        mpiexe_list = ['mpirun', 'mpiexec', 'srun']
+        mpiexe_list = [self.spec['mpi'].prefix.bin.srun,
+                       self.spec['mpi'].prefix.bin.mpirun,
+                       self.spec['mpi'].prefix.bin.mpiexec]
         for mpiexe in mpiexe_list:
             if os.path.isfile(mpiexe):
-                self.run_test(mpiexe, ['-n', '4', test_exe], [],
+                self.run_test(mpiexe, ['-n', '1', test_exe], [],
                               installed=False,
                               purpose='test: pnetcdf smoke test',
                               skip_missing=True,

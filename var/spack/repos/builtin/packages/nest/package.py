@@ -1,4 +1,4 @@
-# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -13,33 +13,13 @@ class Nest(CMakePackage):
     It focuses on the dynamics, size and structure of neural systems rather
     than on the exact morphology of individual neurons."""
 
-    homepage = "http://www.nest-simulator.org"
-    url      = "https://github.com/nest/nest-simulator/archive/refs/tags/v2.20.0.tar.gz"
+    homepage = "https://www.nest-simulator.org"
+    url      = "https://github.com/nest/nest-simulator/archive/refs/tags/v3.0.tar.gz"
     git      = "https://github.com/nest/nest-simulator.git"
 
     version('master', branch='master')
-    version('2.20.1', 'fd9aaebedd1d5ace9e7b4c5ae867f1fd')
-    version('2.20.0', sha256='40e33187c22d6e843d80095b221fa7fd5ebe4dbc0116765a91fc5c425dd0eca4')
-    version('2.14.0', sha256='d6316d6c9153100a3220488abfa738958c4b65bf2622bd15540e4aa81e79f17f')
-    version('2.12.0', sha256='bac578f38bb0621618ee9d5f2f1febfee60cddc000ff32e51a5f5470bb3df40d')
-    version('2.10.0', sha256='2b6fc562cd6362e812d94bb742562a5a685fb1c7e08403765dbe123d59b0996c')
-    version('2.8.0',  sha256='d47325b27a5599b6ea58a3c4ef06656e7c5a4941c4e94dec6a5c2fa956209915')
-    version('2.6.0',  sha256='5fe4924bc57d0c7dd820aa371de935eedf7e813832c0eee2c976b33c9a8db4cf')
-    version('2.4.2',  sha256='8f86e58c1a12b733ffabd8b0400326e5a3494a458149ea8ebe9f19674d05b91b')
-    # VISIONARY-TODO: compute sha256 and bring 2.2.2 upstream
-    version('2.2.2', 'ced2d42091061973f6a18f0e5b97129f')
-
-    # apply patches to specific versions
-    patch('nest_2.4.2_tso.patch', when='@2.4.2+backports')
-
-    # fixes tau_m - tau_syn fail in iaf_psc_exp_ps
-    # https://github.com/nest/nest-simulator/issues/1087
-    patch('nest_iaf_psc_exp_ps_2160.patch', when='@2.3.0:2.18.0+backports')
-
-    variant("backports", default=False,
-            description="Patches wrong behavior in old versions. This is"
-                        " deactivated by default to get reproducible but"
-                        " wrong behavior")
+    version('3.0', sha256='d481ea67f3251fe3aadf5252ab0a999172f0cd5536c5985366d271d772e686e6')
+    version('2.20.1', sha256='df3d32b5899d5d444f708037b290f889ac6ff8eae6b7be9e9faee2c0d660d8e5')
 
     maintainers = ['ikitayama']
 
@@ -61,11 +41,11 @@ class Nest(CMakePackage):
             description="Enable debugging symbols")
     # TODO add variants for neurosim and music when these are in spack
 
-    conflicts('~gsl', when='@:2.10.99',
+    conflicts('~gsl', when='@:2.10',
               msg='Option only introduced for non-ancient versions.')
-    conflicts('~shared', when='@:2.10.99',
+    conflicts('~shared', when='@:2.10',
               msg='Option only introduced for non-ancient versions.')
-    conflicts('~openmp', when='@:2.10.99',
+    conflicts('~openmp', when='@:2.10',
               msg='Option only introduced for non-ancient versions.')
     conflicts('+optimize +debug', when='@:2.10.99',
               msg="Optimized debug build not available for ancient versions.")
@@ -99,15 +79,15 @@ class Nest(CMakePackage):
             )
 
     # Before 2.12.0 it was an autotools package
-    @when('@:2.10.99')
+    @when('@:2.10')
     def cmake(self, spec, prefix):
         pass
 
-    @when('@:2.10.99')
+    @when('@:2.10')
     def build(self, spec, prefix):
         pass
 
-    @when('@:2.10.99')
+    @when('@:2.10')
     def install(self, spec, prefix):
         configure_args = ["CXXFLAGS=-std=c++03",
                           "--prefix=" + prefix,
