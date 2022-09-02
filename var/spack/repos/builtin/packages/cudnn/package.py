@@ -11,10 +11,10 @@ from spack import *
 _versions = {
     # cuDNN 8.3.3
     '8.3.3.40-11.5': {
-        'Linux-x86_64': 'd6ef2f6b5f3be625a7f5fba5c01bcb77902aa45e6ac068ac5a1df3fcae3a668a',
-        'Linux-ppc64le': '2b99d47454366c5d21fec2cbb9a6541153b7c8f34d369d2a2c74733d6453034c',
-        'Linux-aarch64': 'c96415fd06db25ed7c966757157670ba7c9bc423994f1dcbf64b33e91407eef4'},
-
+        "Linux-x86_64": "eabe96c75cf03ea4f5379894d914f1f8ae14ceab121989e84b0836d927fb7731",
+        "Linux-ppc64le": "eaedc8dea675767f9445c11d96e6b472110d2fed728db4179153ca7da6503083",
+        "Linux-aarch64": "83b1d21b0f6495dfdc2316e6d53489db8ab1b752e4e4d21caca0a08fb2136cdc",
+    },
     # cuDNN 8.3.2
     '8.3.2.44-11.5': {
         'Linux-x86_64': 'df11c96415f96d8eb6276d5593c811616342ce06eb29a83e13b503df766e5677',
