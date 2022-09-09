@@ -26,6 +26,7 @@ class VisionaryDls(Package):
 
     depends_on('py-breathe')
     depends_on('py-brian2')
+    depends_on('py-deap')
     depends_on('py-flask')
     depends_on('py-h5py')
     depends_on('py-ipycanvas')
