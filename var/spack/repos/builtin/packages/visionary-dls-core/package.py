@@ -34,6 +34,7 @@ class VisionaryDlsCore(Package):
     depends_on('gflags')
     depends_on('googletest@1.11.0:+gmock')
     # depends_on('icarus')
+    depends_on('inja')  # template engine for PPU source jit generation
     depends_on('intel-tbb')  # ppu gdbserver
     depends_on('libelf')
     depends_on('liblockfile')
