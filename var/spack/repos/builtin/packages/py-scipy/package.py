@@ -93,10 +93,6 @@ class PyScipy(PythonPackage):
     # https://github.com/scipy/scipy/issues/12860
     patch('https://git.sagemath.org/sage.git/plain/build/pkgs/scipy/patches/extern_decls.patch?id=711fe05025795e44b84233e065d240859ccae5bd',
           sha256='5433f60831cb554101520a8f8871ac5a32c95f7a971ccd68b69049535b106780', when='@1.2:1.5.3')
-    # https://github.com/scipy/scipy/issues/11611
-    patch('fix-gcc10-1.4.1.patch', when='@1.4.0:1.4.1 %gcc@10.1:')
-    # derived from patch above by mueller@kip.uni-heidelberg.de
-    patch('fix-gcc10-1.2.2.patch', level=2, when='@1.2.2:1.2.999 %gcc@10.1:')
 
     patch('scipy-clang.patch', when='@1.5.0:1.6.3 %clang')
 
@@ -106,9 +102,7 @@ class PyScipy(PythonPackage):
 
         # https://github.com/scipy/scipy/issues/11611
         if self.spec.satisfies('@:1.4 %gcc@10:'):
-            env.append_flags('FFLAGS', '-fallow-argument-mismatch')
-            # fixme: use self.compiler....
-            env.append_flags('FFLAGS', '-fPIC')
+            env.set('FFLAGS', '-fallow-argument-mismatch')
 
     def install_options(self, spec, prefix):
         args = []

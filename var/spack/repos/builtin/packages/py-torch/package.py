@@ -103,7 +103,7 @@ class PyTorch(PythonPackage, CudaPackage):
     depends_on('python@2.7:2,3.5:3.7', when='@:1.3', type=('build', 'link', 'run'))
     depends_on('py-setuptools', type=('build', 'run'))
     depends_on('py-future', when='@1.5:', type=('build', 'run'))
-    depends_on('py-future', when='@1.1: ^python@:2.999.999', type=('build', 'run'))
+    depends_on('py-future', when='@1.1: ^python@:2', type=('build', 'run'))
     depends_on('py-pyyaml', type=('build', 'run'))
     depends_on('py-typing', when='^python@:3.4', type=('build', 'run'))
     depends_on('py-pybind11@2.6.2:', when='@1.8:', type=('build', 'link', 'run'))
@@ -323,8 +323,6 @@ class PyTorch(PythonPackage, CudaPackage):
                 for flag in self.spec.compiler_flags['cxxflags']:
                     if 'gcc-toolchain' in flag:
                         env.set('CMAKE_CUDA_FLAGS', '=-Xcompiler={0}'.format(flag))
-
-        enable_or_disable('rocm')
 
         enable_or_disable('rocm')
 

@@ -24,11 +24,6 @@ class PyLlvmlite(PythonPackage):
     version('0.23.0', sha256='bc8b1b46274d05b578fe9e980a6d98fa71c8727f6f9ed31d4d8468dce7aa5762')
     version('0.20.0', sha256='b2f174848df16bb9195a07fec102110a06d018da736bd9b3570a54d44c797c29')
 
-    variant('skipllvmcheck', default=False, description='skips the llvm version check')
-
-    patch('https://github.com/jschueller/llvmlite/commit/7c14ef015f2f95f264f53404dfcea68b1214d6e9.patch',
-          sha256='586f594a850b314800737dff4b12d04d641a96eb94c0507140a50aea5ba2f80e', when='@:0.32.999')
-
     depends_on('py-setuptools', type='build')
     depends_on('python@3.7:3.10', type=('build', 'run'), when='@0.38.0:')
     depends_on('python@3.7:3.9', type=('build', 'run'), when='@0.37')
@@ -57,6 +52,3 @@ class PyLlvmlite(PythonPackage):
             # Need to set PIC flag since this is linking statically with LLVM
             env.set('CXX_FLTO_FLAGS', '-flto {0}'.format(
                 self.compiler.cxx_pic_flag))
-            # env.set('CXXFLAGS', '-fPIC')
-        if self.spec.satisfies('@0.33.0: +skipllvmcheck'):
-            env.set('LLVMLITE_SKIP_LLVM_VERSION_CHECK', 1)
