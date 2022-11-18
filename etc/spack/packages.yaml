@@ -53,9 +53,6 @@ packages:
     variants: [+jit]
   py-h5py:
     variants: [~mpi]
-  # otherwise -simulation prefers 2.0.2 -> bug?
-  py-matplotlib:
-    version: [2.2.5]
   py-tables:
     variants: [~auto~avx2+sse2]
   python:
