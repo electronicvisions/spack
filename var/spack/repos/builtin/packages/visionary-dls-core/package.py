@@ -41,7 +41,7 @@ class VisionaryDlsCore(Package):
     depends_on('log4cxx')
     depends_on('munge')
     depends_on('pkg-config')
-    depends_on('py-matplotlib')
+    depends_on('py-matplotlib@3:')
     depends_on('py-nose')
     depends_on('py-numpy')
     depends_on('py-pybind11')
