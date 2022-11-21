@@ -41,6 +41,7 @@ class VisionaryDlsCore(Package):
     depends_on('log4cxx')
     depends_on('munge')
     depends_on('pkg-config')
+    depends_on('py-jax@0.3.25: +cuda cuda_arch=61,80,86')
     depends_on('py-matplotlib@3:')
     depends_on('py-nose')
     depends_on('py-numpy')
@@ -53,6 +54,7 @@ class VisionaryDlsCore(Package):
     depends_on('py-python-usbtmc')
     depends_on('py-scipy')
     depends_on('py-sqlalchemy')
+    depends_on('py-tree-math')
     depends_on('util-linux') # from lib-rcf
     depends_on('yaml-cpp+shared')
 
