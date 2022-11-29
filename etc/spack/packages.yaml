@@ -9,10 +9,6 @@ packages:
       pil: [py-pillow]
       java: [openjdk]
       pkgconfig: [pkg-config]
-  bazel:
-    # TODO: update (4.0.0 failed), 3.6.0 worked before
-    # 3.7: for py-tensorboard (via lightning)
-    version: [3.7.2]
   cuda:
     # debian bullseye backports is at 470, eq. 11.4
     version: [11.4.4]
