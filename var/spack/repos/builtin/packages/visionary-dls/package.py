@@ -41,6 +41,7 @@ class VisionaryDls(Package):
     depends_on('py-pytorch-ignite')
     depends_on('py-pytorch-lightning')
     depends_on('py-sacred')
+    depends_on('py-sbi')
     depends_on('py-scikit-learn')
     depends_on('py-seaborn')
     depends_on('py-soundfile')
