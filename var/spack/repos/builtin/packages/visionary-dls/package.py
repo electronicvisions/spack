@@ -33,6 +33,7 @@ class VisionaryDls(Package):
     depends_on('py-ipywidgets')
     depends_on('py-lxml')  # collab tests
     depends_on('py-myst-parser')
+    depends_on('py-networkx')
     depends_on('py-norse')
     depends_on('py-notebook')
     depends_on('py-numba')
