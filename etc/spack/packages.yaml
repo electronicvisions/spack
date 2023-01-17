@@ -40,6 +40,9 @@ packages:
   mesa:
     # mesa via ghostscript -> libepoxy+glx, but doesn't build with llvm@11.1.0
     variants: [~llvm]
+  py-netcdf4:
+    # we do not build openmpi with slurm support
+    variants: [~mpi]
   openblas:
     variants: [cpu_target=NEHALEM]
   nccl:
