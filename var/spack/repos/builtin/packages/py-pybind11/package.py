@@ -1,3 +1,7 @@
+# Manually added version 2.10.0 and 2.10.1
+# In upstream spack PythonPackage was changes to PythonPackage and the build
+# specification was changed accordingly.
+#
 # Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
@@ -19,12 +23,14 @@ class PyPybind11(CMakePackage, PythonPackage):
     introspection."""
 
     homepage = "https://pybind11.readthedocs.io"
-    url      = "https://github.com/pybind/pybind11/archive/v2.6.2.tar.gz"
+    url      = "https://github.com/pybind/pybind11/archive/refs/tags/v2.10.1.tar.gz"
     git      = "https://github.com/pybind/pybind11.git"
 
     maintainers = ['ax3l']
 
     version('master', branch='master')
+    version('2.10.1', sha256="111014b516b625083bef701df7880f78c2243835abdb263065b6b59b960b6bad")
+    version('2.10.0', sha256="eacf582fa8f696227988d08cfc46121770823839fe9e301a20fbce67e7cd70ec")
     version('2.9.1', sha256='c6160321dc98e6e1184cc791fbeadd2907bb4a0ce0e447f2ea4ff8ab56550913')
     version('2.9.0', sha256='057fb68dafd972bc13afb855f3b0d8cf0fa1a78ef053e815d9af79be7ff567cb')
     version('2.8.1', sha256='f1bcc07caa568eb312411dde5308b1e250bd0e1bc020fae855bf9f43209940cc')
@@ -48,6 +54,7 @@ class PyPybind11(CMakePackage, PythonPackage):
     depends_on('py-setuptools@42:', type='build')
     depends_on('py-pytest', type='test')
     depends_on('python@2.7:2.8,3.5:', type=('build', 'run'))
+    depends_on('python@3.6:', when="@2.10.0:", type=("build", "run"))
     depends_on('cmake@3.13:', type='build')
     depends_on('cmake@3.18:', type='build', when='@2.6.0:')
 
