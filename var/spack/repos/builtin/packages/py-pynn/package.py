@@ -46,7 +46,7 @@ class PyPynn(PythonPackage):
     depends_on('py-lazyarray@0.5.0:', type=('build', 'run'), when="@0.10.0:")
 
     depends_on("py-neo@0.3:0.4.1", type=("build", "run"), when="@:0.8.3")
-    depends_on("py-neo@0.5.0:", type=("build", "run"), when="@0.9.0:")
+    depends_on("py-neo@0.5.0:0.8.0", type=("build", "run"), when="@0.9.0:0.9.6")
     depends_on('py-neo@0.10.0:', type=('build', 'run'), when="@0.10.0:")
 
     depends_on('py-mock@1.0:', type='test')
