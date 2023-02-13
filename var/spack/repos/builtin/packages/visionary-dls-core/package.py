@@ -44,6 +44,7 @@ class VisionaryDlsCore(Package):
     depends_on('pkg-config')
     depends_on('py-jax@0.3.25: +cuda cuda_arch=61,80,86')
     depends_on('py-matplotlib@3:')
+    depends_on('py-networkx')
     depends_on('py-nose')
     depends_on('py-numpy')
     depends_on('py-pybind11')
