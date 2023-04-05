@@ -47,6 +47,7 @@ class VisionaryDlsCore(Package):
     depends_on('py-networkx')
     depends_on('py-nose')
     depends_on('py-numpy')
+    depends_on('py-optax')
     depends_on('py-pybind11')
     depends_on('py-pybind11-stubgen')
     depends_on('py-pycodestyle')
