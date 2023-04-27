@@ -1,0 +1,212 @@
+diff --git a/src/cocotb_bus/drivers/__init__.py b/src/cocotb_bus/drivers/__init__.py
+index 55261afb..e83abb28 100644
+--- a/src/cocotb_bus/drivers/__init__.py
++++ b/src/cocotb_bus/drivers/__init__.py
+@@ -260,7 +260,7 @@ class BusDriver(Driver):
+         registering more callbacks can occur.
+         """
+         await ReadOnly()
+-        while signal.value.integer != 1:
++        while int(signal) != 1:
+             await RisingEdge(signal)
+             await ReadOnly()
+         await NextTimeStep()
+@@ -274,7 +274,7 @@ class BusDriver(Driver):
+         registering more callbacks can occur.
+         """
+         await ReadOnly()
+-        while signal.value.integer != 0:
++        while int(signal) != 0:
+             await Edge(signal)
+             await ReadOnly()
+         await NextTimeStep()
+diff --git a/src/cocotb_bus/drivers/amba.py b/src/cocotb_bus/drivers/amba.py
+index 9aedf6e4..041e5210 100644
+--- a/src/cocotb_bus/drivers/amba.py
++++ b/src/cocotb_bus/drivers/amba.py
+@@ -308,7 +308,7 @@ class AXI4Master(BusDriver):
+             while True:
+                 await ReadOnly()
+                 if self.bus.BVALID.value and self.bus.BREADY.value:
+-                    result = AXIxRESP(self.bus.BRESP.value.integer)
++                    result = AXIxRESP(int(self.bus.BRESP))
+                     break
+                 await RisingEdge(self.clock)
+ 
+@@ -429,7 +429,7 @@ class AXI4Master(BusDriver):
+                                                     size, byte_offset)
+ 
+                         data.append(beat_value)
+-                        rresp.append(AXIxRESP(self.bus.RRESP.value.integer))
++                        rresp.append(AXIxRESP(int(self.bus.RRESP)))
+ 
+                         if burst is not AXIBurst.FIXED:
+                             byte_offset = (byte_offset + size) % rdata_bytes
+diff --git a/src/cocotb_bus/drivers/avalon.py b/src/cocotb_bus/drivers/avalon.py
+index 7649abc1..0a13e578 100644
+--- a/src/cocotb_bus/drivers/avalon.py
++++ b/src/cocotb_bus/drivers/avalon.py
+@@ -295,9 +295,9 @@ class AvalonMemory(BusDriver):
+             if resp is True:
+                 self._val.binstr = "x" * self._width
+             else:
+-                self._val.integer = resp
++                self._val = resp
+                 self.log.debug("sending 0x%x (%s)" %
+-                               (self._val.integer, self._val.binstr))
++                               (int(self._val), self._val.binstr))
+             self.bus.readdata.value = self._val
+             if hasattr(self.bus, "readdatavalid"):
+                 self.bus.readdatavalid.value = 1
+@@ -306,7 +306,7 @@ class AvalonMemory(BusDriver):
+ 
+     def _write_burst_addr(self):
+         """Reading write burst address, burstcount, byteenable."""
+-        addr = self.bus.address.value.integer
++        addr = int(self.bus.address)
+         if addr % self.dataByteSize != 0:
+             self.log.error("Address must be aligned to data width" +
+                            "(addr = " + hex(addr) +
+@@ -319,7 +319,7 @@ class AvalonMemory(BusDriver):
+                            "0b" + "1" * len(self.bus.byteenable) +
+                            ")")
+ 
+-        burstcount = self.bus.burstcount.value.integer
++        burstcount = int(self.bus.burstcount)
+         if burstcount == 0:
+             self.log.error("Write burstcount must be 1 at least")
+ 
+@@ -329,7 +329,7 @@ class AvalonMemory(BusDriver):
+         """Writing value in _mem with byteaddr size."""
+         await FallingEdge(self.clock)
+         for i in range(self.dataByteSize):
+-            data = self.bus.writedata.value.integer
++            data = int(self.bus.writedata)
+             addrtmp = byteaddr + i
+             datatmp = (data >> (i*8)) & 0xff
+             self._mem[addrtmp] = datatmp
+@@ -360,7 +360,7 @@ class AvalonMemory(BusDriver):
+             if self._readable and self.bus.read.value:
+                 if not self._burstread:
+                     self._pad()
+-                    addr = self.bus.address.value.integer
++                    addr = int(self.bus.address)
+                     if addr not in self._mem:
+                         self.log.warning("Attempt to read from uninitialized "
+                                          "address 0x%x", addr)
+@@ -370,13 +370,13 @@ class AvalonMemory(BusDriver):
+                                        addr, self._mem[addr])
+                         self._responses.append(self._mem[addr])
+                 else:
+-                    addr = self.bus.address.value.integer
++                    addr = int(self.bus.address)
+                     if addr % self.dataByteSize != 0:
+                         self.log.error("Address must be aligned to data width" +
+                                        "(addr = " + hex(addr) +
+                                        ", width = " + str(self._width))
+                     addr = int(addr / self.dataByteSize)
+-                    burstcount = self.bus.burstcount.value.integer
++                    burstcount = int(self.bus.burstcount)
+                     byteenable = self.bus.byteenable.value
+                     if byteenable != int("1"*len(self.bus.byteenable), 2):
+                         self.log.error("Only full word access is supported " +
+@@ -416,8 +416,8 @@ class AvalonMemory(BusDriver):
+ 
+             if self._writeable and self.bus.write.value:
+                 if not self._burstwrite:
+-                    addr = self.bus.address.value.integer
+-                    data = self.bus.writedata.value.integer
++                    addr = int(self.bus.address)
++                    data = int(self.bus.writedata)
+                     if hasattr(self.bus, "byteenable"):
+                         byteenable = int(self.bus.byteenable.value)
+                         mask = 0
+@@ -457,7 +457,7 @@ class AvalonMemory(BusDriver):
+                         # self._mem is aligned on 8 bits words
+                         await self._writing_byte_value(addr + count*self.dataByteSize)
+                         self.log.debug("writing %016X @ %08X",
+-                                       self.bus.writedata.value.integer,
++                                       int(self.bus.writedata),
+                                        addr + count * self.dataByteSize)
+                         await edge
+                         # generate waitrequest randomly
+diff --git a/src/cocotb_bus/drivers/xgmii.py b/src/cocotb_bus/drivers/xgmii.py
+index a6bfeddf..29df786a 100644
+--- a/src/cocotb_bus/drivers/xgmii.py
++++ b/src/cocotb_bus/drivers/xgmii.py
+@@ -75,7 +75,7 @@ class _XGMIIBus:
+             self._integer |= (byte << (index * 8))
+             self._integer |= (int(ctrl) << (self._nbytes*8 + index))
+ 
+-        self._value.integer = self._integer
++        self._value = self._integer
+ 
+     @property
+     def value(self):
+@@ -84,7 +84,7 @@ class _XGMIIBus:
+ 
+         NB clears the value.
+         """
+-        self._value.integer = self._integer
++        self._value = self._integer
+         self._integer = 0
+         return self._value
+ 
+diff --git a/src/cocotb_bus/monitors/__init__.py b/src/cocotb_bus/monitors/__init__.py
+index a4aaf016..4283aa43 100644
+--- a/src/cocotb_bus/monitors/__init__.py
++++ b/src/cocotb_bus/monitors/__init__.py
+@@ -163,9 +163,9 @@ class BusMonitor(Monitor):
+     def in_reset(self):
+         """Boolean flag showing whether the bus is in reset state or not."""
+         if self._reset_n is not None:
+-            return not bool(self._reset_n.value.integer)
++            return not bool(int(self._reset_n))
+         if self._reset is not None:
+-            return bool(self._reset.value.integer)
++            return bool(int(self._reset))
+         return False
+ 
+     def __str__(self):
+diff --git a/src/cocotb_bus/monitors/avalon.py b/src/cocotb_bus/monitors/avalon.py
+index 7b4b095a..6baed2af 100644
+--- a/src/cocotb_bus/monitors/avalon.py
++++ b/src/cocotb_bus/monitors/avalon.py
+@@ -164,8 +164,8 @@ class AvalonSTPkts(BusMonitor):
+                     vec = self.bus.data.value
+                 else:
+                     value = self.bus.data.value.get_binstr()
+-                    if self.config["useEmpty"] and self.bus.empty.value.integer:
+-                        empty = self.bus.empty.value.integer * self.config["dataBitsPerSymbol"]
++                    if self.config["useEmpty"] and int(self.bus.empty):
++                        empty = int(self.bus.empty) * self.config["dataBitsPerSymbol"]
+                         if self.config["firstSymbolInHighOrderBits"]:
+                             value = value[:-empty]
+                         else:
+@@ -181,11 +181,11 @@ class AvalonSTPkts(BusMonitor):
+ 
+                 if hasattr(self.bus, 'channel'):
+                     if channel is None:
+-                        channel = self.bus.channel.value.integer
++                        channel = int(self.bus.channel)
+                         if channel > self.config["maxChannel"]:
+                             raise AvalonProtocolError("Channel value (%d) is greater than maxChannel (%d)" %
+                                                       (channel, self.config["maxChannel"]))
+-                    elif self.bus.channel.value.integer != channel:
++                    elif int(self.bus.channel) != channel:
+                         raise AvalonProtocolError("Channel value changed during packet")
+ 
+                 if self.bus.endofpacket.value:
+diff --git a/src/cocotb_bus/monitors/xgmii.py b/src/cocotb_bus/monitors/xgmii.py
+index 8d9bef1a..d890e250 100644
+--- a/src/cocotb_bus/monitors/xgmii.py
++++ b/src/cocotb_bus/monitors/xgmii.py
+@@ -66,7 +66,7 @@ class XGMII(Monitor):
+ 
+         Returns a tuple of lists.
+         """
+-        value = self.signal.value.integer
++        value = int(self.signal.value)
+         bytes = []
+         ctrls = []
+         byte_shift = 8

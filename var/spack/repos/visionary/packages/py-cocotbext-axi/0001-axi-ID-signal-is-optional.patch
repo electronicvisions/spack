@@ -1,0 +1,111 @@
+From da1cbefdc914f22e6d095365e6224bc7a33df587 Mon Sep 17 00:00:00 2001
+From: Robin Ole Heinemann <robin.ole.heinemann@gmail.com>
+Date: Mon, 4 Mar 2024 16:30:16 +0100
+Subject: [PATCH] axi: ID signal is optional
+
+---
+ cocotbext/axi/axi_channels.py | 16 ++++++++--------
+ cocotbext/axi/axi_slave.py    |  8 ++++----
+ cocotbext/axi/constants.py    |  1 +
+ 3 files changed, 13 insertions(+), 12 deletions(-)
+
+diff --git a/cocotbext/axi/axi_channels.py b/cocotbext/axi/axi_channels.py
+index c2a896c..4702f25 100644
+--- a/cocotbext/axi/axi_channels.py
++++ b/cocotbext/axi/axi_channels.py
+@@ -26,8 +26,8 @@ from .stream import define_stream
+ 
+ # Write address channel
+ AxiAWBus, AxiAWTransaction, AxiAWSource, AxiAWSink, AxiAWMonitor = define_stream("AxiAW",
+-    signals=["awid", "awaddr", "awlen", "awsize", "awburst", "awvalid", "awready"],
+-    optional_signals=["awlock", "awcache", "awprot", "awqos", "awregion", "awuser"],
++    signals=["awaddr", "awlen", "awsize", "awburst", "awvalid", "awready"],
++    optional_signals=["awlock", "awcache", "awprot", "awqos", "awregion", "awuser", "awid"],
+     signal_widths={"awlen": 8, "awsize": 3, "awburst": 2, "awlock": 1,
+         "awcache": 4, "awprot": 3, "awqos": 4, "awregion": 4}
+ )
+@@ -41,23 +41,23 @@ AxiWBus, AxiWTransaction, AxiWSource, AxiWSink, AxiWMonitor = define_stream("Axi
+ 
+ # Write response channel
+ AxiBBus, AxiBTransaction, AxiBSource, AxiBSink, AxiBMonitor = define_stream("AxiB",
+-    signals=["bid", "bvalid", "bready"],
+-    optional_signals=["bresp", "buser"],
++    signals=["bvalid", "bready"],
++    optional_signals=["bid", "bresp", "buser"],
+     signal_widths={"bresp": 2}
+ )
+ 
+ # Read address channel
+ AxiARBus, AxiARTransaction, AxiARSource, AxiARSink, AxiARMonitor = define_stream("AxiAR",
+-    signals=["arid", "araddr", "arlen", "arsize", "arburst", "arvalid", "arready"],
+-    optional_signals=["arlock", "arcache", "arprot", "arqos", "arregion", "aruser"],
++    signals=["araddr", "arlen", "arsize", "arburst", "arvalid", "arready"],
++    optional_signals=["arlock", "arcache", "arprot", "arqos", "arregion", "aruser", "arid"],
+     signal_widths={"arlen": 8, "arsize": 3, "arburst": 2, "arlock": 1,
+         "arcache": 4, "arprot": 3, "arqos": 4, "arregion": 4}
+ )
+ 
+ # Read data channel
+ AxiRBus, AxiRTransaction, AxiRSource, AxiRSink, AxiRMonitor = define_stream("AxiR",
+-    signals=["rid", "rdata", "rlast", "rvalid", "rready"],
+-    optional_signals=["rresp", "ruser"],
++    signals=["rdata", "rlast", "rvalid", "rready"],
++    optional_signals=["rresp", "ruser", "rid"],
+     signal_widths={"rresp": 2, "rlast": 1}
+ )
+ 
+diff --git a/cocotbext/axi/axi_slave.py b/cocotbext/axi/axi_slave.py
+index 3b8105c..1468a7b 100644
+--- a/cocotbext/axi/axi_slave.py
++++ b/cocotbext/axi/axi_slave.py
+@@ -55,7 +55,7 @@ class AxiSlaveWrite(Reset):
+         self.b_channel.queue_occupancy_limit = 2
+ 
+         self.address_width = len(self.aw_channel.bus.awaddr)
+-        self.id_width = len(self.aw_channel.bus.awid)
++        self.id_width = len(getattr(self.aw_channel.bus, "awid", []))
+         self.width = len(self.w_channel.bus.wdata)
+         self.byte_size = 8
+         self.byte_lanes = self.width // self.byte_size
+@@ -83,7 +83,7 @@ class AxiSlaveWrite(Reset):
+             assert self.byte_lanes == len(self.w_channel.bus.wstrb)
+         assert self.byte_lanes * self.byte_size == self.width
+ 
+-        assert len(self.b_channel.bus.bid) == len(self.aw_channel.bus.awid)
++        assert len(getattr(self.b_channel.bus, "bid", [])) == self.id_width
+ 
+         self._process_write_cr = None
+ 
+@@ -221,7 +221,7 @@ class AxiSlaveRead(Reset):
+         self.r_channel.queue_occupancy_limit = 2
+ 
+         self.address_width = len(self.ar_channel.bus.araddr)
+-        self.id_width = len(self.ar_channel.bus.arid)
++        self.id_width = len(getattr(self.ar_channel.bus, "arid", []))
+         self.width = len(self.r_channel.bus.rdata)
+         self.byte_size = 8
+         self.byte_lanes = self.width // self.byte_size
+@@ -244,7 +244,7 @@ class AxiSlaveRead(Reset):
+ 
+         assert self.byte_lanes * self.byte_size == self.width
+ 
+-        assert len(self.r_channel.bus.rid) == len(self.ar_channel.bus.arid)
++        assert len(getattr(self.r_channel.bus, "rid", [])) == self.id_width
+ 
+         self._process_read_cr = None
+ 
+diff --git a/cocotbext/axi/constants.py b/cocotbext/axi/constants.py
+index 0781e56..1979e0a 100644
+--- a/cocotbext/axi/constants.py
++++ b/cocotbext/axi/constants.py
+@@ -94,6 +94,7 @@ AWCACHE_WRITE_BACK_READ_AND_WRITE_ALLOC = 0b1111
+ # Protection bits
+ # AWPROT/ARPROT
+ class AxiProt(enum.IntFlag):
++    SECURE      = 0b000
+     PRIVILEGED  = 0b001
+     NONSECURE   = 0b010
+     INSTRUCTION = 0b100
+-- 
+2.40.0
+
