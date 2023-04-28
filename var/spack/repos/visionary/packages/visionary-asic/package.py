@@ -14,4 +14,17 @@ class VisionaryAsic(BundlePackage):
 
     version('1.0')
 
+    # verilog-ethernet test deps
+    depends_on('py-cocotb')
+    depends_on('py-cocotb-bus')
+    depends_on('py-cocotb-test')
+    depends_on('py-cocotbext-axi')
+    depends_on('py-cocotbext-eth')
+    depends_on('py-construct')
+    depends_on('py-jinja2')
+    depends_on('py-pytest')
+    depends_on('py-pytest-xdist')
+    depends_on('py-scapy')
+    depends_on('py-myhdl+cosim-icarus')
+
     depends_on('tcl-osys@1.1.1-post1')
