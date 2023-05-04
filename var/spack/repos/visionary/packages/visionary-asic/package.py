@@ -30,3 +30,13 @@ class VisionaryAsic(BundlePackage):
     depends_on('py-myhdl+cosim-icarus')
 
     depends_on('tcl-osys@1.1.1-post1')
+
+    # visionary deps
+    depends_on('py-pylint')
+    depends_on('py-pycodestyle')
+    depends_on('py-nose')
+    depends_on('py-pyyaml')
+    depends_on('py-numpy')
+    depends_on('py-matplotlib')
+    depends_on('py-notebook')
+    depends_on('py-pytest')
