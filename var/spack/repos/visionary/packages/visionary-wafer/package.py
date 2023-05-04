@@ -44,6 +44,7 @@ class VisionaryWafer(BundlePackage):
     #depends_on('py-brian2')
     depends_on('py-bokeh')
     depends_on('py-elephant')
+    depends_on('py-h5py')
     depends_on('py-notebook')
     depends_on('py-numba')
     depends_on('py-pynn @0.9.6')
