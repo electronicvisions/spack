@@ -14,6 +14,8 @@ class VisionaryAsic(BundlePackage):
 
     version('1.0')
 
+    depends_on('berkeley-db@4.7') # Cadance Virtuoso 6.1.8
+
     # verilog-ethernet test deps
     depends_on('py-cocotb')
     depends_on('py-cocotb-bus')
