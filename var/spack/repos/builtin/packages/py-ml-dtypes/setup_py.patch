@@ -1,0 +1,36 @@
+diff --git a/setup.py b/setup.py
+index 25d374d..2ca32f1 100644
+--- a/setup.py
++++ b/setup.py
+@@ -18,7 +18,7 @@ import fnmatch
+ import platform
+ import numpy as np
+ from pybind11.setup_helpers import Pybind11Extension
+-from setuptools import setup
++from setuptools import setup, find_packages
+ from setuptools.command.build_py import build_py as build_py_orig
+ 
+ if platform.system() == "Windows":
+@@ -36,7 +36,6 @@ exclude = ["third_party*"]
+ 
+ 
+ class build_py(build_py_orig):  # pylint: disable=invalid-name
+-
+   def find_package_modules(self, package, package_dir):
+     modules = super().find_package_modules(package, package_dir)
+     return [  # pylint: disable=g-complex-comprehension
+@@ -50,6 +49,8 @@ class build_py(build_py_orig):  # pylint: disable=invalid-name
+ 
+ 
+ setup(
++    name="ml_dtypes",
++    version="0.1.0",
+     ext_modules=[
+         Pybind11Extension(
+             "ml_dtypes._custom_floats",
+@@ -67,4 +68,5 @@ setup(
+     ],
+     include_package_data=False,
+     cmdclass={"build_py": build_py},
++    packages=find_packages(),
+ )
