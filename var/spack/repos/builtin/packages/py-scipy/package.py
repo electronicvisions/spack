@@ -59,7 +59,7 @@ class PyScipy(PythonPackage):
     depends_on('py-pybind11@2.4.3:', when='@1.5:1.6.1', type=('build', 'link'))
     depends_on('py-pybind11@2.4.3:2.6', when='@1.6.2:1.7.1', type=('build', 'link'))
     depends_on('py-pybind11@2.4.3:2.7', when='@1.7.2:1.7', type=('build', 'link'))
-    depends_on('py-pybind11@2.4.3:2.8', when='@1.8:', type=('build', 'link'))
+    depends_on('py-pybind11@2.4.3:', when='@1.8:', type=('build', 'link'))
     depends_on('py-pythran@0.9.11', when='@1.7.0:1.7.1', type=('build', 'link'))
     depends_on('py-pythran@0.9.12:0.9', when='@1.7.2:1.7', type=('build', 'link'))
     depends_on('py-pythran@0.10:', when='@1.8:', type=('build', 'link'))
