@@ -1,0 +1,77 @@
+diff --git a/source/bear/CMakeLists.txt b/source/bear/CMakeLists.txt
+index 376a003..cbcdc35 100644
+--- a/source/bear/CMakeLists.txt
++++ b/source/bear/CMakeLists.txt
+@@ -7,7 +7,8 @@ target_link_libraries(bear
+         sys_a
+         flags_a
+         fmt::fmt
+-        spdlog::spdlog)
++        spdlog::spdlog
++        stdc++fs)
+ 
+ include(GNUInstallDirs)
+ install(TARGETS bear
+diff --git a/source/citnames/CMakeLists.txt b/source/citnames/CMakeLists.txt
+index dc9d5f3..f230b31 100644
+--- a/source/citnames/CMakeLists.txt
++++ b/source/citnames/CMakeLists.txt
+@@ -13,7 +13,8 @@ target_link_libraries(citnames_json_a PUBLIC
+         sys_a
+         fmt::fmt
+         spdlog::spdlog
+-        nlohmann_json::nlohmann_json)
++        nlohmann_json::nlohmann_json
++        stdc++fs)
+ target_compile_options(citnames_json_a PRIVATE -fexceptions)
+ 
+ # Create a static library, which is used for unit tests and the final shared library.
+@@ -44,7 +45,8 @@ target_link_libraries(citnames_a PUBLIC
+         sys_a
+         exec_a
+         fmt::fmt
+-        spdlog::spdlog)
++        spdlog::spdlog
++        stdc++fs)
+ 
+ # Create an executable from the sub projects.
+ add_executable(citnames
+diff --git a/source/intercept/CMakeLists.txt b/source/intercept/CMakeLists.txt
+index e9598c0..ea1e10f 100644
+--- a/source/intercept/CMakeLists.txt
++++ b/source/intercept/CMakeLists.txt
+@@ -51,7 +51,8 @@ target_link_libraries(intercept_a PUBLIC
+         rpc_a
+         sys_a
+         result_a
+-        spdlog::spdlog)
++        spdlog::spdlog
++        stdc++fs)
+ 
+ 
+ # Intercept orchestrator executable.
+@@ -94,7 +95,8 @@ target_link_libraries(wrapper_a PUBLIC
+         result_a
+         sys_a
+         rpc_a
+-        spdlog::spdlog)
++        spdlog::spdlog
++        stdc++fs)
+ 
+ 
+ # Intercept report sender executable.
+diff --git a/source/libsys/CMakeLists.txt b/source/libsys/CMakeLists.txt
+index ca2638f..bdf3e74 100644
+--- a/source/libsys/CMakeLists.txt
++++ b/source/libsys/CMakeLists.txt
+@@ -16,7 +16,8 @@ target_link_libraries(sys_a PUBLIC
+         ${CMAKE_DL_LIBS}
+         result_a
+         fmt::fmt
+-        spdlog::spdlog)
++        spdlog::spdlog
++        stdc++fs)
+ 
+ if (ENABLE_UNIT_TESTS)
+     add_executable(sys_unit_test
+
