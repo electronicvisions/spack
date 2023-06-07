@@ -40,3 +40,4 @@ class VisionaryAsic(BundlePackage):
     depends_on('py-matplotlib')
     depends_on('py-notebook')
     depends_on('py-pytest')
+    depends_on('py-pandas')
