@@ -38,6 +38,7 @@ class VisionaryDevTools(Package):
     depends_on('git-fat-git')
     depends_on('gtkplus')
     depends_on('imagemagick')
+    depends_on('iwyu')
     depends_on('jq')
     depends_on('libpcap')
     depends_on('libtool')
