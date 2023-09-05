@@ -11,7 +11,7 @@ packages:
       pkgconfig: [pkg-config]
   cuda:
     # debian bullseye backports is at 470, eq. 11.4
-    version: [11.4.4]
+    version: [11.8.0]
   dask:
     variants: [~distributed]
   py-torch:
