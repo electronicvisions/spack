@@ -1,9 +1,0 @@
-diff --git a/qtlocation/src/3rdparty/mapbox-gl-native/src/mbgl/util/convert.cpp b/qtlocation/src/3rdparty/mapbox-gl-native/src/mbgl/util/convert.cpp
-index 97bfe91..56d3e17 100644
---- a/qtlocation/src/3rdparty/mapbox-gl-native/src/mbgl/util/convert.cpp
-+++ b/qtlocation/src/3rdparty/mapbox-gl-native/src/mbgl/util/convert.cpp
-@@ -1,3 +1,4 @@
-+#include <cstdint>
- #include <mbgl/util/convert.hpp>
- 
- namespace mbgl {
