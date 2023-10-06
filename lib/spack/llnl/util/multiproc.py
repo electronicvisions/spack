@@ -11,7 +11,7 @@ to pickle functions if they're passed indirectly as parameters.
 from multiprocessing import Process, Semaphore, Value
 from multiprocessing.pool import Pool
 
-__all__ = ["Barrier", "NoDaemonPool"]
+__all__ = ["Barrier"]
 
 
 class Barrier:
@@ -60,26 +60,3 @@ class Barrier:
 
 class BarrierTimeoutError(Exception):
     pass
-
-
-class NoDaemonProcess(Process):
-    """Daemon processes are not allowed to create child processes.
-    Yet most meaningful funciontality in spack requires system-interaction via
-    child processes."""
-    # make 'daemon' attribute always return False
-    def _get_daemon(self):
-        return False
-
-    def _set_daemon(self, value):
-        pass
-
-    daemon = property(_get_daemon, _set_daemon)
-
-
-# We sub-class multiprocessing.pool.Pool instead of multiprocessing.Pool
-# because the latter is only a wrapper function, not a proper class.
-class NoDaemonPool(Pool):
-    """Daemon processes are not allowed to create child processes.
-    Yet most meaningful funciontality in spack requires system-interaction via
-    child processes."""
-    Process = NoDaemonProcess
