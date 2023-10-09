@@ -26,7 +26,7 @@ from spack import *
 
 
 class PyJsonrpcServer(PythonPackage):
-    """A Python 2 and 3 asynchronous JSON RPC server"""
+    """A Python 3 asynchronous JSON RPC server"""
 
     homepage = "https://github.com/palantir/python-jsonrpc-server"
     url      = "https://pypi.io/packages/source/p/python-jsonrpc-server/python-jsonrpc-server-0.1.2.tar.gz"
@@ -35,4 +35,3 @@ class PyJsonrpcServer(PythonPackage):
 
     depends_on('py-setuptools', type='build')
     depends_on('py-future@0.14.0:', type=('build', 'run'))
-    depends_on('py-futures', type=('build', 'run'), when='^python@:2.999.999')

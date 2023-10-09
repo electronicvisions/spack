@@ -34,9 +34,7 @@ class PyLanguageServer(PythonPackage):
     version('0.22.0', 'a45f2ea5538dc7e9743f7f319f98bb71')
 
     depends_on('py-setuptools', type='build')
-    depends_on('py-configparser', type=('build', 'run'), when='^python@:2.999.999')
     depends_on('py-future@0.14.0:', type=('build', 'run'))
-    depends_on('py-futures', type=('build', 'run'), when='^python@:2.999.999')
     depends_on('py-jedi@0.12:', type=('build', 'run'))
     depends_on('py-jsonrpc-server@0.1.0:', type=('build', 'run'))
     depends_on('py-pluggy', type=('build', 'run'))
