@@ -56,9 +56,6 @@ class VisionaryDls(Package):
     depends_on('py-yccp@1.0.0:')
     depends_on('xerces-c')
 
-    # TODO Re-enable once https://github.com/spack/spack/pull/13112 is merged
-    #  depends_on('tensorflow')
-
     def install(self, spec, prefix):
         mkdirp(prefix.etc)
         # store a copy of this package.

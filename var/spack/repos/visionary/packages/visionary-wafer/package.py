@@ -26,8 +26,6 @@ class VisionaryWafer(Package):
     # depends_on('python@:2.7.99')
     depends_on('python@3:')
 
-    variant('tensorflow', default=False)
-
     # to provide non-gccxml spack views we manually add the gccxml w/o dependencies later :)
     variant('gccxml', default=False)
 
@@ -44,9 +42,6 @@ class VisionaryWafer(Package):
     depends_on('xerces-c')
     depends_on(Boost.with_default_variants)
     depends_on('boost@1.69.0: +graph+icu+mpi+python+numpy cxxstd=17')
-    # we didn't introduce cuda support at all, upstream defaults to it
-    # if we want cuda we need to decide on the cuda_arch, cf. py-torch
-    # depends_on('py-tensorflow~cuda~tensorrt~nccl', when='+tensorflow')
     depends_on('log4cxx')
     depends_on('googletest@1.11.0:+gmock')
     depends_on('py-slurm-pipeline')
