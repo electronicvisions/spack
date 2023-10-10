@@ -70,7 +70,7 @@ class VisionaryDlsCore(Package):
     #   - cuda arch 8.0 (NVIDIA A100)
     #   - cuda arch 8.6 (NVIDIA GeForce RTX 3080)
     # We want to set defaults in packages.yaml, but it's ignored?
-    depends_on('py-torch@1.11.0 ~caffe2 ~xnnpack ~mkldnn ~cudnn ~magma ~nnpack ~qnnpack ~test +cuda cuda_arch=61,80,86')
+    depends_on('py-torch@1.11.0 ~caffe2 ~xnnpack ~mkldnn ~cudnn ~magma ~qnnpack ~test +cuda cuda_arch=61,80,86')
 
     # we only support Python 3.7+!
     depends_on('python@3.7.0:')
