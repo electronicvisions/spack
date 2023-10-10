@@ -25,6 +25,8 @@ packages:
     variants: [+htmlreport]
   gcc:
     compiler: [gcc@11.2.0]
+  gdb:
+    require: "~debuginfod"
   genpybind:
     version: ['ebrains']
   hdf5:
