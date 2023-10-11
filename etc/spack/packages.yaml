@@ -26,7 +26,7 @@ packages:
   gcc:
     compiler: [gcc@11.2.0]
   gdb:
-    require: "~debuginfod"
+    require: "@:13.0~debuginfod"  # 13.1 requires zstd with pkgconfig which can not be found, unpin in the future
   genpybind:
     version: ['ebrains']
   hdf5:
