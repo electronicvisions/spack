@@ -241,8 +241,10 @@ class Llvm(CMakePackage, CudaPackage):
     # lldb dependencies
     with when("+lldb +python"):
         depends_on("swig")
-        depends_on("swig@2:", when="@10:")
-        depends_on("swig@3:", when="@12:")
+        # begin VISIONS: modified, bring upstream
+        depends_on("swig@2:4.0", when="@10:")
+        depends_on("swig@3:4.0", when="@12:")
+        # end VISIONS
     depends_on("libedit", when="+lldb")
     depends_on("ncurses", when="+lldb")
     depends_on("py-six", when="+lldb+python")
