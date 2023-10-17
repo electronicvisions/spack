@@ -7,7 +7,7 @@
 from spack.package import *
 
 
-class PyJax(PythonPackage, CudaPackage):
+class PyJax(PythonPackage):
     """JAX is Autograd and XLA, brought together for high-performance
     machine learning research. With its updated version of Autograd,
     JAX can automatically differentiate native Python and NumPy
@@ -27,8 +27,6 @@ class PyJax(PythonPackage, CudaPackage):
     version("0.3.25", sha256="18bea69321cb95ea5ea913adfe5e2c1d453cade9d4cfd0dc814ecba9fc0cb6e3")
     version("0.2.25", sha256="822e8d1e06257eaa0fdc4c0a0686c4556e9f33647fa2a766755f984786ae7446")
 
-    variant("cuda", default=True, description="CUDA support")
-
     depends_on("python@3.7:", type=("build", "run"))
     depends_on("python@3.8:", when="@0.4:", type=("build", "run"))
     depends_on("python@3.9:", when="@0.4.14:", type=("build", "run"))
@@ -45,30 +43,12 @@ class PyJax(PythonPackage, CudaPackage):
     depends_on("py-ml-dtypes@0.1.0:", when="@0.4.9:", type=("build", "run"))
     depends_on("py-ml-dtypes@0.0.3:", when="@0.4.7:", type=("build", "run"))
 
-    depends_on("py-jaxlib@0.1.69:", type=("build", "run"), when="~cuda")
-    depends_on("py-jaxlib@0.1.69:+cuda", type=("build", "run"), when="+cuda")
-    depends_on("py-jaxlib@0.3.22:", type=("build", "run"), when="@0.3.25:~cuda")
-    depends_on("py-jaxlib@0.3.22:+cuda", type=("build", "run"), when="@0.3.25:+cuda")
-    depends_on("py-jaxlib@0.4.2:", type=("build", "run"), when="@0.4.3:~cuda")
-    depends_on("py-jaxlib@0.4.2:+cuda", type=("build", "run"), when="@0.4.3:+cuda")
-    depends_on("py-jaxlib@0.4.7:", type=("build", "run"), when="@0.4.9:~cuda")
-    depends_on("py-jaxlib@0.4.7:+cuda", type=("build", "run"), when="@0.4.9:+cuda")
-    depends_on("py-jaxlib@0.4.13:+cuda", type=("build", "run"), when="@0.4.13:+cuda")
-    depends_on("py-jaxlib@0.4.13:", type=("build", "run"), when="@0.4.13:~cuda")
-    depends_on("py-jaxlib@0.4.14:+cuda", type=("build", "run"), when="@0.4.14:+cuda")
-    depends_on("py-jaxlib@0.4.14:", type=("build", "run"), when="@0.4.14:~cuda")
-
-    for arch in CudaPackage.cuda_arch_values:
-        depends_on(
-            "py-jaxlib@0.1.69:+cuda cuda_arch={0}".format(arch),
-            type=("build", "run"),
-            when="cuda_arch={0}".format(arch),
-        )
-        depends_on(
-            "py-jaxlib@0.3.22:+cuda cuda_arch={0}".format(arch),
-            type=("build", "run"),
-            when="@0.3.25:cuda_arch={0}".format(arch),
-        )
+    depends_on("py-jaxlib@0.1.69:", type=("build", "run"))
+    depends_on("py-jaxlib@0.3.22:", type=("build", "run"), when="@0.3.25:")
+    depends_on("py-jaxlib@0.4.2:", type=("build", "run"), when="@0.4.3:")
+    depends_on("py-jaxlib@0.4.7:", type=("build", "run"), when="@0.4.9:")
+    depends_on("py-jaxlib@0.4.13:", type=("build", "run"), when="@0.4.13:")
+    depends_on("py-jaxlib@0.4.14:", type=("build", "run"), when="@0.4.14:")
 
     # Historical dependencies
     depends_on("py-absl-py", when="@:0.3", type=("build", "run"))
