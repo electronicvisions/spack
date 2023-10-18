@@ -1,4 +1,4 @@
-# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -6,6 +6,7 @@
 from spack.package import *
 
 
+# VISIONS: based on spack/0.20.0
 class PyNeo(PythonPackage):
     """Neo is a package for representing electrophysiology data in Python,
     together with support for reading a wide range of neurophysiology
@@ -14,8 +15,10 @@ class PyNeo(PythonPackage):
     homepage = "https://neuralensemble.org/neo"
     pypi = "neo/neo-0.4.1.tar.gz"
 
+    # begin VISIONS (added): bring upstream
     version("0.11.1", sha256="f4a206044b332ad00b10072b0dc7a70b359fa365ec786f92ab757ef4ae588474")
     version("0.11.0", sha256="cdf8e1324a3fbbd1efd5618dcd37cfc497b1997923bd710b598472c1d846674a")
+    # end VISIONS
     version("0.10.2", sha256="2d4218b0826daeea880e155227060029ec38a00238ceb5f097138d9467c6399b")
     version("0.10.0", sha256="e591a53e18cfa4478603a0e133f3fa0e07bc016b2a279d21d72cf8196eca8353")
     version("0.9.0", sha256="6e31c88d7c52174fa2512df589b2b5003e9471fde27fca9f315f4770ba3bd3cb")
@@ -30,7 +33,9 @@ class PyNeo(PythonPackage):
     depends_on("py-numpy@1.7.1:", type=("build", "run"), when="@0.5.2:0.8.0")
     depends_on("py-numpy@1.13.0:", type=("build", "run"), when="@0.9.0")
     depends_on("py-numpy@1.16.1:", type=("build", "run"), when="@0.10.0:")
+    # begin VISIONS (added): bring upstream
     depends_on("py-numpy@1.18.5:", type=("build", "run"), when="@0.11.0:")
+    # end VISIONS
 
     depends_on("py-quantities@0.9.0:", type=("build", "run"), when="@0.3.3:0.8.0")
     depends_on("py-quantities@0.12.1:", type=("build", "run"), when="@0.9.0:")
