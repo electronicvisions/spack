@@ -6,14 +6,13 @@
 from spack.package import *
 
 
-class VisionaryClusterservices(BundlePackage):
+class VisionaryNmpi(BundlePackage):
     """
-    Visionary Meta Package to make sure the dependecies for all visionary cluster services
-    are built.
+    Visionary Meta Package which bundels packages needed to provide the nmpi jobrunner.
     """
 
     version('1.0')
 
-    depends_on('visionary-slurmviz')
-    depends_on('visionary-unicore')
-    depends_on('visionary-nmpi')
+    depends_on('py-hbp-neuromorphic-platform')
+    depends_on('py-pandas')
+    depends_on('py-psutil')
