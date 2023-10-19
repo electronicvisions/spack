@@ -37,8 +37,6 @@ class Nest(CMakePackage):
             description="Enable GNU Scientific Library")
     variant('shared',   default=True,
             description="Build shared libraries")
-    variant("debug", default=False,
-            description="Enable debugging symbols")
     # TODO add variants for neurosim and music when these are in spack
 
     conflicts('~gsl', when='@:2.10',
@@ -47,8 +45,6 @@ class Nest(CMakePackage):
               msg='Option only introduced for non-ancient versions.')
     conflicts('~openmp', when='@:2.10',
               msg='Option only introduced for non-ancient versions.')
-    conflicts('+optimize +debug', when='@:2.10.99',
-              msg="Optimized debug build not available for ancient versions.")
 
     depends_on('python@3.8:',       when='+python @3:', type=('build', 'run'))
     depends_on('python@2.6:',       when='+python', type=('build', 'run'))
@@ -106,10 +102,6 @@ class Nest(CMakePackage):
             configure_args.append("--with-optimize")
         else:
             configure_args.append("--without-optimize")
-        if '+debug' in spec:
-            configure_args.append("--with-debug")
-        else:
-            configure_args.append("--without-debug")
 
         configure(*configure_args)
 
@@ -151,11 +143,6 @@ class Nest(CMakePackage):
             args.append('-Dstatic-libraries=OFF')
         else:
             args.append('-Dstatic-libraries=ON')
-
-        if '+debug' in self.spec:
-            args.append('-Dwith-debug=ON')
-        else:
-            args.append('-Dwith-debug=OFF')
 
         return args
 
