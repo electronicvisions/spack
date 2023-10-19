@@ -1,23 +1,16 @@
-# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
-from spack import *
+from spack.package import *
 from spack.pkg.builtin.boost import Boost
 
 
-class VisionaryDlsCore(Package):
+class VisionaryDlsCore(BundlePackage):
     """Core package that contains dependencies of the core DLS software
     ONLY!"""
-
-    homepage = ''
-    # some random tarball, to make `spack fetch --dependencies visionary-defaults` work
-    url = 'https://github.com/electronicvisions/spack/archive/v0.8.tar.gz'
-
-    # This is only a dummy tarball (see difference between version numbers)
-    # TODO: as soon as a MetaPackage-concept has been merged, please update this package
-    version('1.0', '372ce038842f20bf0ae02de50c26e85d', url='https://github.com/electronicvisions/spack/archive/v0.8.tar.gz')
+    version('1.0')
 
     # Depend on visionary-nux to enable joint developement of host and PPU code with one meta package
     depends_on('visionary-nux ~dev')
@@ -77,10 +70,3 @@ class VisionaryDlsCore(Package):
 
     # xilinx runtime dependencies
     depends_on('visionary-xilinx')
-
-    def install(self, spec, prefix):
-        mkdirp(prefix.etc)
-        # store a copy of this package.
-        install(__file__, join_path(prefix.etc, spec.name + '.py'))
-
-        # we could create some filesystem view here?

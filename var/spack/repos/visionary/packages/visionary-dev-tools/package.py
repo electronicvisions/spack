@@ -1,22 +1,17 @@
-# Copyright 2013-2019 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
-import os.path as osp
+from spack.package import *
 
-class VisionaryDevTools(Package):
+
+class VisionaryDevTools(BundlePackage):
     """Developer convenience packages common to all visionary
        development meta packages. Application specific build tools belong
        to the dedicated meta packages."""
 
-    homepage = ''
-    # some random tarball, to make `spack fetch --dependencies visionary-defaults` work
-    url = 'https://github.com/electronicvisions/spack/archive/v0.8.tar.gz'
-
-    # This is only a dummy tarball (see difference between version numbers)
-    # TODO: as soon as a MetaPackage-concept has been merged, please update this package
-    version('1.0', '372ce038842f20bf0ae02de50c26e85d', url='https://github.com/electronicvisions/spack/archive/v0.8.tar.gz')
+    version('1.0')
 
     depends_on('ack')
     depends_on('autoconf')
@@ -93,11 +88,3 @@ class VisionaryDevTools(Package):
     depends_on('wget')
     depends_on('yaml-cpp+shared')
     depends_on('zsh')
-
-    def install(self, spec, prefix):
-        mkdirp(prefix.etc)
-        # store a copy of this package.
-        filename = osp.basename(osp.dirname(__file__)) # gives name of parent folder
-        install(__file__, join_path(prefix.etc, filename + '.py'))
-
-        # we could create some filesystem view here?
