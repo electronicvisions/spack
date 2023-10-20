@@ -1,4 +1,4 @@
-# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -7,7 +7,7 @@ import os
 import shutil
 import sys
 
-from spack import *
+from spack.package import *
 
 
 def _install_shlib(name, src, dst):
@@ -26,18 +26,21 @@ def _install_shlib(name, src, dst):
         os.symlink(shlib0, join_path(dst, shlib))
 
 
+# VISIONS: based on spack/0.20.0
 class Hdf5Blosc(Package):
     """Blosc filter for HDF5"""
-    homepage = "https://github.com/Blosc/hdf5-blosc"
-    url      = "https://github.com/Blosc/hdf5-blosc/archive/refs/tags/v1.0.0.tar.gz"
-    git      = "https://github.com/Blosc/hdf5-blosc.git"
 
-    version('master', branch='master')
-    version('1.0.0', sha256='007a8bf0c7d0a571615685a4c0bd1768ed9137b7c41d0edf65f3fab71b7c19c1')
+    homepage = "https://github.com/Blosc/hdf5-blosc"
+    git = "https://github.com/Blosc/hdf5-blosc.git"
+
+    version("master", branch="master")
+    # begin VISIONS (added):
+    version("1.0.0", sha256="007a8bf0c7d0a571615685a4c0bd1768ed9137b7c41d0edf65f3fab71b7c19c1")
+    # end VISIONS
 
     depends_on("c-blosc")
     depends_on("hdf5")
-    depends_on("libtool", type='build')
+    depends_on("libtool", type="build")
 
     parallel = False
 
@@ -64,32 +67,47 @@ class Hdf5Blosc(Package):
 
         # Build and install filter
         with working_dir("src"):
-            libtool("--mode=compile", "--tag=CC",
-                    "cc", "-g", "-O",
-                    "-c", "blosc_filter.c")
-            libtool("--mode=link", "--tag=CC",
-                    "cc", "-g", "-O",
-                    "-rpath", prefix.lib,
-                    "-o", "libblosc_filter.la",
-                    "blosc_filter.lo",
-                    "-L%s" % spec["c-blosc"].prefix.lib, "-lblosc",
-                    "-L%s" % spec["hdf5"].prefix.lib, "-lhdf5")
+            libtool("--mode=compile", "--tag=CC", "cc", "-g", "-O", "-c", "blosc_filter.c")
+            libtool(
+                "--mode=link",
+                "--tag=CC",
+                "cc",
+                "-g",
+                "-O",
+                "-rpath",
+                prefix.lib,
+                "-o",
+                "libblosc_filter.la",
+                "blosc_filter.lo",
+                "-L%s" % spec["c-blosc"].prefix.lib,
+                "-lblosc",
+                "-L%s" % spec["hdf5"].prefix.lib,
+                "-lhdf5",
+            )
             _install_shlib("libblosc_filter", ".libs", prefix.lib)
 
             # Build and install plugin
             # The plugin requires at least HDF5 1.8.11:
             if spec["hdf5"].satisfies("@1.8.11:"):
-                libtool("--mode=compile", "--tag=CC",
-                        "cc", "-g", "-O",
-                        "-c", "blosc_plugin.c")
-                libtool("--mode=link", "--tag=CC",
-                        "cc", "-g", "-O",
-                        "-rpath", prefix.lib,
-                        "-o", "libblosc_plugin.la",
-                        "blosc_plugin.lo",
-                        "-L%s" % prefix.lib, "-lblosc_filter",
-                        "-L%s" % spec["c-blosc"].prefix.lib, "-lblosc",
-                        "-L%s" % spec["hdf5"].prefix.lib, "-lhdf5")
+                libtool("--mode=compile", "--tag=CC", "cc", "-g", "-O", "-c", "blosc_plugin.c")
+                libtool(
+                    "--mode=link",
+                    "--tag=CC",
+                    "cc",
+                    "-g",
+                    "-O",
+                    "-rpath",
+                    prefix.lib,
+                    "-o",
+                    "libblosc_plugin.la",
+                    "blosc_plugin.lo",
+                    "-L%s" % prefix.lib,
+                    "-lblosc_filter",
+                    "-L%s" % spec["c-blosc"].prefix.lib,
+                    "-lblosc",
+                    "-L%s" % spec["hdf5"].prefix.lib,
+                    "-lhdf5",
+                )
                 _install_shlib("libblosc_plugin", ".libs", prefix.lib)
 
         if self.run_tests:
@@ -161,8 +179,7 @@ Done.
                 cc = Executable(self.compiler.cc)
             # TODO: Automate these path and library settings
             cc("-c", "-I%s" % spec["hdf5"].prefix.include, "check.c")
-            cc("-o", "check", "check.o",
-               "-L%s" % spec["hdf5"].prefix.lib, "-lhdf5")
+            cc("-o", "check", "check.o", "-L%s" % spec["hdf5"].prefix.lib, "-lhdf5")
             try:
                 check = Executable("./check")
                 output = check(output=str)
