@@ -2705,8 +2705,7 @@ class Spec(object):
 
         extra = set(user_spec_deps.keys()).difference(visited_user_specs)
         if extra:
-            # TODO: make configurable and bring upstream
-            tty.warn(str(InvalidDependencyError(self.name, extra)))
+            raise InvalidDependencyError(self.name, extra)
 
         Spec.inject_patches_variant(self)
 
