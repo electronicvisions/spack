@@ -807,10 +807,14 @@ class Llvm(CMakePackage, CudaPackage):
             install_tree("bin", join_path(self.prefix, "libexec", "llvm"))
 
     def add_files_to_view(self, view, merge_map):
+        python = self.spec["python"]
         # we remove libgomp-related files from views as they conflict with
-        # gcc-ones
+        # gcc- or python-ones
         ignore_file_paths = [
             join_path(self.prefix, "lib", "libgomp.so"),
+            join_path(self.prefix, "lib",
+                      f"python{'.'.join(str(python.version).split('.')[:2])}",
+                      "site-packages", "README.txt"),
         ]
 
         if self.spec.satisfies('~force_full_view'):
