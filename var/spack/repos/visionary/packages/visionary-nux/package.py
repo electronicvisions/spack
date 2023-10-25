@@ -24,4 +24,4 @@ class VisionaryNux(BundlePackage):
     depends_on('texinfo')
     depends_on('wget')
 
-    conflicts('flex', when='@2.6.3', msg='Binutils 2.25 for Nux doesn\'t build with flex 2.6.3.')
+    conflicts('flex@2.6.3', msg='Binutils 2.25 for Nux doesn\'t build with flex 2.6.3.')
