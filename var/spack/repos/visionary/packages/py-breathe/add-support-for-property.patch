@@ -1,11 +1,11 @@
 diff -pur a/breathe/renderer/sphinxrenderer.py b/breathe/renderer/sphinxrenderer.py
 --- a/breathe/renderer/sphinxrenderer.py	2020-09-10 20:35:57.000000000 +0200
 +++ b/breathe/renderer/sphinxrenderer.py	2021-06-14 14:29:20.457286215 +0200
-@@ -233,6 +233,7 @@ class DomainDirectiveFactory:
+@@ -272,6 +272,7 @@ class DomainDirectiveFactory:
          #       index-text and whatever other things are different.
-         'function': (PyFunction, 'function'),
-         'variable': (PyAttribute, 'attribute'),
-+        'property': (PyAttribute, 'attribute'),
-         'class': (PyClasslike, 'class'),
-         'namespace': (PyClasslike, 'class'),
+         "function": (PyFunction, "function"),
+         "variable": (PyAttribute, "attribute"),
++        "property": (PyAttribute, "attribute"),
+         "class": (PyClasslike, "class"),
+         "namespace": (PyClasslike, "class"),
      }
