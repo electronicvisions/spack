@@ -15,10 +15,9 @@ class PySphinxcontribJupyter(PythonPackage):
 
     depends_on('python@2.7:2.8,3.3:', type=('build', 'run'))
     depends_on('py-setuptools', type='build')
-    depends_on('py-sphinx', type=('build', 'run'))
+    depends_on('py-sphinx@:3', type=('build', 'run'))
     depends_on('py-docutils', type=('build', 'run'))
     depends_on('py-nbformat', type=('build', 'run'))
-    depends_on('py-sphinx', type=('build', 'run'))
     depends_on('py-dask', type=('build', 'run'))
     depends_on('py-distributed', type=('build', 'run'))
     depends_on('py-ipython', type=('build', 'run'))
