@@ -22,6 +22,7 @@ packages:
   cairo:
     variants: [+X]
   cppcheck:
+    version: [2.7]  # > 2.7 stalls with boost hana
     variants: [+htmlreport]
   gcc:
     compiler: [gcc@11.2.0]
