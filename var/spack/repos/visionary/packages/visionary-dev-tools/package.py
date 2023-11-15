@@ -57,7 +57,7 @@ class VisionaryDevTools(BundlePackage):
     depends_on('py-ipython')
     depends_on('py-jedi')
     depends_on('py-junit-xml')
-    depends_on('py-language-server')
+    depends_on('py-python-lsp-server')
     depends_on('py-line-profiler')
     depends_on('py-memory-profiler')
     depends_on('py-pudb')
