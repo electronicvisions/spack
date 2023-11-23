@@ -47,6 +47,7 @@ class PyJax(PythonPackage):
     depends_on("py-ml-dtypes@0.2.0:", when="@0.4.14:", type=("build", "run"))
     depends_on("py-ml-dtypes@0.1.0:", when="@0.4.9:", type=("build", "run"))
     depends_on("py-ml-dtypes@0.0.3:", when="@0.4.7:", type=("build", "run"))
+    depends_on("py-importlib-metadata@4.6:", when="@0.4.11: ^python@:3.9", type="run")
     # end VISIONS
 
     # See _minimum_jaxlib_version in jax/version.py
@@ -63,7 +64,9 @@ class PyJax(PythonPackage):
     # end VISIONS
 
     for jax, jaxlib in jax_to_jaxlib.items():
-        depends_on(f"py-jaxlib@{jaxlib}:", when=f"@{jax}", type=("build", "run"))
+        # begin VISIONS (modified): bring upstream
+        depends_on(f"py-jaxlib@{jaxlib}", when=f"@{jax}", type=("build", "run"))
+        # end VISIONS
 
     # Historical dependencies
     depends_on("py-absl-py", when="@:0.3", type=("build", "run"))
