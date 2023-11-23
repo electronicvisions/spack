@@ -36,7 +36,7 @@ class VisionaryDlsCore(BundlePackage):
     depends_on('log4cxx')
     depends_on('munge')
     depends_on('pkg-config')
-    depends_on('py-jax@0.3.25 ^py-jaxlib +cuda cuda_arch=61,80,86')
+    depends_on('py-jax@0.4.13 ^py-jaxlib +cuda cuda_arch=61,80,86') # later requires python@3.9
     depends_on('py-matplotlib@3:')
     depends_on('py-networkx')
     depends_on('py-nose')
