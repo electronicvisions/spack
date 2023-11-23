@@ -20,7 +20,6 @@ class PyJaxlib(PythonPackage, CudaPackage):
 
     # begin VISIONS (added): bring upstream
     version("0.4.13", sha256="45766238b57b992851763c64bc943858aebafe4cad7b3df6cde844690bc34293")
-    version("0.4.7", sha256="0578d5dd5035b5225cadb6a62ca5f93dd76b70292268502fc01a0fd9ca7001d0")
     # end VISIONS
     version("0.4.3", sha256="2104735dc22be2b105e5517bd5bc6ae97f40e8e9e54928cac1585c6112a3d910")
     version("0.3.22", sha256="680a6f5265ba26d5515617a95ae47244005366f879a5c321782fde60f34e6d0d")

@@ -22,12 +22,10 @@ class PyJax(PythonPackage):
     homepage = "https://github.com/google/jax"
     pypi = "jax/jax-0.2.25.tar.gz"
 
-    # begin VISIONS (modified): bring upstream
+    # begin VISIONS (added): bring upstream
     version("0.4.13", sha256="03bfe6749dfe647f16f15f6616638adae6c4a7ca7167c75c21961ecfd3a3baaa")
-    version("0.4.9", sha256="1ed135cd08f48e4baf10f6eafdb4a4cdae781f9052b5838c09c91a9f4fa75f09")
-    version("0.4.3", sha256="d43f08f940aa30eb339965cfb3d6bee2296537b0dc2f0c65ccae3009279529ae")
-    version("0.3.25", sha256="18bea69321cb95ea5ea913adfe5e2c1d453cade9d4cfd0dc814ecba9fc0cb6e3")
     # end VISIONS
+    version("0.4.3", sha256="d43f08f940aa30eb339965cfb3d6bee2296537b0dc2f0c65ccae3009279529ae")
     version("0.3.23", sha256="bff436e15552a82c0ebdef32737043b799e1e10124423c57a6ae6118c3a7b6cd")
     version("0.2.25", sha256="822e8d1e06257eaa0fdc4c0a0686c4556e9f33647fa2a766755f984786ae7446")
 
@@ -55,9 +53,7 @@ class PyJax(PythonPackage):
     jax_to_jaxlib = {
         "0.4.14": "0.4.14",
         "0.4.13": "0.4.13",
-        "0.4.9": "0.4.7",
         "0.4.3": "0.4.2",
-        "0.3.25": "0.3.22",
         "0.3.23": "0.3.15",
         "0.2.25": "0.1.69",
     }
