@@ -1,3 +1,4 @@
+# begin VISIONS (added): whole file added by us
 ##############################################################################
 # Copyright (c) 2013-2017, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.

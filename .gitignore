@@ -17,9 +17,6 @@
 spack-db.*
 *.in.log
 *.out.log
-modules/
-views/
-*.orig
 
 ###########################
 # Python-specific ignores #
@@ -132,7 +129,6 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.spack
 .env
 .venv
 env/

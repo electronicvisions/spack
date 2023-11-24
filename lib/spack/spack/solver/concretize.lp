@@ -150,11 +150,6 @@ possible_version_weight(Package, Weight)
   :- attr("node_version_satisfies", Package, Constraint),
      version_satisfies(Package, Constraint, _).
 
-% If there is at least a version that satisfy the constraint, impose a lower
-% bound on the choice rule to avoid false positives with the error below
-1 { version(Package, Version) : version_satisfies(Package, Constraint, Version) }
-  :- node_version_satisfies(Package, Constraint), version_satisfies(Package, Constraint, _).
-
 % More specific error message if the version cannot satisfy some constraint
 % Otherwise covered by `no_version_error` and `versions_conflict_error`.
 error(10, "Cannot satisfy '{0}@{1}'", Package, Constraint)
@@ -999,9 +994,6 @@ compiler_weight(Package, 100)
 error(100, "Compiler {1}@{2} requested for {0} cannot be found. Set install_missing_compilers:true if intended.", Package, Compiler, Version)
  :- attr("node_compiler_version", Package, Compiler, Version),
     not node_compiler(Package, _).
-
-% For the time being, be strict and reuse only if the compiler match one we have on the system
-:- node_compiler_version(Package, Compiler, Version), not compiler_version(Compiler, Version).
 
 #defined node_compiler_preference/4.
 #defined default_compiler_preference/3.

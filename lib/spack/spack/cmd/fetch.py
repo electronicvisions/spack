@@ -10,7 +10,6 @@ import spack.cmd.common.arguments as arguments
 import spack.config
 import spack.environment as ev
 import spack.repo
-import argparse
 
 description = "fetch archives for packages"
 section = "build"
@@ -28,10 +27,12 @@ def setup_parser(subparser):
     subparser.add_argument(
         "-D", "--dependencies", action="store_true", help="also fetch all dependencies"
     )
+    # begin VISIONS (added)
     subparser.add_argument(
         '-f', '--file', action='append', default=[],
         dest='specfiles', metavar='SPEC_YAML_FILE',
         help="fetch from file. Read specs to fetch from .yaml files")
+    # end VISIONS
     arguments.add_common_arguments(subparser, ["specs"])
     subparser.epilog = (
         "With an active environment, the specs "
@@ -41,8 +42,11 @@ def setup_parser(subparser):
 
 
 def fetch(parser, args):
+    # begin VISIONS (added)
     specs = []
+    # end VISIONS
     if args.specs:
+    # begin VISIONS (modified)
         specs += spack.cmd.parse_specs(args.specs, concretize=True)
     if args.specfiles:
         for specfile in args.specfiles:
@@ -57,6 +61,7 @@ def fetch(parser, args):
 
             specs.append(s.concretized())
     if not (args.specs or args.specfiles):
+    # end VISIONS
         # No specs were given explicitly, check if we are in an
         # environment. If yes, check the missing argument, if yes
         # fetch all uninstalled specs from it otherwise fetch all.
@@ -73,7 +78,9 @@ def fetch(parser, args):
                     "No uninstalled specs in environment. Did you " "run `spack concretize` yet?"
                 )
         else:
+            # begin VISIONS (modified)
             tty.die("fetch requires at least one package argument or specfile")
+            # end VISIONS
 
     if args.no_checksum:
         spack.config.set("config:checksum", False, scope="command_line")

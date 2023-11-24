@@ -39,6 +39,7 @@ import spack.spec
 import spack.util.git
 import spack.util.gpg as gpg_util
 import spack.util.spack_yaml as syaml
+import spack.util.url as url_util
 import spack.util.web as web_util
 from spack import traverse
 from spack.error import SpackError
@@ -124,11 +125,6 @@ def get_job_name(phase, strip_compiler, spec, osarch, build_group):
         item_idx += 1
 
     return format_str.format(*format_args)
-
-
-def _remove_reserved_tags(tags):
-    """Convenience function to strip reserved tags from jobs"""
-    return [tag for tag in tags if tag not in SPACK_RESERVED_TAGS]
 
 
 def _remove_reserved_tags(tags):
@@ -1392,78 +1388,10 @@ def generate_gitlab_ci_yaml(
 
             output_object["sign-pkgs"] = signing_job
 
-        if ('signing-job-attributes' in gitlab_ci and
-                spack_pipeline_type == 'spack_protected_branch'):
-            # External signing: generate a job to check and sign binary pkgs
-            stage_names.append('stage-sign-pkgs')
-            signing_job_config = gitlab_ci['signing-job-attributes']
-            signing_job = {}
-
-            signing_job_attrs_to_copy = [
-                'image',
-                'tags',
-                'variables',
-                'before_script',
-                'script',
-                'after_script',
-            ]
-
-            _copy_attributes(signing_job_attrs_to_copy,
-                             signing_job_config,
-                             signing_job)
-
-            signing_job_tags = []
-            if 'tags' in signing_job:
-                signing_job_tags = _remove_reserved_tags(signing_job['tags'])
-
-            for tag in ['aws', 'protected', 'notary']:
-                if tag not in signing_job_tags:
-                    signing_job_tags.append(tag)
-            signing_job['tags'] = signing_job_tags
-
-            signing_job['stage'] = 'stage-sign-pkgs'
-            signing_job['when'] = 'always'
-            signing_job['retry'] = {
-                'max': 2,
-                'when': ['always']
-            }
-            signing_job['interruptible'] = True
-
-            output_object['sign-pkgs'] = signing_job
-
-        if spack_buildcache_copy:
-            # Generate a job to copy the contents from wherever the builds are getting
-            # pushed to the url specified in the "SPACK_BUILDCACHE_COPY" environment
-            # variable.
-            src_url = remote_mirror_override or remote_mirror_url
-            dest_url = spack_buildcache_copy
-
-            stage_names.append('stage-copy-buildcache')
-            copy_job = {
-                'stage': 'stage-copy-buildcache',
-                'tags': ['spack', 'public', 'medium', 'aws', 'x86_64'],
-                'image': 'ghcr.io/spack/python-aws-bash:0.0.1',
-                'when': 'on_success',
-                'interruptible': True,
-                'retry': service_job_retries,
-                'script': [
-                    '. ./share/spack/setup-env.sh',
-                    'spack --version',
-                    'aws s3 sync --exclude *index.json* --exclude *pgp* {0} {1}'.format(
-                        src_url, dest_url)
-                ]
-            }
-
-            output_object['copy-mirror'] = copy_job
-
         if rebuild_index_enabled:
             # Add a final job to regenerate the index
             stage_names.append("stage-rebuild-index")
             final_job = spack_ci_ir["jobs"]["reindex"]["attributes"]
-
-            if 'tags' in final_job:
-                service_tags = _remove_reserved_tags(final_job['tags'])
-                final_job['tags'] = service_tags
 
             index_target_mirror = mirror_urls[0]
             if remote_mirror_override:

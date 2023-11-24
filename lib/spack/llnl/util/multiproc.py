@@ -8,8 +8,7 @@ This implements a parallel map operation but it can accept more values
 than multiprocessing.Pool.apply() can.  For example, apply() will fail
 to pickle functions if they're passed indirectly as parameters.
 """
-from multiprocessing import Process, Semaphore, Value
-from multiprocessing.pool import Pool
+from multiprocessing import Semaphore, Value
 
 __all__ = ["Barrier"]
 

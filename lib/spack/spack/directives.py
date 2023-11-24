@@ -68,7 +68,9 @@ __all__ = [
     "resource",
     "build_system",
     "requires",
+    # begin VISIONS (added)
     "same_version_as"
+    # end VISIONS
 ]
 
 #: These are variant names used by Spack internally; packages can't use them
@@ -573,6 +575,7 @@ def extends(spec, type=("build", "run"), **kwargs):
     return _execute_extends
 
 
+# begin VISIONS (added)
 @directive('dependencies')
 def same_version_as(
         dep, when=None, type=default_deptype, patches=None,
@@ -603,6 +606,7 @@ def same_version_as(
                             version=ver, when="" if when is None else when),
                         type=type, patches=patches)
     return _same_version_as
+# end VISIONS
 
 
 @directive("provided")
