@@ -80,5 +80,5 @@ class VisionaryWafer(BundlePackage):
     #   - cuda arch 8.0 (NVIDIA A100)
     #   - cuda arch 8.6 (NVIDIA GeForce RTX 3080)
     # We want to set defaults in packages.yaml, but it's ignored?
-    depends_on('py-torch ~caffe2 ~xnnpack ~mkldnn ~cudnn ~magma ~qnnpack ~test +cuda cuda_arch=61,80,86')
+    depends_on('py-torch@1.13.1 ~caffe2 ~xnnpack ~mkldnn ~cudnn ~magma ~qnnpack ~test +cuda cuda_arch=61,80,86')
     depends_on('py-torchvision')
