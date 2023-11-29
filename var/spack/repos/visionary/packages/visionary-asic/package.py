@@ -14,4 +14,4 @@ class VisionaryAsic(BundlePackage):
 
     version('1.0')
 
-    depends_on('tcl-osys@890eafffbda95b58a472a2005c3cb9e90fd22ff6')
+    depends_on('tcl-osys@1.1.1-post1')
