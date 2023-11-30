@@ -20,6 +20,7 @@ from spack.operating_systems.mac_os import macos_sdk_path, macos_version
 from spack.package import *
 
 
+# VISIONS: based on spack/0.20.0
 class Gcc(AutotoolsPackage, GNUMirrorPackage):
     """The GNU Compiler Collection includes front ends for C, C++, Objective-C,
     Fortran, Ada, and Go, as well as libraries for these languages."""
@@ -431,7 +432,9 @@ class Gcc(AutotoolsPackage, GNUMirrorPackage):
     patch("glibc-2.31-libsanitizer-1.patch", when="@7.1.0:7.5.0,8.1.0:8.3.0,9.0.0:9.2.0")
     patch("glibc-2.31-libsanitizer-1-gcc-6.patch", when="@5.3.0:5.5.0,6.1.0:6.5.0")
     patch("glibc-2.31-libsanitizer-2.patch", when="@8.1.0:8.3.0,9.0.0:9.2.0")
+    # begin VISIONS (added)
     patch('glibc-2.31-libsanitizer-2-gcc-4.patch', when='@4.9.2:4.9.999')
+    # end VISIONS
     patch("glibc-2.31-libsanitizer-2-gcc-6.patch", when="@5.3.0:5.5.0,6.1.0:6.5.0")
     patch("glibc-2.31-libsanitizer-2-gcc-7.patch", when="@7.1.0:7.5.0")
     patch(
@@ -843,10 +846,12 @@ class Gcc(AutotoolsPackage, GNUMirrorPackage):
 
         return options
 
+    # begin VISIONS (added)
     def setup_build_environment(self, env):
         if self.spec.satisfies('@:4.9 %gcc@11:'):
             # fixes problem of operator++ on bool forbidden in C++17
             env.append_flags('CXXFLAGS', '-std=gnu++11')
+    # end VISIONS
 
     # run configure/make/make(install) for the nvptx-none target
     # before running the host compiler phases
