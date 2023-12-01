@@ -282,6 +282,7 @@ class Llvm(CMakePackage, CudaPackage):
     # Fixed in upstream versions of both
     conflicts("^cmake@3.19.0", when="@6:11.0.0")
 
+    # begin VISIONS (added)
     variant('visionary', default=False,
             description="Include patches necessary for visionary python "
             "bindings generator")
@@ -328,6 +329,7 @@ class Llvm(CMakePackage, CudaPackage):
 
     # disable check for member `mode` size in `struct ipc_perm`; newer glibc changed width
     patch('llvm9-disable-check-for-ipc_perm-mode.patch', when='@9.0.0:9.0.999', level=2)
+    # end VISIONS
 
     # sys/ustat.h has been removed in favour of statfs from glibc-2.28. Use fixed sizes:
     patch("llvm5-sanitizer-ustat.patch", when="@4:6.0.0+compiler-rt")
@@ -364,11 +366,12 @@ class Llvm(CMakePackage, CudaPackage):
     # merged in llvm-11.0.0_rc2, first available in 12.0.0
     patch("lldb_external_ncurses-10.patch", when="@10.0.0:11+lldb")
 
-    patch('llvm_py37.patch', when='@4:6 ^python@3.7:')
+    # begin VISIONS (added)
     # see https://bugzilla.redhat.com/show_bug.cgi?id=1540620
     patch('llvm_gcc8.patch', when='@5.0:5.999 %gcc@8.0:')
     # see https://bugs.gentoo.org/708730  # seems to be fixed in 9.0.1
     patch('llvm_gcc10.patch', when='@8.0.0:9.0.0 %gcc@10.0:')
+    # end VISIONS
 
     # https://github.com/spack/spack/issues/19908
     # merged in llvm main prior to 12.0.0
@@ -381,6 +384,8 @@ class Llvm(CMakePackage, CudaPackage):
     # https://reviews.llvm.org/D102059
     patch("no_cyclades.patch", when="@10:12.0.0")
     patch("no_cyclades9.patch", when="@6:9")
+
+    patch("llvm-gcc11.patch", when="@9:11%gcc@11:")
 
     # add -lpthread to build OpenMP libraries with Fujitsu compiler
     patch("llvm12-thread.patch", when="@12 %fj")
@@ -806,6 +811,7 @@ class Llvm(CMakePackage, CudaPackage):
         with working_dir(self.build_directory):
             install_tree("bin", join_path(self.prefix, "libexec", "llvm"))
 
+    # begin VISIONS (added)
     def add_files_to_view(self, view, merge_map):
         python = self.spec["python"]
         # we remove libgomp-related files from views as they conflict with
@@ -823,6 +829,7 @@ class Llvm(CMakePackage, CudaPackage):
                     del merge_map[path]
 
         super(Llvm, self).add_files_to_view(view, merge_map)
+    # end VISIONS
 
     def llvm_config(self, *args, **kwargs):
         lc = Executable(self.prefix.bin.join("llvm-config"))
