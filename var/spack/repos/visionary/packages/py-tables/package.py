@@ -56,12 +56,6 @@ class PyTables(PythonPackage):
     depends_on("bzip2", when="+bzip2")
     depends_on("lzo", when="+lzo")
 
-    # begin VISIONS (added):
-    patch('microarch.patch', when='~auto@3.3.0')
-    patch('microarch_new.patch', when='~auto@3.4.4')
-    patch('microarch_35.patch', when='~auto@3.5.2')
-    # end VISIONS
-
     def setup_build_environment(self, env):
         env.set("HDF5_DIR", self.spec["hdf5"].prefix)
         if "+bzip2" in self.spec:
