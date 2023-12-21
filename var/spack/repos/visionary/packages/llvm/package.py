@@ -290,30 +290,7 @@ class Llvm(CMakePackage, CudaPackage):
             description='Force linking of all files into view, including '
                         'known conflicts (e.g. libgomp).')
 
-    patch('llvm5-0001-libclang-Add-support-for-checking-abstractness-of-re.patch', when='@5.0:6.999 +visionary', level=2)
-    patch('llvm5-0002-libclang-Keep-track-of-TranslationUnit-instance-when.patch', when='@5.0:6.999 +visionary', level=2)
-    patch('llvm5-0003-Fix-warnings-in-Tooling-QualTypeNamesTest.patch',            when='@5.0:6.999 +visionary', level=2)
-    patch('llvm5-0004-Defer-addition-of-keywords-to-identifier-table-when-.patch', when='@5.0:6.999 +visionary', level=2)
-    patch('llvm5-0005-Tooling-Fully-qualify-template-parameters-of-nested-.patch', when='@5.0:6.999 +visionary', level=2)
-    patch('llvm5-0006-libclang-Add-support-for-obtaining-fully-qualified-n.patch', when='@5.0:6.999 +visionary', level=2)
-    patch('llvm5-0007-libclang-Add-option-to-keep-whitespace-when-tokenizi.patch', when='@5.0:6.999 +visionary', level=2)
-    patch('llvm5-0008-Fix-printing-policy-for-AST-context-loaded-from-file.patch', when='@5.0:6.999 +visionary', level=2)
-    patch('llvm5-0009-libclang-Visit-attributes-for-function-and-class-tem.patch', when='@5.0:6.999 +visionary', level=2)
-    patch('llvm5-0010-libclang-Add-support-for-querying-cursor-availabilit.patch', when='@5.0:6.999 +visionary', level=2)
-    patch('llvm5-0011-libclang-Allow-visiting-of-implicit-declarations-and.patch', when='@5.0:6.999 +visionary', level=2)
-    patch('llvm5-0012-libclang-WIP-Fix-get_tokens-in-macro-expansion.patch',       when='@5.0:6.999 +visionary', level=2)
-
-    patch('llvm7-0001-Tooling-Fully-qualify-template-parameters-of-nested-.patch', when='@7.0:7.999 +visionary', level=2)
-    patch('llvm7-0002-libclang-Add-support-for-obtaining-fully-qualified-n.patch', when='@7.0:7.999 +visionary', level=2)
-    patch('llvm7-0003-libclang-Add-option-to-keep-whitespace-when-tokenizi.patch', when='@7.0:7.999 +visionary', level=2)
-    patch('llvm7-0004-libclang-WIP-Allow-visiting-of-implicit-declarations.patch', when='@7.0:7.999 +visionary', level=2)
-    patch('llvm7-0005-libclang-WIP-Fix-get_tokens-in-macro-expansion.patch',       when='@7.0:7.999 +visionary', level=2)
-
     patch('llvm9-0001-Tooling-Fully-qualify-template-parameters-of-nested-.patch', when='@9.0.0:12.0.999 +visionary', level=2)
-    patch('llvm9-0002-libclang-Add-support-for-obtaining-fully-qualified-n.patch', when='@9.0:10.999 +visionary', level=2)
-    patch('llvm9-0003-libclang-Add-option-to-keep-whitespace-when-tokenizi.patch', when='@9.0:10.999 +visionary', level=2)
-    patch('llvm9-0004-libclang-WIP-Allow-visiting-of-implicit-declarations.patch', when='@9.0:10.999 +visionary', level=2)
-    patch('llvm9-0005-libclang-WIP-Fix-get_tokens-in-macro-expansion.patch',       when='@9.0:10.999 +visionary', level=2)
 
     # 0001-Tooling-Fully-qualify-template-parameters-of-nested-.patch from above
     patch('llvm11-0002-libclang-Add-support-for-obtaining-fully-qualified-n.patch', when='@11.0.0:11.0.999 +visionary', level=2)
@@ -365,13 +342,6 @@ class Llvm(CMakePackage, CudaPackage):
     # https://github.com/spack/spack/issues/19625,
     # merged in llvm-11.0.0_rc2, first available in 12.0.0
     patch("lldb_external_ncurses-10.patch", when="@10.0.0:11+lldb")
-
-    # begin VISIONS (added)
-    # see https://bugzilla.redhat.com/show_bug.cgi?id=1540620
-    patch('llvm_gcc8.patch', when='@5.0:5.999 %gcc@8.0:')
-    # see https://bugs.gentoo.org/708730  # seems to be fixed in 9.0.1
-    patch('llvm_gcc10.patch', when='@8.0.0:9.0.0 %gcc@10.0:')
-    # end VISIONS
 
     # https://github.com/spack/spack/issues/19908
     # merged in llvm main prior to 12.0.0
