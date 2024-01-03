@@ -37,7 +37,7 @@ class VisionaryDevTools(BundlePackage):
     depends_on('jq')
     depends_on('libpcap')
     depends_on('libtool')
-    depends_on('llvm+visionary+python~libcxx build_type=Release')
+    depends_on('llvm+visionary+python libcxx=none build_type=Release')
     depends_on('mercurial')
     depends_on('mosh')
     depends_on('munge')

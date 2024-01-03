@@ -37,7 +37,7 @@ packages:
       prefix: /usr
   llvm:
     version: [11.1.0]
-    variants: [~shared_libs+visionary+python~libcxx build_type=Release]
+    variants: [~shared_libs+visionary+python libcxx=none build_type=Release]
   mesa:
     # mesa via ghostscript -> libepoxy+glx, but doesn't build with llvm@11.1.0
     variants: [~llvm]
