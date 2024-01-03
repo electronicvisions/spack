@@ -60,8 +60,8 @@ class PyJax(PythonPackage):
     # end VISIONS
 
     for jax, jaxlib in jax_to_jaxlib.items():
-        # begin VISIONS (modified): bring upstream
-        depends_on(f"py-jaxlib@{jaxlib}", when=f"@{jax}", type=("build", "run"))
+        # begin VISIONS (modified):
+        depends_on(f"py-jaxlib@{jaxlib} +cuda cuda_arch=61,80,86", when=f"@{jax}", type=("build", "run"))
         # end VISIONS
 
     # Historical dependencies
