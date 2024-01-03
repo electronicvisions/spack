@@ -24,8 +24,6 @@ packages:
   cppcheck:
     version: [2.7]  # > 2.7 stalls with boost hana
     variants: [+htmlreport]
-  gcc:
-    compiler: [gcc@11.2.0]
   gdb:
     require: "@:13.0~debuginfod"  # 13.1 requires zstd with pkgconfig which can not be found, unpin in the future
   genpybind:
