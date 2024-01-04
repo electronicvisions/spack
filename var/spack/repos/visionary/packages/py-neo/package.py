@@ -6,7 +6,7 @@
 from spack.package import *
 
 
-# VISIONS: based on spack/0.20.0
+# VISIONS: based on spack/0.21.0
 class PyNeo(PythonPackage):
     """Neo is a package for representing electrophysiology data in Python,
     together with support for reading a wide range of neurophysiology

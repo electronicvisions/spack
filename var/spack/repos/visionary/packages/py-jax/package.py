@@ -7,7 +7,7 @@
 from spack.package import *
 
 
-# VISIONS: based on spack/0.20.0
+# VISIONS: based on spack/0.21.0
 class PyJax(PythonPackage):
     """JAX is Autograd and XLA, brought together for high-performance
     machine learning research. With its updated version of Autograd,

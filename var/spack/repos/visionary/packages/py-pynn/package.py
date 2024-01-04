@@ -6,7 +6,7 @@
 from spack.package import *
 
 
-# VISIONS: based on spack/0.20.0
+# VISIONS: based on spack/0.21.0
 class PyPynn(PythonPackage):
     """A Python package for simulator-independent specification of neuronal
     network models

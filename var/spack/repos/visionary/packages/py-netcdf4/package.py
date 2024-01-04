@@ -6,7 +6,7 @@
 from spack.package import *
 
 
-# VISIONS: based on spack/0.20.0
+# VISIONS: based on spack/0.21.0
 class PyNetcdf4(PythonPackage):
     """Python interface to the netCDF Library."""
 

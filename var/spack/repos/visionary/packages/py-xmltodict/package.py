@@ -6,7 +6,7 @@
 from spack.package import *
 
 
-# VISIONS: based on spack/0.20.0
+# VISIONS: based on spack/0.21.0
 class PyXmltodict(PythonPackage):
     """xmltodict is a Python module that makes working with XML feel like
     you are working with JSON."""

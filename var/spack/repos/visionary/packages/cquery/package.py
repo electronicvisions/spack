@@ -6,7 +6,7 @@
 from spack.package import *
 
 
-# VISIONS: based on spack/0.20.0
+# VISIONS: based on spack/0.21.0
 class Cquery(CMakePackage):
     """a C++ header-only library for Nearest Neighbor (NN) search wih KD-trees."""
 

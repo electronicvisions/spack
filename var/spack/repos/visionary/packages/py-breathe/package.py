@@ -6,7 +6,7 @@
 from spack.package import *
 
 
-# VISIONS: based on spack/0.20.0
+# VISIONS: based on spack/0.21.0
 class PyBreathe(PythonPackage):
     """This is an extension to reStructuredText and Sphinx to be able to read
     and render the Doxygen xml output."""

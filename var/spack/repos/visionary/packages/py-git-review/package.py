@@ -6,7 +6,7 @@
 from spack.package import *
 
 
-# VISIONS: based-on spack/0.20.0
+# VISIONS: based-on spack/0.21.0
 class PyGitReview(PythonPackage):
     """git-review is a tool that helps submitting git branches to gerrit"""
 
