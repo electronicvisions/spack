@@ -6,7 +6,7 @@
 from spack.package import *
 
 
-# VISIONS: based on spack/0.20.0
+# VISIONS: based on spack/0.21.0
 class Mosh(AutotoolsPackage):
     """Remote terminal application that allows roaming, supports intermittent
     connectivity, and provides intelligent local echo and line editing of user
@@ -26,7 +26,7 @@ class Mosh(AutotoolsPackage):
     depends_on("protobuf@:3.21")
     # end VISIONS
     depends_on("ncurses")
-    depends_on("zlib")
+    depends_on("zlib-api")
     depends_on("openssl")
 
     depends_on("pkgconfig", type="build")
