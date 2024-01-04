@@ -6,6 +6,7 @@ from spack.package import *
 
 
 # VISIONS: based on spack/0.20.0
+# Note (JJK): Newer versions fail since a protobuf Header is not found
 class Grpc(CMakePackage):
     """A high performance, open-source universal RPC framework."""
 
