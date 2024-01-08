@@ -36,7 +36,7 @@ packages:
     - spec: libusb@1.0.22
       prefix: /usr
   llvm:
-    version: [11.1.0]
+    require: "@11.1.0"
     variants: [~shared_libs+visionary+python libcxx=none build_type=Release]
   mesa:
     # mesa via ghostscript -> libepoxy+glx, but doesn't build with llvm@11.1.0
