@@ -15,9 +15,7 @@ class VisionarySlurmviz(BundlePackage):
 
     # OJB (2018-08-07): taken from slurm package, default values ajdusted
     # from False to True for all variants
-    variant('gtk', default=True, description='Enable GTK+ support')
     variant('mariadb', default=True, description='Use MariaDB instead of MySQL')
-
     variant('hwloc', default=True, description='Enable hwloc support')
     variant('hdf5', default=True, description='Enable hdf5 support')
     variant('readline', default=True, description='Enable readline support')
@@ -38,7 +36,7 @@ class VisionarySlurmviz(BundlePackage):
     depends_on('readline', when='+readline')
     depends_on('zlib')
 
-    depends_on('gtkplus', when='+gtk')
+    depends_on('gtkplus@2')
     depends_on('hdf5', when='+hdf5')
     # currently there is no support for hwloc 2.0+ in slurm-17.11 it seems
     depends_on('hwloc@:1.999.999', when='+hwloc')
