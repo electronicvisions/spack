@@ -40,7 +40,7 @@ class VisionaryDlsCore(BundlePackage):
     depends_on('py-matplotlib@3:')
     depends_on('py-networkx')
     depends_on('py-nose')
-    depends_on('py-nose2')  # we want to switch from nsoe to nose2 -> remove nose once switch is complete
+    depends_on('py-pytest')  # we want to switch from nose to pytest -> remove nose once switch is complete
     depends_on('py-numpy')
     depends_on('py-optax')
     depends_on('py-pybind11')
