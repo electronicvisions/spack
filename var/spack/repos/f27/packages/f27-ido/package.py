@@ -14,7 +14,7 @@ class F27Ido(BundlePackage):
     depends_on('fftw@3.3.9:+openmp')
     depends_on('libconfig@1.7.2:')
     depends_on('tclap@1.2.2:')
-    depends_on('eigen')
+    depends_on('eigen@:3.3') # 3.4 breaks things?
     depends_on('cuda@11')
     depends_on('gsl')
     depends_on('boost')
