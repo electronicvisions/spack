@@ -39,8 +39,7 @@ class VisionaryDlsCore(BundlePackage):
     depends_on('py-jax@0.4.13') # later requires python@3.9; `^py-jaxlib +cuda cuda_arch=61,80,86` does not work for v0.21.0 -> specify in py-jax/package.py
     depends_on('py-matplotlib@3:')
     depends_on('py-networkx')
-    depends_on('py-nose')
-    depends_on('py-pytest')  # we want to switch from nose to pytest -> remove nose once switch is complete
+    depends_on('py-pytest')
     depends_on('py-numpy')
     depends_on('py-optax')
     depends_on('py-pybind11')

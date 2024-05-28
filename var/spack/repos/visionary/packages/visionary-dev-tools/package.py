@@ -59,8 +59,6 @@ class VisionaryDevTools(BundlePackage):
     depends_on('py-junit-xml')
     depends_on('py-language-server')
     depends_on('py-line-profiler')
-    depends_on('py-nose')
-    depends_on('py-nose2')
     depends_on('py-memory-profiler')
     depends_on('py-pudb')
     depends_on('py-pylint@:1.999.999', when="^python@:2.999.999")
