@@ -596,7 +596,9 @@ class YamlFilesystemView(FilesystemView):
 
         tree = LinkTree(src)
         # there should be no conflicts when linking the meta folder
-        tree.merge(tgt, link=self.link)
+        # begin VISIONS (modified): forward ignore_conflicts
+        tree.merge(tgt, link=self.link, ignore_conflicts=self.ignore_conflicts)
+        # end VISIONS
 
     def print_conflict(self, spec_active, spec_specified, level="error"):
         "Singular print function for spec conflicts."
