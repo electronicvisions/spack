@@ -1,0 +1,48 @@
+diff -pur spack-src/src/Makefile_obj.in spack-src-new/src/Makefile_obj.in
+--- spack-src/src/Makefile_obj.in	2024-04-05 11:52:00.000000000 +0200
++++ spack-src-new/src/Makefile_obj.in	2024-09-25 11:27:06.797009736 +0200
+@@ -357,27 +357,27 @@ V3Number_test: V3Number_test.o
+ .SECONDARY:
+ 
+ %.gch: %
+-	$(OBJCACHE) ${CXX} ${CXXFLAGS} ${CPPFLAGSWALL} ${CFG_CXXFLAGS_PCH} $< -o $@
++	${CXX} ${CXXFLAGS} ${CPPFLAGSWALL} ${CFG_CXXFLAGS_PCH} $< -o $@
+ %.o: %.cpp
+-	$(OBJCACHE) ${CXX} ${CXXFLAGS} ${CPPFLAGSWALL} -c $< -o $@
++	${CXX} ${CXXFLAGS} ${CPPFLAGSWALL} -c $< -o $@
+ %.o: %.c
+-	$(OBJCACHE) ${CC}  ${CFLAGS} ${CPPFLAGSWALL} -c $< -o $@
++	${CC}  ${CFLAGS} ${CPPFLAGSWALL} -c $< -o $@
+ 
+ V3ParseLex.o: V3ParseLex.cpp V3Lexer.yy.cpp V3ParseBison.c
+-	$(OBJCACHE) ${CXX} ${CXXFLAGS} ${CPPFLAGSPARSER} -c $< -o $@
++	${CXX} ${CXXFLAGS} ${CPPFLAGSPARSER} -c $< -o $@
+ 
+ V3ParseGrammar.o: V3ParseGrammar.cpp V3ParseBison.c
+-	$(OBJCACHE) ${CXX} ${CXXFLAGS} ${CPPFLAGSPARSER} -c $< -o $@
++	${CXX} ${CXXFLAGS} ${CPPFLAGSPARSER} -c $< -o $@
+ 
+ V3ParseImp.o: V3ParseImp.cpp V3ParseBison.c
+-	$(OBJCACHE) ${CXX} ${CXXFLAGS} ${CPPFLAGSPARSER} -c $< -o $@
++	${CXX} ${CXXFLAGS} ${CPPFLAGSPARSER} -c $< -o $@
+ 
+ V3PreProc.o: V3PreProc.cpp V3PreLex.yy.cpp
+-	$(OBJCACHE) ${CXX} ${CXXFLAGS} ${CPPFLAGSPARSER} -c $< -o $@
++	${CXX} ${CXXFLAGS} ${CPPFLAGSPARSER} -c $< -o $@
+ 
+ define CXX_ASTMT_template
+ $(1): $(basename $(1)).cpp V3PchAstMT.h.gch
+-	$(OBJCACHE) ${CXX} ${CXXFLAGS} ${CPPFLAGSWALL} ${CFG_CXXFLAGS_PCH_I} V3PchAstMT.h${CFG_GCH_IF_CLANG} -c $(srcdir)/$(basename $(1)).cpp -o $(1)
++	${CXX} ${CXXFLAGS} ${CPPFLAGSWALL} ${CFG_CXXFLAGS_PCH_I} V3PchAstMT.h${CFG_GCH_IF_CLANG} -c $(srcdir)/$(basename $(1)).cpp -o $(1)
+ 
+ endef
+ 
+@@ -385,7 +385,7 @@ $(foreach obj,$(RAW_OBJS_PCH_ASTMT),$(ev
+ 
+ define CXX_ASTNOMT_template
+ $(1): $(basename $(1)).cpp V3PchAstNoMT.h.gch
+-	$(OBJCACHE) ${CXX} ${CXXFLAGS} ${CPPFLAGSWALL} ${CFG_CXXFLAGS_PCH_I} V3PchAstNoMT.h${CFG_GCH_IF_CLANG} -c $(srcdir)/$(basename $(1)).cpp -o $(1)
++	${CXX} ${CXXFLAGS} ${CPPFLAGSWALL} ${CFG_CXXFLAGS_PCH_I} V3PchAstNoMT.h${CFG_GCH_IF_CLANG} -c $(srcdir)/$(basename $(1)).cpp -o $(1)
+ 
+ endef
+ 
