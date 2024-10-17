@@ -291,6 +291,7 @@ fi
 # Finish setting up the mode.
 if [ -z "$mode" ]; then
     mode=ccld
+    prev_arg=""
     for arg in "$@"; do
         if [ "$arg" = "-E" ]; then
             mode=cpp
@@ -302,6 +303,17 @@ if [ -z "$mode" ]; then
             mode=cc
             break
         fi
+        if [ "$prev_arg" = "-o" ]; then
+            # Rudimentary check to see if this compilation is intended to produce
+            # a precompiled header. This is not guaranteed to always succeed -
+            # see #8640
+            #if [[ "$arg" == *".pch" ]] || [[ "$arg" == *".gch" ]]; then
+            if [[ "$arg" == *".gch" ]]; then
+                mode=cpp
+                break
+            fi
+        fi
+        prev_arg="$arg"
     done
 fi
 
@@ -968,4 +980,5 @@ fi
 
 # Execute the full command, preserving spaces with IFS set
 # to the alarm bell separator.
+set -x
 IFS="$lsep"; exec $full_command_list
