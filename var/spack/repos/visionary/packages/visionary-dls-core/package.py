@@ -40,6 +40,7 @@ class VisionaryDlsCore(BundlePackage):
     depends_on('py-matplotlib@3:')
     depends_on('py-networkx')
     depends_on('py-pytest')
+    depends_on('py-nir')
     depends_on('py-numpy')
     depends_on('py-optax')
     depends_on('py-pybind11')
