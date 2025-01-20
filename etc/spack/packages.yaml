@@ -1,7 +1,7 @@
 packages:
   all:
     # AMTHosts
-    require: 'target=sandybridge'
+    require: 'target=x86_64_v2'
     providers:
       mpi: [openmpi, mpich]
       blas: [openblas]
