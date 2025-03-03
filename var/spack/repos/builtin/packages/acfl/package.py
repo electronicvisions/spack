@@ -31,64 +31,99 @@ _os_map = {
     "rhel8": "RHEL-8",
     "rhel9": "RHEL-9",
     "rocky8": "RHEL-8",
+    "rocky9": "RHEL-9",
     "amzn2": "AmazonLinux-2",
     "amzn2023": "AmazonLinux-2023",
 }
 
 _versions = {
-    "23.04": {
+    "23.10": {
         "RHEL-7": (
-            "6526218484e87c195c1145f60536552fabbd25ba98c05cf096f54de18381a422",
-            "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/23-04/arm-compiler-for-linux_23.04_RHEL-7_aarch64.tar",
+            "c3bd4df3e5f6c97369237b0067e0a421dceb9c167d73f22f3da87f5025258314",
+            "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/23-10/arm-compiler-for-linux_23.10_RHEL-7_aarch64.tar",
         ),
         "RHEL-8": (
-            "e658c9d85693cc818f2be9942d8aa71465a84e00046d6f8da72c46a76cc8a747",
-            "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/23-04/arm-compiler-for-linux_23.04_RHEL-8_aarch64.tar",
+            "2aea8890a0c0f60bbcc5ddb043d13bd7cd10501218b04cbeb19129449e7d7053",
+            "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/23-10/arm-compiler-for-linux_23.10_RHEL-8_aarch64.tar",
         ),
         "RHEL-9": (
-            "b71431a16e09ae910737f920aab9c720b5ec83586dba8041b0daa45fa13521d1",
-            "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/23-04/arm-compiler-for-linux_23.04_RHEL-9_aarch64.tar",
+            "6c5c63c701875da7e87c6362be189bcbfaad678c08b81ec91e1e0252a321fae7",
+            "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/23-10/arm-compiler-for-linux_23.10_RHEL-9_aarch64.tar",
         ),
         "SLES-15": (
-            "5dc880272942f5ac2cad7556bdbdf177b62a0736061c1acb1c80ca51ccaba3be",
-            "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/23-04/arm-compiler-for-linux_23.04_SLES-15_aarch64.tar",
+            "e1e62544210bae495cd2503ef280a748fda637c373f1eb76f5ff30c9ec92c4c1",
+            "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/23-10/arm-compiler-for-linux_23.10_SLES-15_aarch64.tar",
         ),
         "Ubuntu-20.04": (
-            "a0b3bcec541a1e78b1a48d6fa876cc0ef2846f40219c95c60ab9852882ee05d2",
-            "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/23-04/arm-compiler-for-linux_23.04_Ubuntu-20.04_aarch64.tar",
+            "83dce8ea03de3b9b937ecfc611961a8e4d15eba4c267a4e47e22a876e403da96",
+            "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/23-10/arm-compiler-for-linux_23.10_Ubuntu-20.04_aarch64.tar",
         ),
         "Ubuntu-22.04": (
-            "10cf29da14830b3a9f0f51cda893e4255ffd1093297a71886865f97958d100f7",
-            "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/23-04/arm-compiler-for-linux_23.04_Ubuntu-22.04_aarch64.tar",
+            "3354f0ab73856a8a5cd99364cbec7a6b22621701790cb36c3e5f756b363e6d43",
+            "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/23-10/arm-compiler-for-linux_23.10_Ubuntu-22.04_aarch64.tar",
         ),
         "AmazonLinux-2": (
-            "65637a34abd076906bcbd56f2a7861ec873bc8d62e321217ade6008939a0bf6b",
-            "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/23-04/arm-compiler-for-linux_23.04_AmazonLinux-2_aarch64.tar",
+            "ee4fa47246f16323d05d91135ef70a8c355ff60209307754b8532b5744d9cfe9",
+            "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/23-10/arm-compiler-for-linux_23.10_AmazonLinux-2_aarch64.tar",
         ),
         "AmazonLinux-2023": (
-            "415f8e908baf550e92ef21d4146904fac0a339132cb7921b4046e47ac71cf4c9",
-            "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/23-04/arm-compiler-for-linux_23.04_AmazonLinux-2023_aarch64.tar",
+            "640487dfc7ab6eca48b448264013c9aa972b84af9f0c6fc8734fa5e8dc008e43",
+            "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/23-10/arm-compiler-for-linux_23.10_AmazonLinux-2023_aarch64.tar",
+        ),
+    },
+    "23.04.1": {
+        "RHEL-7": (
+            "5e84daaf0510f73c235723112f9241bbd744ed89eb4f70f089bac05cf2aad2c4",
+            "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/23-04-1/arm-compiler-for-linux_23.04.1_RHEL-7_aarch64.tar",
+        ),
+        "RHEL-8": (
+            "6ec1f2c7338ea8a2831a7ff353ab44f87804f56716d1f3686576fb950c2f730f",
+            "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/23-04-1/arm-compiler-for-linux_23.04.1_RHEL-8_aarch64.tar",
+        ),
+        "RHEL-9": (
+            "dbd6493ea762b9b4c6cb54a76ad42e2223360882165ee3c223c1b7d1ebe927e2",
+            "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/23-04-1/arm-compiler-for-linux_23.04.1_RHEL-9_aarch64.tar",
+        ),
+        "SLES-15": (
+            "74c29890d47556114922c77e5a9797b055f8fe49f0c8665d17102465fca766b4",
+            "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/23-04-1/arm-compiler-for-linux_23.04.1_SLES-15_aarch64.tar",
+        ),
+        "Ubuntu-20.04": (
+            "78015ff5a246facfe45219a03a3774221b2f3b58db6fa3d9840d2574d103310c",
+            "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/23-04-1/arm-compiler-for-linux_23.04.1_Ubuntu-20.04_aarch64.tar",
+        ),
+        "Ubuntu-22.04": (
+            "19213db67aa11de44b617255e9e32efd294f930c6b6145192acf9ee331452ea6",
+            "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/23-04-1/arm-compiler-for-linux_23.04.1_Ubuntu-22.04_aarch64.tar",
+        ),
+        "AmazonLinux-2": (
+            "31ba559302a2889e5f0897f1c07563b20a5a8eaa671e623bef406b6490d1f4f2",
+            "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/23-04-1/arm-compiler-for-linux_23.04.1_AmazonLinux-2_aarch64.tar",
+        ),
+        "AmazonLinux-2023": (
+            "fa38f3d79775e9a537c59c8ba39c3b10505e895a3602bbd93c09445170db571f",
+            "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/23-04-1/arm-compiler-for-linux_23.04.1_AmazonLinux-2023_aarch64.tar",
         ),
     },
     "22.1": {
         "RHEL-7": (
-            "bfbfef9099bf0e90480d48b3a1a741d583fc939284f869958e9c09e177098c73",
+            "367b9a60fa13b5fcf2fa787122c12d4bfb14d6f3e3e7b0460efc7627484a56a4",
             "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/22-1/arm-compiler-for-linux_22.1_RHEL-7_aarch64.tar",
         ),
         "RHEL-8": (
-            "28116f6030c95ee8f69eba89023966974d6b44d4a686098f5c3c03e34f7495f6",
+            "f03ad3381a74df73a4c25baf5f1c15bd466cfd6286498c38b37ddeaa85c9965e",
             "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/22-1/arm-compiler-for-linux_22.1_RHEL-8_aarch64.tar",
         ),
         "SLES-15": (
-            "6616dba1af4a73300ce822b645a0f1dfd363f507db5ea44cab1c6051ea388554",
+            "8a1c5bd570bd195982c342da8dafb7075f8f6b373b44539d4c810e69e8157c1f",
             "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/22-1/arm-compiler-for-linux_22.1_SLES-15_aarch64.tar",
         ),
         "Ubuntu-18.04": (
-            "3b3dd6f416299fbd14fbaf0b1bddf7e2f4445a186de7a87e9efdae0b9d0dc3d5",
+            "4628599d389efcee07d0986cc3e791931e6a37eddb6e4b93c7846e17efe2148f",
             "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/22-1/arm-compiler-for-linux_22.1_Ubuntu-18.04_aarch64.tar",
         ),
         "Ubuntu-20.04": (
-            "e6361a08f75817c8dbfb56dc72578810eaf5ffb65591215e394cb3ec6bdd9c10",
+            "20d950d16e6bb0b3a4c4f3c8ad393aae2356d4c998303b319da9e9833d4a6d12",
             "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/22-1/arm-compiler-for-linux_22.1_Ubuntu-20.04_aarch64.tar",
         ),
     },
@@ -184,8 +219,7 @@ def get_acfl_prefix(spec):
         )
     else:
         return join_path(
-            spec.prefix,
-            "arm-linux-compiler-{0}_{1}".format(spec.version, get_os(spec.version.string)),
+            spec.prefix, f"arm-linux-compiler-{spec.version}_{get_os(spec.version.string)}"
         )
 
 
@@ -199,8 +233,8 @@ class Acfl(Package):
     with a modern LLVM-based compiler framework.
     """
 
-    homepage = "https://developer.arm.com/tools-and-software/server-and-hpc/arm-allinea-studio"
-    url = "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/22-1/arm-compiler-for-linux_22.1_Ubuntu-20.04_aarch64.tar"
+    homepage = "https://developer.arm.com/Tools%20and%20Software/Arm%20Compiler%20for%20Linux"
+    url = "https://developer.arm.com/-/media/Files/downloads/hpc/arm-compiler-for-linux/23-10/arm-compiler-for-linux_23.10_Ubuntu-22.04_aarch64.tar"
 
     maintainers("annop-w")
 
@@ -237,7 +271,7 @@ class Acfl(Package):
     # Run the installer with the desired install directory
     def install(self, spec, prefix):
         exe = Executable(
-            "./arm-compiler-for-linux_{0}_{1}.sh".format(spec.version, get_os(spec.version.string))
+            f"./arm-compiler-for-linux_{spec.version}_{get_os(spec.version.string)}.sh"
         )
         exe("--accept", "--force", "--install-to", prefix)
 

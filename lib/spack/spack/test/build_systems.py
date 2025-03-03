@@ -5,10 +5,11 @@
 
 import glob
 import os
-import sys
 
 import py.path
 import pytest
+
+import archspec.cpu
 
 import llnl.util.filesystem as fs
 
@@ -22,8 +23,6 @@ from spack.spec import Spec
 from spack.util.executable import which
 
 DATA_PATH = os.path.join(spack.paths.test_path, "data")
-
-pytestmark = pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
 
 
 @pytest.fixture()
@@ -45,8 +44,9 @@ def test_dir(tmpdir):
     return _func
 
 
+@pytest.mark.not_on_windows("make not available on Windows")
 @pytest.mark.usefixtures("config", "mock_packages", "working_env")
-class TestTargets(object):
+class TestTargets:
     @pytest.mark.parametrize(
         "input_dir", glob.iglob(os.path.join(DATA_PATH, "make", "affirmative", "*"))
     )
@@ -93,10 +93,11 @@ class TestTargets(object):
             s.package._if_ninja_target_execute("check")
 
 
+@pytest.mark.not_on_windows("autotools not available on windows")
 @pytest.mark.usefixtures("config", "mock_packages")
-class TestAutotoolsPackage(object):
+class TestAutotoolsPackage:
     def test_with_or_without(self, default_mock_concretization):
-        s = default_mock_concretization("a")
+        s = default_mock_concretization("pkg-a")
         options = s.package.with_or_without("foo")
 
         # Ensure that values that are not representing a feature
@@ -128,7 +129,7 @@ class TestAutotoolsPackage(object):
         assert "--without-lorem-ipsum" in options
 
     def test_none_is_allowed(self, default_mock_concretization):
-        s = default_mock_concretization("a foo=none")
+        s = default_mock_concretization("pkg-a foo=none")
         options = s.package.with_or_without("foo")
 
         # Ensure that values that are not representing a feature
@@ -210,6 +211,9 @@ class TestAutotoolsPackage(object):
             assert "gnuconfig version of config.guess" not in f.read()
 
     @pytest.mark.disable_clean_stage_check
+    @pytest.mark.skipif(
+        str(archspec.cpu.host().family) != "x86_64", reason="test data is specific for x86_64"
+    )
     def test_autotools_gnuconfig_replacement_no_gnuconfig(self, mutable_database, monkeypatch):
         """
         Tests whether a useful error message is shown when patch_config_files is
@@ -257,7 +261,7 @@ spack:
 
 
 @pytest.mark.usefixtures("config", "mock_packages")
-class TestCMakePackage(object):
+class TestCMakePackage:
     def test_cmake_std_args(self, default_mock_concretization):
         # Call the function on a CMakePackage instance
         s = default_mock_concretization("cmake-client")
@@ -311,9 +315,19 @@ class TestCMakePackage(object):
         with pytest.raises(KeyError, match="not a variant"):
             s.package.define_from_variant("NONEXISTENT")
 
+    def test_cmake_std_args_cuda(self, default_mock_concretization):
+        s = default_mock_concretization("vtk-m +cuda cuda_arch=70 ^cmake@3.23")
+        option = spack.build_systems.cmake.CMakeBuilder.define_cuda_architectures(s.package)
+        assert "-DCMAKE_CUDA_ARCHITECTURES:STRING=70" == option
+
+    def test_cmake_std_args_hip(self, default_mock_concretization):
+        s = default_mock_concretization("vtk-m +rocm amdgpu_target=gfx900 ^cmake@3.23")
+        option = spack.build_systems.cmake.CMakeBuilder.define_hip_architectures(s.package)
+        assert "-DCMAKE_HIP_ARCHITECTURES:STRING=gfx900" == option
+
 
 @pytest.mark.usefixtures("config", "mock_packages")
-class TestDownloadMixins(object):
+class TestDownloadMixins:
     """Test GnuMirrorPackage, SourceforgePackage, SourcewarePackage and XorgPackage."""
 
     @pytest.mark.parametrize(

@@ -22,8 +22,6 @@ class Fplo(MakefilePackage):
     url = "file://{0}/FPLO22.00-62.tar.gz".format(os.getcwd())
     manual_download = True
 
-    maintainers("glennpj")
-
     version("22.00-62", sha256="0d1d4e9c1e8e41900901e26c3cd08ee39dcfdeb3f2c4c8862055eaf704b6d69e")
 
     # TODO: Try to get LAPACK to work with something other than MKL. The build
@@ -85,7 +83,7 @@ class Fplo(MakefilePackage):
         filter_file(r"^\s*F90\s*=.*", "F90=" + spack_fc, *files)
 
         # patch for 64 bit integers
-        if "^mkl+ilp64" in spec:
+        if spec["mkl"].satisfies("+ilp64"):
             setuphelper = FileFilter(join_path(self.build_directory, "PYTHON", "setuphelper.py"))
             setuphelper.filter("mkl 64bit integer 32bit", "mkl 64bit integer 64bit")
 

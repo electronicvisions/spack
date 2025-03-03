@@ -10,6 +10,7 @@ import spack.cmd.common.arguments as arguments
 import spack.config
 import spack.environment as ev
 import spack.repo
+import spack.traverse
 
 description = "fetch archives for packages"
 section = "build"
@@ -42,6 +43,13 @@ def setup_parser(subparser):
 
 
 def fetch(parser, args):
+    if args.no_checksum:
+        spack.config.set("config:checksum", False, scope="command_line")
+
+    if args.deprecated:
+        spack.config.set("config:deprecated", True, scope="command_line")
+
+
     # begin VISIONS (added)
     specs = []
     # end VISIONS
@@ -74,26 +82,23 @@ def fetch(parser, args):
             else:
                 specs = env.all_specs()
             if specs == []:
-                tty.die(
-                    "No uninstalled specs in environment. Did you " "run `spack concretize` yet?"
-                )
+                tty.die("No uninstalled specs in environment. Did you run `spack concretize` yet?")
         else:
             # begin VISIONS (modified)
             tty.die("fetch requires at least one package argument or specfile")
             # end VISIONS
 
-    if args.no_checksum:
-        spack.config.set("config:checksum", False, scope="command_line")
+    if args.dependencies or args.missing:
+        to_be_fetched = spack.traverse.traverse_nodes(specs, key=spack.traverse.by_dag_hash)
+    else:
+        to_be_fetched = specs
 
-    if args.deprecated:
-        spack.config.set("config:deprecated", True, scope="command_line")
+    for spec in to_be_fetched:
+        if args.missing and spec.installed:
+            continue
 
-    for spec in specs:
-        if args.missing or args.dependencies:
-            for s in spec.traverse(root=False):
-                # Skip already-installed packages with --missing
-                if args.missing and s.installed:
-                    continue
+        pkg = spec.package
 
-                s.package.do_fetch()
-        spec.package.do_fetch()
+        pkg.stage.keep = True
+        with pkg.stage:
+            pkg.do_fetch()

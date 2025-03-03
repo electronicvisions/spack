@@ -3,11 +3,16 @@
 %
 % SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
+%=============================================================================
 % OS compatibility rules for reusing solves.
 % os_compatible(RecentOS, OlderOS)
 % OlderOS binaries can be used on RecentOS
+%=============================================================================
 
 % macOS
+os_compatible("sequoia", "sonoma").
+os_compatible("sonoma", "ventura").
+os_compatible("ventura", "monterey").
 os_compatible("monterey", "bigsur").
 os_compatible("bigsur", "catalina").
 

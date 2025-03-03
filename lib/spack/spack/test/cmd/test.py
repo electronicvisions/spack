@@ -5,16 +5,19 @@
 
 import argparse
 import os
-import sys
 
 import pytest
 
 from llnl.util.filesystem import copy_tree
 
+import spack.cmd.common.arguments
 import spack.cmd.install
+import spack.cmd.test
 import spack.config
+import spack.install_test
 import spack.package_base
 import spack.paths
+import spack.spec
 import spack.store
 from spack.install_test import TestStatus
 from spack.main import SpackCommand
@@ -22,7 +25,7 @@ from spack.main import SpackCommand
 install = SpackCommand("install")
 spack_test = SpackCommand("test")
 
-pytestmark = pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
+pytestmark = pytest.mark.not_on_windows("does not run on windows")
 
 
 def test_test_package_not_installed(

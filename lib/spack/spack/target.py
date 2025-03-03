@@ -32,7 +32,7 @@ def _ensure_other_is_target(method):
     return _impl
 
 
-class Target(object):
+class Target:
     def __init__(self, name, module_name=None):
         """Target models microarchitectures and their compatibility.
 
@@ -102,7 +102,10 @@ class Target(object):
         if self.microarchitecture.vendor == "generic":
             return str(self)
 
-        return syaml.syaml_dict(self.microarchitecture.to_dict(return_list_of_items=True))
+        # Get rid of compiler flag information before turning the uarch into a dict
+        uarch_dict = self.microarchitecture.to_dict()
+        uarch_dict.pop("compilers", None)
+        return syaml.syaml_dict(uarch_dict.items())
 
     def __repr__(self):
         cls_name = self.__class__.__name__

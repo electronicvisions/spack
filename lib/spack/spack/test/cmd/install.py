@@ -7,8 +7,8 @@ import builtins
 import filecmp
 import itertools
 import os
+import pathlib
 import re
-import sys
 import time
 
 import pytest
@@ -23,6 +23,7 @@ import spack.config
 import spack.environment as ev
 import spack.hash_types as ht
 import spack.package_base
+import spack.store
 import spack.util.executable
 from spack.error import SpackError
 from spack.main import SpackCommand
@@ -36,8 +37,6 @@ mirror = SpackCommand("mirror")
 uninstall = SpackCommand("uninstall")
 buildcache = SpackCommand("buildcache")
 find = SpackCommand("find")
-
-pytestmark = pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
 
 
 @pytest.fixture()
@@ -89,7 +88,7 @@ def test_install_runtests_all(monkeypatch, mock_packages, install_mockery):
         assert pkg.run_tests
 
     monkeypatch.setattr(spack.package_base.PackageBase, "unit_test_check", check)
-    install("--test=all", "a")
+    install("--test=all", "pkg-a")
 
 
 def test_install_package_already_installed(
@@ -203,7 +202,7 @@ def test_show_log_on_error(
     assert isinstance(install.error, spack.build_environment.ChildError)
     assert install.error.pkg.name == "build-error"
 
-    assert "==> Installing build-error" in out
+    assert "Installing build-error" in out
     assert "See build log for details:" in out
 
 
@@ -216,7 +215,9 @@ def test_install_overwrite(mock_packages, mock_archive, mock_fetch, config, inst
 
     # Ignore manifest and install times
     manifest = os.path.join(
-        spec.prefix, spack.store.layout.metadata_dir, spack.store.layout.manifest_file_name
+        spec.prefix,
+        spack.store.STORE.layout.metadata_dir,
+        spack.store.STORE.layout.manifest_file_name,
     )
     ignores = [manifest, spec.package.times_log_path]
 
@@ -260,9 +261,9 @@ def test_install_commit(mock_git_version_info, install_mockery, mock_packages, m
 
     """
     repo_path, filename, commits = mock_git_version_info
-    monkeypatch.setattr(
-        spack.package_base.PackageBase, "git", "file://%s" % repo_path, raising=False
-    )
+    file_url = pathlib.Path(repo_path).as_uri()
+
+    monkeypatch.setattr(spack.package_base.PackageBase, "git", file_url, raising=False)
 
     # Use the earliest commit in the respository
     spec = Spec(f"git-test-commit@{commits[-1]}").concretized()
@@ -291,7 +292,9 @@ def test_install_overwrite_multiple(
     install("cmake")
 
     ld_manifest = os.path.join(
-        libdwarf.prefix, spack.store.layout.metadata_dir, spack.store.layout.manifest_file_name
+        libdwarf.prefix,
+        spack.store.STORE.layout.metadata_dir,
+        spack.store.STORE.layout.manifest_file_name,
     )
 
     ld_ignores = [ld_manifest, libdwarf.package.times_log_path]
@@ -300,7 +303,9 @@ def test_install_overwrite_multiple(
     expected_libdwarf_md5 = fs.hash_directory(libdwarf.prefix, ignore=ld_ignores)
 
     cm_manifest = os.path.join(
-        cmake.prefix, spack.store.layout.metadata_dir, spack.store.layout.manifest_file_name
+        cmake.prefix,
+        spack.store.STORE.layout.metadata_dir,
+        spack.store.STORE.layout.manifest_file_name,
     )
 
     cm_ignores = [cm_manifest, cmake.package.times_log_path]
@@ -512,7 +517,7 @@ def test_extra_files_are_archived(
 
     install("archive-files")
 
-    archive_dir = os.path.join(spack.store.layout.metadata_path(s), "archived-files")
+    archive_dir = os.path.join(spack.store.STORE.layout.metadata_path(s), "archived-files")
     config_log = os.path.join(archive_dir, mock_archive.expanded_archive_basedir, "config.log")
     assert os.path.exists(config_log)
 
@@ -541,6 +546,7 @@ def test_cdash_report_concretization_error(
             assert any(x in content for x in expected_messages)
 
 
+@pytest.mark.not_on_windows("Windows log_output logs phase header out of order")
 @pytest.mark.disable_clean_stage_check
 def test_cdash_upload_build_error(tmpdir, mock_fetch, install_mockery, capfd):
     # capfd interferes with Spack's capturing
@@ -564,61 +570,58 @@ def test_cdash_upload_build_error(tmpdir, mock_fetch, install_mockery, capfd):
 @pytest.mark.disable_clean_stage_check
 def test_cdash_upload_clean_build(tmpdir, mock_fetch, install_mockery, capfd):
     # capfd interferes with Spack's capturing of e.g., Build.xml output
-    with capfd.disabled():
-        with tmpdir.as_cwd():
-            install("--log-file=cdash_reports", "--log-format=cdash", "a")
-            report_dir = tmpdir.join("cdash_reports")
-            assert report_dir in tmpdir.listdir()
-            report_file = report_dir.join("a_Build.xml")
-            assert report_file in report_dir.listdir()
-            content = report_file.open().read()
-            assert "</Build>" in content
-            assert "<Text>" not in content
+    with capfd.disabled(), tmpdir.as_cwd():
+        install("--log-file=cdash_reports", "--log-format=cdash", "pkg-a")
+        report_dir = tmpdir.join("cdash_reports")
+        assert report_dir in tmpdir.listdir()
+        report_file = report_dir.join("pkg-a_Build.xml")
+        assert report_file in report_dir.listdir()
+        content = report_file.open().read()
+        assert "</Build>" in content
+        assert "<Text>" not in content
 
 
 @pytest.mark.disable_clean_stage_check
 def test_cdash_upload_extra_params(tmpdir, mock_fetch, install_mockery, capfd):
     # capfd interferes with Spack's capture of e.g., Build.xml output
-    with capfd.disabled():
-        with tmpdir.as_cwd():
-            install(
-                "--log-file=cdash_reports",
-                "--log-format=cdash",
-                "--cdash-build=my_custom_build",
-                "--cdash-site=my_custom_site",
-                "--cdash-track=my_custom_track",
-                "a",
-            )
-            report_dir = tmpdir.join("cdash_reports")
-            assert report_dir in tmpdir.listdir()
-            report_file = report_dir.join("a_Build.xml")
-            assert report_file in report_dir.listdir()
-            content = report_file.open().read()
-            assert 'Site BuildName="my_custom_build - a"' in content
-            assert 'Name="my_custom_site"' in content
-            assert "-my_custom_track" in content
+    with capfd.disabled(), tmpdir.as_cwd():
+        install(
+            "--log-file=cdash_reports",
+            "--log-format=cdash",
+            "--cdash-build=my_custom_build",
+            "--cdash-site=my_custom_site",
+            "--cdash-track=my_custom_track",
+            "pkg-a",
+        )
+        report_dir = tmpdir.join("cdash_reports")
+        assert report_dir in tmpdir.listdir()
+        report_file = report_dir.join("pkg-a_Build.xml")
+        assert report_file in report_dir.listdir()
+        content = report_file.open().read()
+        assert 'Site BuildName="my_custom_build - pkg-a"' in content
+        assert 'Name="my_custom_site"' in content
+        assert "-my_custom_track" in content
 
 
 @pytest.mark.disable_clean_stage_check
 def test_cdash_buildstamp_param(tmpdir, mock_fetch, install_mockery, capfd):
     # capfd interferes with Spack's capture of e.g., Build.xml output
-    with capfd.disabled():
-        with tmpdir.as_cwd():
-            cdash_track = "some_mocked_track"
-            buildstamp_format = "%Y%m%d-%H%M-{0}".format(cdash_track)
-            buildstamp = time.strftime(buildstamp_format, time.localtime(int(time.time())))
-            install(
-                "--log-file=cdash_reports",
-                "--log-format=cdash",
-                "--cdash-buildstamp={0}".format(buildstamp),
-                "a",
-            )
-            report_dir = tmpdir.join("cdash_reports")
-            assert report_dir in tmpdir.listdir()
-            report_file = report_dir.join("a_Build.xml")
-            assert report_file in report_dir.listdir()
-            content = report_file.open().read()
-            assert buildstamp in content
+    with capfd.disabled(), tmpdir.as_cwd():
+        cdash_track = "some_mocked_track"
+        buildstamp_format = "%Y%m%d-%H%M-{0}".format(cdash_track)
+        buildstamp = time.strftime(buildstamp_format, time.localtime(int(time.time())))
+        install(
+            "--log-file=cdash_reports",
+            "--log-format=cdash",
+            "--cdash-buildstamp={0}".format(buildstamp),
+            "pkg-a",
+        )
+        report_dir = tmpdir.join("cdash_reports")
+        assert report_dir in tmpdir.listdir()
+        report_file = report_dir.join("pkg-a_Build.xml")
+        assert report_file in report_dir.listdir()
+        content = report_file.open().read()
+        assert buildstamp in content
 
 
 @pytest.mark.disable_clean_stage_check
@@ -626,38 +629,37 @@ def test_cdash_install_from_spec_json(
     tmpdir, mock_fetch, install_mockery, capfd, mock_packages, mock_archive, config
 ):
     # capfd interferes with Spack's capturing
-    with capfd.disabled():
-        with tmpdir.as_cwd():
-            spec_json_path = str(tmpdir.join("spec.json"))
+    with capfd.disabled(), tmpdir.as_cwd():
+        spec_json_path = str(tmpdir.join("spec.json"))
 
-            pkg_spec = Spec("a")
-            pkg_spec.concretize()
+        pkg_spec = Spec("pkg-a")
+        pkg_spec.concretize()
 
-            with open(spec_json_path, "w") as fd:
-                fd.write(pkg_spec.to_json(hash=ht.dag_hash))
+        with open(spec_json_path, "w") as fd:
+            fd.write(pkg_spec.to_json(hash=ht.dag_hash))
 
-            install(
-                "--log-format=cdash",
-                "--log-file=cdash_reports",
-                "--cdash-build=my_custom_build",
-                "--cdash-site=my_custom_site",
-                "--cdash-track=my_custom_track",
-                "-f",
-                spec_json_path,
-            )
+        install(
+            "--log-format=cdash",
+            "--log-file=cdash_reports",
+            "--cdash-build=my_custom_build",
+            "--cdash-site=my_custom_site",
+            "--cdash-track=my_custom_track",
+            "-f",
+            spec_json_path,
+        )
 
-            report_dir = tmpdir.join("cdash_reports")
-            assert report_dir in tmpdir.listdir()
-            report_file = report_dir.join("a_Configure.xml")
-            assert report_file in report_dir.listdir()
-            content = report_file.open().read()
-            install_command_regex = re.compile(
-                r"<ConfigureCommand>(.+)</ConfigureCommand>", re.MULTILINE | re.DOTALL
-            )
-            m = install_command_regex.search(content)
-            assert m
-            install_command = m.group(1)
-            assert "a@" in install_command
+        report_dir = tmpdir.join("cdash_reports")
+        assert report_dir in tmpdir.listdir()
+        report_file = report_dir.join("pkg-a_Configure.xml")
+        assert report_file in report_dir.listdir()
+        content = report_file.open().read()
+        install_command_regex = re.compile(
+            r"<ConfigureCommand>(.+)</ConfigureCommand>", re.MULTILINE | re.DOTALL
+        )
+        m = install_command_regex.search(content)
+        assert m
+        install_command = m.group(1)
+        assert "pkg-a@" in install_command
 
 
 @pytest.mark.disable_clean_stage_check
@@ -699,9 +701,11 @@ def test_cache_only_fails(tmpdir, mock_fetch, install_mockery, capfd):
     assert "was not installed" in out
 
     # Check that failure prefix locks are still cached
-    failure_lock_prefixes = ",".join(spack.store.db._prefix_failures.keys())
-    assert "libelf" in failure_lock_prefixes
-    assert "libdwarf" in failure_lock_prefixes
+    failed_packages = [
+        pkg_name for dag_hash, pkg_name in spack.store.STORE.failure_tracker.locker.locks.keys()
+    ]
+    assert "libelf" in failed_packages
+    assert "libdwarf" in failed_packages
 
 
 def test_install_only_dependencies(tmpdir, mock_fetch, install_mockery):
@@ -738,6 +742,7 @@ def test_install_deps_then_package(tmpdir, mock_fetch, install_mockery):
     assert os.path.exists(root.prefix)
 
 
+@pytest.mark.not_on_windows("Environment views not supported on windows. Revisit after #34701")
 @pytest.mark.regression("12002")
 def test_install_only_dependencies_in_env(
     tmpdir, mock_fetch, install_mockery, mutable_mock_env_path
@@ -786,15 +791,15 @@ def test_install_no_add_in_env(tmpdir, mock_fetch, install_mockery, mutable_mock
     #                 ^libdwarf
     #         ^mpich
     #     libelf@0.8.10
-    #     a~bvv
-    #         ^b
-    #     a
-    #         ^b
+    #     pkg-a~bvv
+    #         ^pkg-b
+    #     pkg-a
+    #         ^pkg-b
     e = ev.create("test", with_view=False)
     e.add("mpileaks")
     e.add("libelf@0.8.10")  # so env has both root and dep libelf specs
-    e.add("a")
-    e.add("a ~bvv")
+    e.add("pkg-a")
+    e.add("pkg-a ~bvv")
     e.concretize()
     e.write()
     env_specs = e.all_specs()
@@ -805,9 +810,9 @@ def test_install_no_add_in_env(tmpdir, mock_fetch, install_mockery, mutable_mock
 
     # First find and remember some target concrete specs in the environment
     for e_spec in env_specs:
-        if e_spec.satisfies(Spec("a ~bvv")):
+        if e_spec.satisfies(Spec("pkg-a ~bvv")):
             a_spec = e_spec
-        elif e_spec.name == "b":
+        elif e_spec.name == "pkg-b":
             b_spec = e_spec
         elif e_spec.satisfies(Spec("mpi")):
             mpi_spec = e_spec
@@ -830,8 +835,8 @@ def test_install_no_add_in_env(tmpdir, mock_fetch, install_mockery, mutable_mock
         assert "You can add specs to the environment with 'spack add " in inst_out
 
         # Without --add, ensure that two packages "a" get installed
-        inst_out = install("a", output=str)
-        assert len([x for x in e.all_specs() if x.installed and x.name == "a"]) == 2
+        inst_out = install("pkg-a", output=str)
+        assert len([x for x in e.all_specs() if x.installed and x.name == "pkg-a"]) == 2
 
         # Install an unambiguous dependency spec (that already exists as a dep
         # in the environment) and make sure it gets installed (w/ deps),
@@ -864,7 +869,7 @@ def test_install_no_add_in_env(tmpdir, mock_fetch, install_mockery, mutable_mock
         # root of the environment as well as installed.
         assert b_spec not in e.roots()
 
-        install("--add", "b")
+        install("--add", "pkg-b")
 
         assert b_spec in e.roots()
         assert b_spec not in e.uninstalled_specs()
@@ -887,7 +892,7 @@ def test_install_help_does_not_show_cdash_options(capsys):
         assert "CDash URL" not in captured.out
 
 
-def test_install_help_cdash(capsys):
+def test_install_help_cdash():
     """Make sure `spack install --help-cdash` describes CDash arguments"""
     install_cmd = SpackCommand("install")
     out = install_cmd("--help-cdash")
@@ -895,40 +900,40 @@ def test_install_help_cdash(capsys):
 
 
 @pytest.mark.disable_clean_stage_check
-def test_cdash_auth_token(tmpdir, mock_fetch, install_mockery, capfd):
+def test_cdash_auth_token(tmpdir, mock_fetch, install_mockery, monkeypatch, capfd):
     # capfd interferes with Spack's capturing
-    with tmpdir.as_cwd():
-        with capfd.disabled():
-            os.environ["SPACK_CDASH_AUTH_TOKEN"] = "asdf"
-            out = install("-v", "--log-file=cdash_reports", "--log-format=cdash", "a")
-            assert "Using CDash auth token from environment" in out
+    with tmpdir.as_cwd(), capfd.disabled():
+        monkeypatch.setenv("SPACK_CDASH_AUTH_TOKEN", "asdf")
+        out = install("-v", "--log-file=cdash_reports", "--log-format=cdash", "pkg-a")
+        assert "Using CDash auth token from environment" in out
 
 
+@pytest.mark.not_on_windows("Windows log_output logs phase header out of order")
 @pytest.mark.disable_clean_stage_check
 def test_cdash_configure_warning(tmpdir, mock_fetch, install_mockery, capfd):
     # capfd interferes with Spack's capturing of e.g., Build.xml output
-    with capfd.disabled():
-        with tmpdir.as_cwd():
-            # Test would fail if install raised an error.
+    with capfd.disabled(), tmpdir.as_cwd():
+        # Test would fail if install raised an error.
 
-            # Ensure that even on non-x86_64 architectures, there are no
-            # dependencies installed
-            spec = spack.spec.Spec("configure-warning").concretized()
-            spec.clear_dependencies()
-            specfile = "./spec.json"
-            with open(specfile, "w") as f:
-                f.write(spec.to_json())
+        # Ensure that even on non-x86_64 architectures, there are no
+        # dependencies installed
+        spec = Spec("configure-warning").concretized()
+        spec.clear_dependencies()
+        specfile = "./spec.json"
+        with open(specfile, "w") as f:
+            f.write(spec.to_json())
 
-            install("--log-file=cdash_reports", "--log-format=cdash", specfile)
-            # Verify Configure.xml exists with expected contents.
-            report_dir = tmpdir.join("cdash_reports")
-            assert report_dir in tmpdir.listdir()
-            report_file = report_dir.join("Configure.xml")
-            assert report_file in report_dir.listdir()
-            content = report_file.open().read()
-            assert "foo: No such file or directory" in content
+        install("--log-file=cdash_reports", "--log-format=cdash", specfile)
+        # Verify Configure.xml exists with expected contents.
+        report_dir = tmpdir.join("cdash_reports")
+        assert report_dir in tmpdir.listdir()
+        report_file = report_dir.join("Configure.xml")
+        assert report_file in report_dir.listdir()
+        content = report_file.open().read()
+        assert "foo: No such file or directory" in content
 
 
+@pytest.mark.not_on_windows("ArchSpec gives test platform debian rather than windows")
 def test_compiler_bootstrap(
     install_mockery_mutable_config,
     mock_packages,
@@ -942,9 +947,10 @@ def test_compiler_bootstrap(
     assert CompilerSpec("gcc@=12.0") not in compilers.all_compiler_specs()
 
     # Test succeeds if it does not raise an error
-    install("a%gcc@=12.0")
+    install("pkg-a%gcc@=12.0")
 
 
+@pytest.mark.not_on_windows("Binary mirrors not supported on windows")
 def test_compiler_bootstrap_from_binary_mirror(
     install_mockery_mutable_config,
     mock_packages,
@@ -966,7 +972,7 @@ def test_compiler_bootstrap_from_binary_mirror(
     install("gcc@=10.2.0")
 
     # Put installed compiler in the buildcache
-    buildcache("push", "-u", "-a", "-f", "-d", mirror_dir.strpath, "gcc@10.2.0")
+    buildcache("push", "-u", "-f", mirror_dir.strpath, "gcc@10.2.0")
 
     # Now uninstall the compiler
     uninstall("-y", "gcc@10.2.0")
@@ -981,10 +987,11 @@ def test_compiler_bootstrap_from_binary_mirror(
     # Now make sure that when the compiler is installed from binary mirror,
     # it also gets configured as a compiler.  Test succeeds if it does not
     # raise an error
-    install("--no-check-signature", "--cache-only", "--only", "dependencies", "b%gcc@=10.2.0")
-    install("--no-cache", "--only", "package", "b%gcc@10.2.0")
+    install("--no-check-signature", "--cache-only", "--only", "dependencies", "pkg-b%gcc@=10.2.0")
+    install("--no-cache", "--only", "package", "pkg-b%gcc@10.2.0")
 
 
+@pytest.mark.not_on_windows("ArchSpec gives test platform debian rather than windows")
 @pytest.mark.regression("16221")
 def test_compiler_bootstrap_already_installed(
     install_mockery_mutable_config,
@@ -1001,7 +1008,7 @@ def test_compiler_bootstrap_already_installed(
 
     # Test succeeds if it does not raise an error
     install("gcc@=12.0")
-    install("a%gcc@=12.0")
+    install("pkg-a%gcc@=12.0")
 
 
 def test_install_fails_no_args(tmpdir):
@@ -1028,6 +1035,7 @@ def test_install_fails_no_args_suggests_env_activation(tmpdir):
     assert "using the `spack.yaml` in this directory" in output
 
 
+@pytest.mark.not_on_windows("Environment views not supported on windows. Revisit after #34701")
 def test_install_env_with_tests_all(
     tmpdir, mock_packages, mock_fetch, install_mockery, mutable_mock_env_path
 ):
@@ -1039,6 +1047,7 @@ def test_install_env_with_tests_all(
         assert os.path.exists(test_dep.prefix)
 
 
+@pytest.mark.not_on_windows("Environment views not supported on windows. Revisit after #34701")
 def test_install_env_with_tests_root(
     tmpdir, mock_packages, mock_fetch, install_mockery, mutable_mock_env_path
 ):
@@ -1050,6 +1059,7 @@ def test_install_env_with_tests_root(
         assert not os.path.exists(test_dep.prefix)
 
 
+@pytest.mark.not_on_windows("Environment views not supported on windows. Revisit after #34701")
 def test_install_empty_env(
     tmpdir, mock_packages, mock_fetch, install_mockery, mutable_mock_env_path
 ):
@@ -1063,6 +1073,7 @@ def test_install_empty_env(
     assert "no specs to install" in out
 
 
+@pytest.mark.not_on_windows("Windows logger I/O operation on closed file when install fails")
 @pytest.mark.disable_clean_stage_check
 @pytest.mark.parametrize(
     "name,method",
@@ -1086,6 +1097,7 @@ def test_installation_fail_tests(install_mockery, mock_fetch, name, method):
     assert "See test log for details" in output
 
 
+@pytest.mark.not_on_windows("Buildcache not supported on windows")
 def test_install_use_buildcache(
     capsys,
     mock_packages,
@@ -1138,7 +1150,7 @@ def test_install_use_buildcache(
 
     # Populate the buildcache
     install(package_name)
-    buildcache("push", "-u", "-a", "-f", "-d", mirror_dir.strpath, package_name, dependency_name)
+    buildcache("push", "-u", "-f", mirror_dir.strpath, package_name, dependency_name)
 
     # Uninstall the all of the packages for clean slate
     uninstall("-y", "-a")
@@ -1163,6 +1175,7 @@ def test_install_use_buildcache(
             install_use_buildcache(opt)
 
 
+@pytest.mark.not_on_windows("Windows logger I/O operation on closed file when install fails")
 @pytest.mark.regression("34006")
 @pytest.mark.disable_clean_stage_check
 def test_padded_install_runtests_root(install_mockery_mutable_config, mock_fetch):
@@ -1177,7 +1190,7 @@ def test_report_filename_for_cdash(install_mockery_mutable_config, mock_fetch):
     parser = argparse.ArgumentParser()
     spack.cmd.install.setup_parser(parser)
     args = parser.parse_args(
-        ["--cdash-upload-url", "https://blahblah/submit.php?project=debugging", "a"]
+        ["--cdash-upload-url", "https://blahblah/submit.php?project=debugging", "pkg-a"]
     )
     specs = spack.cmd.install.concrete_specs_from_cli(args, {})
     filename = spack.cmd.install.report_filename(args, specs)
