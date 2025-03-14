@@ -14,6 +14,8 @@ class VisionaryClusterservices(BundlePackage):
 
     version('1.0')
 
+    depends_on('python@3.8.2')
+
     depends_on('visionary-slurmviz')
     depends_on('visionary-unicore')
     depends_on('visionary-nmpi')

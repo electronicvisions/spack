@@ -16,9 +16,7 @@ class VisionaryWafer(BundlePackage):
 
     depends_on('visionary-dev-tools', when='+dev')
 
-    # conflicts('python@3:')
-    # depends_on('python@:2.7.99')
-    depends_on('python@3:')
+    depends_on('python@3.8.2')
 
     # to provide non-gccxml spack views we manually add the gccxml w/o dependencies later :)
     variant('gccxml', default=False)

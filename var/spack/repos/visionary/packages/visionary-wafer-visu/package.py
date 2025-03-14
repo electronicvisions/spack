@@ -10,5 +10,7 @@ class VisionaryWaferVisu(BundlePackage):
     """Visionary Meta Package"""
     version('1.0')
 
+    depends_on('python@3.8.2')
+
     depends_on("emscripten")
     depends_on("py-numpy")

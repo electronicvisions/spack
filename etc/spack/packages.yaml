@@ -58,8 +58,6 @@ packages:
     variants: [~mpi]
   py-tables:
     variants: [~auto~avx2+sse2]
-  python:
-    version: [3.8.2]
   ruby:
     variants: [~openssl]
   tk:
