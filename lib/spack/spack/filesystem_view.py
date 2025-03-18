@@ -846,11 +846,13 @@ def filter_exclude(specs, exclude):
     return filter(keep, specs)
 
 
-def get_dependencies(specs):
+# begin VISIONS (modified): bring upstream
+def get_dependencies(specs, deptype=("link", "run")):
     "Get set of dependencies (includes specs)"
     retval = set()
-    set(map(retval.update, (set(s.traverse()) for s in specs)))
+    set(map(retval.update, (set(s.traverse(deptype=deptype)) for s in specs)))
     return retval
+# end VISIONS
 
 
 class ConflictingProjectionsError(SpackError):
