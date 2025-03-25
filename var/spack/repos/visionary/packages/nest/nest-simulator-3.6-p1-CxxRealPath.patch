@@ -1,0 +1,13 @@
+diff --git a/bin/nest-config.in b/bin/nest-config.in
+index a54ae0352..43bff5286 100755
+--- a/bin/nest-config.in
++++ b/bin/nest-config.in
+@@ -71,7 +71,7 @@
+         echo "-L$prefix/@CMAKE_INSTALL_LIBDIR@/nest @MODULE_LINK_LIBS@"
+         ;;
+     --compiler)
+-        echo "@CMAKE_CXX_COMPILER@"
++        echo "@SPACK_CXX_COMPILER@"
+         ;;
+     --compiler-name)
+         echo "@CMAKE_CXX_COMPILER_ID@"
