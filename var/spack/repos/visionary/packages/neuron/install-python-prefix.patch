@@ -1,0 +1,13 @@
+diff --git i/cmake/BuildOptionDefaults.cmake w/cmake/BuildOptionDefaults.cmake
+index cdf1b2892..b5c90d84a 100644
+--- i/cmake/BuildOptionDefaults.cmake
++++ w/cmake/BuildOptionDefaults.cmake
+@@ -32,7 +32,7 @@ else()
+   set(NRN_ENABLE_INTERNAL_READLINE_DEFAULT OFF)
+ endif()
+ # Some distributions may set the prefix. To avoid errors, unset it
+-set(NRN_MODULE_INSTALL_OPTIONS_DEFAULT "--prefix= --home=${CMAKE_INSTALL_PREFIX}")
++set(NRN_MODULE_INSTALL_OPTIONS_DEFAULT "--prefix=${CMAKE_INSTALL_PREFIX}")
+ set(NRN_PYTHON_DYNAMIC_DEFAULT "")
+ set(NRN_MPI_DYNAMIC_DEFAULT "")
+ set(NRN_RX3D_OPT_LEVEL_DEFAULT "0")
