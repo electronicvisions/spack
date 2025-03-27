@@ -44,7 +44,7 @@ class VisionaryWafer(BundlePackage):
     depends_on('py-elephant')
     depends_on('py-h5py')
     depends_on('py-notebook')
-    depends_on('py-numba')
+    depends_on('py-numba@:0.56')  # @0.57 fails at runtime due to unsupported llvm version (constraints in py-numba package missing)
     depends_on('py-pynn @0.9.6')
     depends_on('py-matplotlib@3:')
     depends_on('py-numpy')
