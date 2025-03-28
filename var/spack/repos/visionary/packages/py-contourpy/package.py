@@ -20,7 +20,6 @@ class PyContourpy(PythonPackage):
     depends_on("python@3.8:", when="@1.0.7:", type=("build", "link", "run"))
     depends_on("python@3.7:", type=("build", "link", "run"))
     depends_on("py-pybind11@2.6:", type=("build", "link"))
-    depends_on("py-setuptools@42:", type="build")
     # begin VISIONS (modified): bring upstream
     depends_on("py-setuptools@61:", type="build")
     # end VISIONS
