@@ -12,5 +12,6 @@
 # -------------------------------------------------------------------------
 repos:
   - $spack/var/spack/repos/visionary
+  - $spack/submodules/ebrains-spack-builds
   - $spack/var/spack/repos/f27
   - $spack/var/spack/repos/builtin

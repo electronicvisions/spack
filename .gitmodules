@@ -1,0 +1,3 @@
+[submodule "submodules/ebrains-spack-builds"]
+	path = submodules/ebrains-spack-builds
+	url = https://gitlab.ebrains.eu/ri/tech-hub/platform/esd/ebrains-spack-builds.git

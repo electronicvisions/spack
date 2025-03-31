@@ -12,7 +12,8 @@
   ```
   git init --shared=all
   git remote add origin https://github.com/electronicvisions/spack
-  git checkout 2017-12-01
+  git checkout origin/visionary
+  git submodule update --init
   ```
 
 - unload any modules you may have loaded:
