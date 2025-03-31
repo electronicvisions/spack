@@ -1,4 +1,4 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -21,6 +21,8 @@ class TclItcl(AutotoolsPackage):
         url='https://sourceforge.net/projects/incrtcl/files/%5BIncr%20Tcl_Tk%5D-source/Itcl%203.4.3/itcl3.4.3.tar.gz')
     # end VISIONS
 
+    depends_on("c", type="build")  # generated
+
     extends("tcl")
 
     def configure_args(self):
@@ -30,4 +32,3 @@ class TclItcl(AutotoolsPackage):
             "--with-tcl=" + self.spec["tcl"].libs.directories[0],
         ]
         return args
-

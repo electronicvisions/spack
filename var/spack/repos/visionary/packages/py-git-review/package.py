@@ -1,4 +1,4 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -6,12 +6,14 @@
 from spack.package import *
 
 
-# VISIONS: based-on spack/0.21.0
+# VISIONS: based-on spack/0.23.1
 class PyGitReview(PythonPackage):
     """git-review is a tool that helps submitting git branches to gerrit"""
 
     homepage = "https://docs.openstack.org/infra/git-review"
     pypi = "git-review/git-review-1.25.0.tar.gz"
+
+    license("Apache-2.0")
 
     # begin VISIONS: bring upstream
     version("2.3.1", sha256="24e938136eecb6e6cbb38b5e2b034a286b70b5bb8b5a2853585c9ed23636014f")

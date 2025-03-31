@@ -1,4 +1,4 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -9,7 +9,7 @@ import glob
 # end VISIONS
 
 
-# VISIONS: based on spack/0.21.0
+# VISIONS: based on spack/0.23.1
 class Gccxml(CMakePackage):
     """gccxml dumps an XML description of C++ source code using an extension of
     the GCC C++ compiler."""
@@ -19,6 +19,9 @@ class Gccxml(CMakePackage):
 
     version("develop", branch="master")
     version("latest", commit="3afa8ba5be6866e603dcabe80aff79856b558e24", preferred=True)
+
+    depends_on("c", type="build")  # generated
+    depends_on("cxx", type="build")  # generated
 
     patch("darwin-gcc.patch", when="%gcc platform=darwin")
     # taken from https://github.com/gccxml/gccxml/issues/11#issuecomment-140334118

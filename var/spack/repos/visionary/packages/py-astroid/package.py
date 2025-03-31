@@ -1,4 +1,4 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -6,13 +6,15 @@
 from spack.package import *
 
 
-# VISIONS: based on spack/0.21.0
+# VISIONS: based on spack/0.23.1
 class PyAstroid(PythonPackage):
     """A common base representation of python source code for pylint
     and other projects."""
 
     homepage = "https://github.com/PyCQA/astroid"
     pypi = "astroid/astroid-2.8.3.tar.gz"
+
+    license("LGPL-2.1-or-later")
 
     # begin VISIONS (added): bring upstream
     version("2.15.8", sha256="6c107453dffee9055899705de3c9ead36e74119cee151e5a9aaf7f0b0e020a6a")

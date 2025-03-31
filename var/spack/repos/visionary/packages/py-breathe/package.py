@@ -1,4 +1,4 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -6,13 +6,15 @@
 from spack.package import *
 
 
-# VISIONS: based on spack/0.21.0
+# VISIONS: based on spack/0.23.1
 class PyBreathe(PythonPackage):
     """This is an extension to reStructuredText and Sphinx to be able to read
     and render the Doxygen xml output."""
 
     homepage = "https://github.com/michaeljones/breathe"
     url = "https://github.com/michaeljones/breathe/archive/v4.11.1.tar.gz"
+
+    license("BSD-3-Clause")
 
     version("4.35.0", sha256="55b54723752fc04b892a0f868782b1df65e69db6ca94fb32cf04be495bfd7841")
     version("4.34.0", sha256="b22e70eb4000492508d687d71f258c8f9678398e277bcee0daf34cd438a46e25")
@@ -28,6 +30,9 @@ class PyBreathe(PythonPackage):
     version("4.7.2", sha256="982d47909d22fcd71b48bad5aef3644294340b24f612b2887cde2e3be464d960")
     version("4.7.1", sha256="afb1ab0084b25d3670fa8f5cf2eeaee6fe61bfc77876e3816b140eacd4949875")
     version("4.7.0", sha256="5629c67f5adb41f39375d36c5f0d60d34b1230be268125e535205d77f69211e4")
+
+    depends_on("c", type="build")  # generated
+    depends_on("cxx", type="build")  # generated
 
     depends_on("py-setuptools", type="build")
 

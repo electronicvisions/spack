@@ -32,21 +32,18 @@ class Bear(CMakePackage):
     version("2.2.0", sha256="6bd61a6d64a24a61eab17e7f2950e688820c72635e1cf7ea8ea7bf9482f3b612")
     version("2.0.4", sha256="33ea117b09068aa2cd59c0f0f7535ad82c5ee473133779f1cc20f6f99793a63e")
 
-    # begin VISIONS (deleted): only needed since we backported this for 0.21.0
-    # depends_on("c", type="build")  # generated
-    # depends_on("cxx", type="build")  # generated
-    # end VISIONS
+    depends_on("c", type="build")  # generated
+    depends_on("cxx", type="build")  # generated
 
     depends_on("pkgconfig", when="@3:")
-    # begin VISIONS (modified): bring upstream
-    depends_on("fmt@6.4:", when="@3:")
-    depends_on("fmt@8", when="@3:3.1.2")
+    # begin VISIONS (modified): bring upstream (version constrained only to resolve dependency conflict: https://github.com/spack/spack/pull/40637)
+    depends_on("fmt", when="@3:")
+    # fmt::join moved to fmt/ranges.h in fmt@11:
+    depends_on("fmt@:10", when="@3:3.1.4")
     # end VISIONS
     depends_on("grpc +shared", when="@3.0.0:")
     depends_on("nlohmann-json", when="@3.0.0:")
-    # begin VISIONS (modified): only needed since we backported this for 0.21.0
-    depends_on("spdlog +fmt_external", when="@3.0.0:")
-    # end VISIONS
+    depends_on("spdlog", when="@3.0.0:")
     depends_on("cmake@2.8:", when="@2.0.4:", type="build")
     depends_on("cmake@3.12:", when="@3.0.0:", type="build")
     depends_on("python", type="build")
