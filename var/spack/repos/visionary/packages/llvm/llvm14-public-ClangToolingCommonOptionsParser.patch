@@ -1,0 +1,12 @@
+diff -pur spack-src/clang/include/clang/Tooling/CommonOptionsParser.h spack-src-new/clang/include/clang/Tooling/CommonOptionsParser.h
+--- spack-src/clang/include/clang/Tooling/CommonOptionsParser.h	2025-02-17 12:35:27.296733912 +0100
++++ spack-src-new/clang/include/clang/Tooling/CommonOptionsParser.h	2025-02-17 12:35:59.393070972 +0100
+@@ -64,7 +64,7 @@ namespace tooling {
+ /// \endcode
+ class CommonOptionsParser {
+ 
+-protected:
++public:
+   /// Parses command-line, initializes a compilation database.
+   ///
+   /// This constructor can change argc and argv contents, e.g. consume

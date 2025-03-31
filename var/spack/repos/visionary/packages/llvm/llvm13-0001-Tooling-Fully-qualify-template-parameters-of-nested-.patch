@@ -1,0 +1,32 @@
+diff -pur spack-src/clang/unittests/Tooling/QualTypeNamesTest.cpp spack-src-new/clang/unittests/Tooling/QualTypeNamesTest.cpp
+--- spack-src/clang/unittests/Tooling/QualTypeNamesTest.cpp	2022-01-20 22:31:59.000000000 +0100
++++ spack-src-new/clang/unittests/Tooling/QualTypeNamesTest.cpp	2025-02-03 18:25:49.156686779 +0100
+@@ -66,6 +66,10 @@ TEST(QualTypeNameTest, getFullyQualified
+   // Template parameter expansion.
+   Visitor.ExpectedQualTypeNames["CheckC"] =
+       "A::B::Template0<A::B::C::MyInt, A::B::AnotherClass>";
++  // Template parameters of nested name specifier should also be fully expanded.
++  Visitor.ExpectedQualTypeNames["CheckNested"] =
++      // "typename A::B::Template0<A::B::C::MyInt, A::B::AnotherClass>::nested";
++      "typename A::B::Template0<int, A::B::Class0>::nested";
+   // Recursive template parameter expansion.
+   Visitor.ExpectedQualTypeNames["CheckD"] =
+       "A::B::Template0<A::B::Template1<A::B::C::MyInt, A::B::AnotherClass>, "
+@@ -111,7 +115,7 @@ TEST(QualTypeNameTest, getFullyQualified
+       "     InnerAlias<int> AliasTypeVal;\n"
+       "     InnerAlias<Class0>::Inner AliasInnerTypeVal;\n"
+       "   }\n"
+-      "   template<class X, class Y> class Template0;"
++      "   template<class X, class Y> struct Template0 { typedef int nested; };"
+       "   template<class X, class Y> class Template1;"
+       "   typedef B::Class0 AnotherClass;\n"
+       "   void Function1(Template0<C::MyInt,\n"
+@@ -119,6 +123,8 @@ TEST(QualTypeNameTest, getFullyQualified
+       "   void Function2(Template0<Template1<C::MyInt, AnotherClass>,\n"
+       "                            Template0<int, long> > CheckD);\n"
+       "   void Function3(const B::Class0* CheckM);\n"
++      "   void Function4(typename Template0<C::MyInt,\n"
++      "                  AnotherClass>::nested CheckNested);\n"
+       "  }\n"
+       "template<typename... Values> class Variadic {};\n"
+       "Variadic<int, B::Template0<int, char>, "

@@ -1,0 +1,43 @@
+diff --git a/genpybind/annotations.py b/genpybind/annotations.py
+index 1dfd1f4..871ef4d 100644
+--- a/genpybind/annotations.py
++++ b/genpybind/annotations.py
+@@ -3,7 +3,7 @@
+ from __future__ import unicode_literals
+ 
+ import ast
+-import collections
++from collections.abc import Sequence
+ 
+ from clang.cindex import CursorKind
+ 
+@@ -25,7 +25,7 @@ LOZENGE = u"◊"
+ SPECIAL_NAMES = {"true": True, "false": False, "default": None, "none": None}
+ 
+ 
+-class Annotations(collections.Sequence):
++class Annotations(Sequence):
+     def __init__(self, annotations=None):
+         # type: (Union[None, Text, Iterable[Text]]) -> None
+         self._annotations = []  # type: List[AnnotationT]
+diff --git a/genpybind/registry.py b/genpybind/registry.py
+index 4f66ace..75ba7a9 100644
+--- a/genpybind/registry.py
++++ b/genpybind/registry.py
+@@ -1,6 +1,6 @@
+ from __future__ import unicode_literals
+ 
+-import collections
++from collections.abc import Mapping
+ import re
+ 
+ from clang import cindex
+@@ -16,7 +16,7 @@ if False:  # pylint: disable=using-constant-test
+ RE_NON_IDENTIFIER = re.compile(r"[^a-zA-Z0-9_]+")
+ 
+ 
+-class Registry(collections.Mapping):
++class Registry(Mapping):
+     def __init__(self, tags=None):
+         # type: (Optional[Iterable[Text]]) -> None
+         self._declarations = {}  # type: Dict[Text, Optional[Declaration]]

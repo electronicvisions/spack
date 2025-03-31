@@ -1,0 +1,136 @@
+diff -pur spack-src/clang/bindings/python/clang/cindex.py spack-src-new/clang/bindings/python/clang/cindex.py
+--- spack-src/clang/bindings/python/clang/cindex.py	2022-01-20 22:31:59.000000000 +0100
++++ spack-src-new/clang/bindings/python/clang/cindex.py	2025-02-03 18:35:08.767069975 +0100
+@@ -2428,6 +2428,14 @@ class Type(Structure):
+         """Retrieve the spelling of this Type."""
+         return conf.lib.clang_getTypeSpelling(self)
+ 
++    @property
++    def fully_qualified_name(self):
++        """Retrieve the fully qualified name of this Type."""
++        if not hasattr(self, '_fully_qualified_name'):
++            self._fully_qualified_name = conf.lib.clang_getFullyQualifiedTypeName(self)
++
++        return self._fully_qualified_name
++
+     def __eq__(self, other):
+         if type(other) != type(self):
+             return False
+@@ -3869,6 +3877,11 @@ functionList = [
+    [Type],
+    _CXString,
+    _CXString.from_result),
++
++  ("clang_getFullyQualifiedTypeName",
++   [Type],
++   _CXString,
++   _CXString.from_result),
+ 
+   ("clang_hashCursor",
+    [Cursor],
+diff -pur spack-src/clang/bindings/python/tests/cindex/test_cursor.py spack-src-new/clang/bindings/python/tests/cindex/test_cursor.py
+--- spack-src/clang/bindings/python/tests/cindex/test_cursor.py	2022-01-20 22:31:59.000000000 +0100
++++ spack-src-new/clang/bindings/python/tests/cindex/test_cursor.py	2025-02-03 18:35:08.767069975 +0100
+@@ -316,6 +316,14 @@ class TestCursor(unittest.TestCase):
+         underlying = typedef.underlying_typedef_type
+         self.assertEqual(underlying.kind, TypeKind.INT)
+ 
++    def test_fully_qualified_type_name():
++        source = 'namespace uiae { struct X { typedef int sometype; }; }'
++        tu = get_tu(source, lang='cpp')
++
++        cls = get_cursor(tu, 'sometype')
++        fqn = cls.type.fully_qualified_name
++        self.assertTrue(fqn.endswith("uiae::X::sometype"), fqn)
++
+     def test_semantic_parent(self):
+         tu = get_tu(kParentTest, 'cpp')
+         curs = get_cursors(tu, 'f')
+diff -pur spack-src/clang/include/clang-c/Index.h spack-src-new/clang/include/clang-c/Index.h
+--- spack-src/clang/include/clang-c/Index.h	2022-01-20 22:31:59.000000000 +0100
++++ spack-src-new/clang/include/clang-c/Index.h	2025-02-03 18:35:52.971255790 +0100
+@@ -33,7 +33,7 @@
+  * compatible, thus CINDEX_VERSION_MAJOR is expected to remain stable.
+  */
+ #define CINDEX_VERSION_MAJOR 0
+-#define CINDEX_VERSION_MINOR 63
++#define CINDEX_VERSION_MINOR 64
+ 
+ #define CINDEX_VERSION_ENCODE(major, minor) (((major)*10000) + ((minor)*1))
+ 
+@@ -3447,6 +3447,14 @@ CINDEX_LINKAGE CXType clang_getCursorTyp
+ CINDEX_LINKAGE CXString clang_getTypeSpelling(CXType CT);
+ 
+ /**
++ * Retrieve the fully qualified name of the underlying type.
++ * This includes full qualification of all template parameters etc.
++ *
++ * If the type is invalid, an empty string is returned.
++ */
++CINDEX_LINKAGE CXString clang_getFullyQualifiedTypeName(CXType CT);
++
++/**
+  * Retrieve the underlying type of a typedef declaration.
+  *
+  * If the cursor does not reference a typedef declaration, an invalid type is
+diff -pur spack-src/clang/tools/libclang/CMakeLists.txt spack-src-new/clang/tools/libclang/CMakeLists.txt
+--- spack-src/clang/tools/libclang/CMakeLists.txt	2022-01-20 22:31:59.000000000 +0100
++++ spack-src-new/clang/tools/libclang/CMakeLists.txt	2025-02-03 18:35:11.263080474 +0100
+@@ -52,6 +52,7 @@ set(LIBS
+   clangSema
+   clangSerialization
+   clangTooling
++  clangToolingCore
+ )
+ 
+ if (CLANG_ENABLE_ARCMT)
+diff -pur spack-src/clang/tools/libclang/CXType.cpp spack-src-new/clang/tools/libclang/CXType.cpp
+--- spack-src/clang/tools/libclang/CXType.cpp	2022-01-20 22:31:59.000000000 +0100
++++ spack-src-new/clang/tools/libclang/CXType.cpp	2025-02-03 18:35:11.263080474 +0100
+@@ -19,6 +19,7 @@
+ #include "clang/AST/DeclObjC.h"
+ #include "clang/AST/DeclTemplate.h"
+ #include "clang/AST/Expr.h"
++#include "clang/AST/QualTypeNames.h"
+ #include "clang/AST/Type.h"
+ #include "clang/Basic/AddressSpaces.h"
+ #include "clang/Frontend/ASTUnit.h"
+@@ -303,6 +304,27 @@ CXString clang_getTypeSpelling(CXType CT
+   return cxstring::createDup(OS.str());
+ }
+ 
++CXString clang_getFullyQualifiedTypeName(CXType CT) {
++  QualType T = GetQualType(CT);
++  if (T.isNull())
++    return cxstring::createEmpty();
++
++  // For builtin types (but not typedefs pointing to builtin types) return their
++  // spelling.  Otherwise "bool" will be turned into "_Bool".
++  const Type *TP = T.getTypePtrOrNull();
++  if (TP && TP->isBuiltinType() && T->getAs<TypedefType>() == nullptr)
++    return clang_getTypeSpelling(CT);
++
++  CXTranslationUnit TU = GetTU(CT);
++  ASTContext &Ctx = cxtu::getASTUnit(TU)->getASTContext();
++  PrintingPolicy Policy(Ctx.getPrintingPolicy());
++  Policy.SuppressScope = false;
++  Policy.AnonymousTagLocations = false;
++  Policy.PolishForDeclaration = true;
++  std::string name = TypeName::getFullyQualifiedName(T, Ctx, Policy, /*WithGlobalNsPrefix=*/true);
++  return cxstring::createDup(name.c_str());
++}
++
+ CXType clang_getTypedefDeclUnderlyingType(CXCursor C) {
+   using namespace cxcursor;
+   CXTranslationUnit TU = cxcursor::getCursorTU(C);
+diff -pur spack-src/clang/tools/libclang/libclang.map spack-src-new/clang/tools/libclang/libclang.map
+--- spack-src/clang/tools/libclang/libclang.map	2022-01-20 22:31:59.000000000 +0100
++++ spack-src-new/clang/tools/libclang/libclang.map	2025-02-03 18:36:14.531346336 +0100
+@@ -303,6 +303,7 @@ LLVM_13 {
+     clang_getFileName;
+     clang_getFileTime;
+     clang_getFileUniqueID;
++    clang_getFullyQualifiedTypeName;
+     clang_getFunctionTypeCallingConv;
+     clang_getIBOutletCollectionType;
+     clang_getIncludedFile;

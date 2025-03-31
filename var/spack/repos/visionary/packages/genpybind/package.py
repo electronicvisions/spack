@@ -1,30 +1,12 @@
-##############################################################################
-# Copyright (c) 2013-2017, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
+# Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
-# This file is part of Spack.
-# Created by Todd Gamblin, tgamblin@llnl.gov, All rights reserved.
-# LLNL-CODE-647188
-#
-# For details, see https://github.com/spack/spack
-# Please also see the NOTICE and LICENSE files for our notice and the LGPL.
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU Lesser General Public License (as
-# published by the Free Software Foundation) version 2.1, February 1999.
-#
-# This program is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the terms and
-# conditions of the GNU Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public
-# License along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-##############################################################################
-from spack import *
+# SPDX-License-Identifier: (Apache-2.0 OR MIT)
+
+from spack.package import *
 
 
+# VISIONS: based on EBRAINS/25-02
 class Genpybind(WafPackage):
     """Autogeneration of Python bindings from manually annotated C++ headers"""
 
@@ -39,16 +21,29 @@ class Genpybind(WafPackage):
     version('master', branch='master')
     version('develop', branch='develop')
 
-    version('ebrains', tag='ebrains_release-1-rc1', git='https://github.com/electronicvisions/genpybind')
     version('visions', branch='master', git='https://github.com/electronicvisions/genpybind')
+    # good for ebrains-10.0 too…
+    version('ebrains-llvm15', tag='ebrains-9.0-a9', git='https://github.com/electronicvisions/genpybind')
+    version('ebrains', tag='ebrains_release-1-rc1', git='https://github.com/electronicvisions/genpybind')
+
+    # begin VISIONS (added)
+    conflicts("llvm@:14", when="@ebrains-llvm15")
+    conflicts("llvm@16:", when="@ebrains-llvm15")
+    # end VISIONS
 
     depends_on(
-        'llvm+clang+python+visionary@5.0.0:5.999.999,7.0.0:7.999.999,9.0.0:',
-        type=('build', 'link', 'run'))
+            'llvm+clang+python+visionary@5.0.0:',
+        type=('build', 'link'))
     depends_on('binutils', type='build')
     depends_on('python@2.7:', type=('build', 'run'))
 
     extends('python')
+
+    patch('v0.2.1-python3.10.patch', when='@:0.2.1 ^python@3.10:')
+
+    # llvm-config needs to be found at build time of packages using genpybind
+    def setup_dependent_build_environment(self, env, dependent_spec):
+        env.prepend_path("PATH", self.spec["llvm"].prefix.bin)
 
     def configure_args(self):
         args = super(Genpybind, self).configure_args()

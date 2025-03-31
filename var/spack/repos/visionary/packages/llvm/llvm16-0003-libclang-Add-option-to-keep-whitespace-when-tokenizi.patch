@@ -1,0 +1,238 @@
+diff -pur spack-src/clang/bindings/python/clang/cindex.py spack-src-new/clang/bindings/python/clang/cindex.py
+--- spack-src/clang/bindings/python/clang/cindex.py	2022-01-20 22:31:59.000000000 +0100
++++ spack-src-new/clang/bindings/python/clang/cindex.py	2025-02-03 18:37:54.447765317 +0100
+@@ -529,6 +529,13 @@ class TokenGroup(object):
+ 
+     You should not instantiate this class outside of this module.
+     """
++
++    # Default tokenization mode.
++    TOKENIZE_NONE = 0
++
++    # Used to indicate that tokens for whitespace should be returned.
++    TOKENIZE_KEEP_WHITESPACE = 1
++
+     def __init__(self, tu, memory, count):
+         self._tu = tu
+         self._memory = memory
+@@ -538,7 +545,7 @@ class TokenGroup(object):
+         conf.lib.clang_disposeTokens(self._tu, self._memory, self._count)
+ 
+     @staticmethod
+-    def get_tokens(tu, extent):
++    def get_tokens(tu, extent, options=0):
+         """Helper method to return all tokens in an extent.
+ 
+         This functionality is needed multiple places in this module. We define
+@@ -547,8 +554,8 @@ class TokenGroup(object):
+         tokens_memory = POINTER(Token)()
+         tokens_count = c_uint()
+ 
+-        conf.lib.clang_tokenize(tu, extent, byref(tokens_memory),
+-                byref(tokens_count))
++        conf.lib.clang_tokenizeRange(tu, extent, byref(tokens_memory),
++                byref(tokens_count), options)
+ 
+         count = int(tokens_count.value)
+ 
+@@ -1852,13 +1859,16 @@ class Cursor(Structure):
+             for descendant in child.walk_preorder():
+                 yield descendant
+ 
+-    def get_tokens(self):
++    def get_tokens(self, options=0):
+         """Obtain Token instances formulating that compose this Cursor.
+ 
+         This is a generator for Token instances. It returns all tokens which
+         occupy the extent this cursor occupies.
++
++        options is a bitwise or of TokenGroup.TOKENIZE_XXX flags which will
++        control tokenization behavior.
+         """
+-        return TokenGroup.get_tokens(self._tu, self.extent)
++        return TokenGroup.get_tokens(self._tu, self.extent, options)
+ 
+     def get_field_offsetof(self):
+         """Returns the offsetof the FIELD_DECL pointed by this Cursor."""
+@@ -3073,18 +3091,21 @@ class TranslationUnit(ClangObject):
+             return CodeCompletionResults(ptr)
+         return None
+ 
+-    def get_tokens(self, locations=None, extent=None):
++    def get_tokens(self, locations=None, extent=None, options=0):
+         """Obtain tokens in this translation unit.
+ 
+         This is a generator for Token instances. The caller specifies a range
+         of source code to obtain tokens for. The range can be specified as a
+         2-tuple of SourceLocation or as a SourceRange. If both are defined,
+         behavior is undefined.
++
++        options is a bitwise or of TokenGroup.TOKENIZE_XXX flags which will
++        control tokenization behavior.
+         """
+         if locations is not None:
+             extent = SourceRange(start=locations[0], end=locations[1])
+ 
+-        return TokenGroup.get_tokens(self, extent)
++        return TokenGroup.get_tokens(self, extent, options)
+ 
+ class File(ClangObject):
+     """
+@@ -3957,6 +3983,10 @@ functionList = [
+   ("clang_tokenize",
+    [TranslationUnit, SourceRange, POINTER(POINTER(Token)), POINTER(c_uint)]),
+ 
++  ("clang_tokenizeRange",
++   [TranslationUnit, SourceRange, POINTER(POINTER(Token)), POINTER(c_uint),
++    c_uint]),
++
+   ("clang_visitChildren",
+    [Cursor, callbacks['cursor_visit'], py_object],
+    c_uint),
+diff -pur spack-src/clang/bindings/python/tests/cindex/test_cursor.py spack-src-new/clang/bindings/python/tests/cindex/test_cursor.py
+--- spack-src/clang/bindings/python/tests/cindex/test_cursor.py	2022-01-20 22:31:59.000000000 +0100
++++ spack-src-new/clang/bindings/python/tests/cindex/test_cursor.py	2025-02-03 18:37:54.447765317 +0100
+@@ -10,6 +10,7 @@ import unittest
+ from clang.cindex import AvailabilityKind
+ from clang.cindex import CursorKind
+ from clang.cindex import TemplateArgumentKind
++from clang.cindex import TokenGroup
+ from clang.cindex import TranslationUnit
+ from clang.cindex import TypeKind
+ from .util import get_cursor
+@@ -480,6 +489,14 @@ class TestCursor(unittest.TestCase):
+         self.assertEqual(tokens[0].spelling, 'int')
+         self.assertEqual(tokens[1].spelling, 'foo')
+ 
++    def test_get_tokens_with_whitespace():
++        source = 'class C { void f(); }\nvoid C::f() { }'
++        tu = get_tu(source)
++
++        tokens = list(tu.cursor.get_tokens(TokenGroup.TOKENIZE_KEEP_WHITESPACE))
++        self.assertEqual(''.join(t.spelling for t in tokens), source)
++        self.assertEqual(len(tokens), 27, [t.spelling for t in tokens])
++
+     def test_get_token_cursor(self):
+         """Ensure we can map tokens to cursors."""
+         tu = get_tu('class A {}; int foo(A var = A());', lang='cpp')
+diff -pur spack-src/clang/include/clang-c/Index.h spack-src-new/clang/include/clang-c/Index.h
+--- spack-src/clang/include/clang-c/Index.h	2022-01-20 22:31:59.000000000 +0100
++++ spack-src-new/clang/include/clang-c/Index.h	2025-02-03 18:38:17.919863604 +0100
+@@ -33,7 +33,7 @@
+  * compatible, thus CINDEX_VERSION_MAJOR is expected to remain stable.
+  */
+ #define CINDEX_VERSION_MAJOR 0
+-#define CINDEX_VERSION_MINOR 64
++#define CINDEX_VERSION_MINOR 65
+ 
+ #define CINDEX_VERSION_ENCODE(major, minor) (((major)*10000) + ((minor)*1))
+ 
+@@ -5036,6 +5044,28 @@ CINDEX_LINKAGE CXSourceLocation clang_ge
+  */
+ CINDEX_LINKAGE CXSourceRange clang_getTokenExtent(CXTranslationUnit, CXToken);
+ 
++typedef enum {
++  /**
++   * \brief Used to indicate that no special tokenization options are needed.
++   */
++  CXTokenize_None = 0x0,
++
++  /**
++   * \brief Used to indicate that tokens for whitespace should be returned.
++   */
++  CXTokenize_KeepWhitespace = 0x1
++} CXTokenize_Flags;
++
++/**
++ * \brief Tokenize the source code described by the given range into raw
++ * lexical tokens.
++ *
++ * \see clang_tokenizeRange
++ *
++ */
++CINDEX_LINKAGE void clang_tokenize(CXTranslationUnit TU, CXSourceRange Range,
++                                   CXToken **Tokens, unsigned *NumTokens);
++
+ /**
+  * Tokenize the source code described by the given range into raw
+  * lexical tokens.
+@@ -5052,9 +5082,13 @@ CINDEX_LINKAGE CXSourceRange clang_getTo
+  * \param NumTokens will be set to the number of tokens in the \c *Tokens
+  * array.
+  *
++ * \param options A bitmask of options that affects tokenization. This should be
++ * a bitwise OR of the CXTokenize_XXX flags.
++ *
+  */
+-CINDEX_LINKAGE void clang_tokenize(CXTranslationUnit TU, CXSourceRange Range,
+-                                   CXToken **Tokens, unsigned *NumTokens);
++CINDEX_LINKAGE void clang_tokenizeRange(CXTranslationUnit TU,
++                                        CXSourceRange Range, CXToken **Tokens,
++                                        unsigned *NumTokens, unsigned options);
+ 
+ /**
+  * Annotate the given set of tokens by providing cursors for each token
+diff -pur spack-src/clang/tools/libclang/CIndex.cpp spack-src-new/clang/tools/libclang/CIndex.cpp
+--- spack-src/clang/tools/libclang/CIndex.cpp	2022-01-20 22:31:59.000000000 +0100
++++ spack-src-new/clang/tools/libclang/CIndex.cpp	2025-02-03 18:37:55.855771214 +0100
+@@ -6882,7 +6882,7 @@ CXSourceRange clang_getTokenExtent(CXTra
+ }
+ 
+ static void getTokens(ASTUnit *CXXUnit, SourceRange Range,
+-                      SmallVectorImpl<CXToken> &CXTokens) {
++                      SmallVectorImpl<CXToken> &CXTokens, unsigned options) {
+   SourceManager &SourceMgr = CXXUnit->getSourceManager();
+   std::pair<FileID, unsigned> BeginLocInfo =
+       SourceMgr.getDecomposedSpellingLoc(Range.getBegin());
+@@ -6903,6 +6903,9 @@ static void getTokens(ASTUnit *CXXUnit,
+             CXXUnit->getASTContext().getLangOpts(), Buffer.begin(),
+             Buffer.data() + BeginLocInfo.second, Buffer.end());
+   Lex.SetCommentRetentionState(true);
++  if (options & CXTokenize_KeepWhitespace) {
++    Lex.SetKeepWhitespaceMode(true);
++  }
+ 
+   // Lex tokens until we hit the end of the range.
+   const char *EffectiveBufferEnd = Buffer.data() + EndLocInfo.second;
+@@ -6973,7 +6976,7 @@ CXToken *clang_getToken(CXTranslationUni
+       SM.getComposedLoc(DecomposedEnd.first, DecomposedEnd.second);
+ 
+   SmallVector<CXToken, 32> CXTokens;
+-  getTokens(CXXUnit, SourceRange(Begin, End), CXTokens);
++  getTokens(CXXUnit, SourceRange(Begin, End), CXTokens, CXTokenize_None);
+ 
+   if (CXTokens.empty())
+     return NULL;
+@@ -6987,6 +6990,12 @@ CXToken *clang_getToken(CXTranslationUni
+ 
+ void clang_tokenize(CXTranslationUnit TU, CXSourceRange Range, CXToken **Tokens,
+                     unsigned *NumTokens) {
++  return clang_tokenizeRange(TU, Range, Tokens, NumTokens, CXTokenize_None);
++}
++
++void clang_tokenizeRange(CXTranslationUnit TU, CXSourceRange Range,
++                         CXToken **Tokens, unsigned *NumTokens,
++                         unsigned options) {
+   LOG_FUNC_SECTION { *Log << TU << ' ' << Range; }
+ 
+   if (Tokens)
+@@ -7010,7 +7019,7 @@ void clang_tokenize(CXTranslationUnit TU
+     return;
+ 
+   SmallVector<CXToken, 32> CXTokens;
+-  getTokens(CXXUnit, R, CXTokens);
++  getTokens(CXXUnit, R, CXTokens, options);
+ 
+   if (CXTokens.empty())
+     return;
+diff -pur spack-src/clang/tools/libclang/libclang.map spack-src-new/clang/tools/libclang/libclang.map
+--- spack-src/clang/tools/libclang/libclang.map	2022-01-20 22:31:59.000000000 +0100
++++ spack-src-new/clang/tools/libclang/libclang.map	2025-02-03 18:38:37.647946177 +0100
+@@ -398,6 +399,7 @@ LLVM_13 {
+     clang_suspendTranslationUnit;
+     clang_toggleCrashRecovery;
+     clang_tokenize;
++    clang_tokenizeRange;
+     clang_uninstall_llvm_fatal_error_handler;
+     clang_visitChildren;
+     clang_visitChildrenWithBlock;
