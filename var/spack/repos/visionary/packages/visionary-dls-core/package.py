@@ -53,7 +53,7 @@ class VisionaryDlsCore(BundlePackage):
     depends_on('py-scipy')
     depends_on('py-sqlalchemy')
     depends_on('py-tree-math')
-    depends_on('python@3.8.2')
+    depends_on('python@3.10')
     depends_on('util-linux') # from lib-rcf
     depends_on('yaml-cpp+shared')
 
@@ -66,9 +66,6 @@ class VisionaryDlsCore(BundlePackage):
     #   - cuda arch 8.6 (NVIDIA GeForce RTX 3080)
     # We want to set defaults in packages.yaml, but it's ignored?
     depends_on('py-torch ~caffe2 ~xnnpack ~mkldnn ~cudnn ~magma ~qnnpack ~test ~gloo +cuda cuda_arch=61,80,86')
-
-    # we only support Python 3.7+!
-    depends_on('python@3.7.0:')
 
     # xilinx runtime dependencies
     depends_on('visionary-xilinx')

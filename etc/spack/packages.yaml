@@ -58,6 +58,8 @@ packages:
     variants: [+X]
   pcre:
     variants: [+jit]
+  python:
+    version: ["3.10"]
   py-h5py:
     variants: [~mpi]
   py-tables:

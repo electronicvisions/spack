@@ -71,7 +71,7 @@ class VisionaryDevTools(BundlePackage):
     depends_on('py-virtualenv')
     depends_on('py-xmlrunner')
     depends_on('py-yq')
-    depends_on('python@3.8.2')
+    depends_on('python')
     depends_on('rtags')
     depends_on('tar')
     depends_on('texinfo')
