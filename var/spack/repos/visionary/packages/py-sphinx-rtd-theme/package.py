@@ -25,7 +25,7 @@ class PySphinxRtdTheme(PythonPackage):
 
     depends_on("py-setuptools", type="build")
     # begin VISIONS (added): bring upstream
-    depends_on("py-sphinx@1.6:4.1", when="@0.4.1:", type=("build", "run"))
+    depends_on("py-sphinx@1.6:4.1", when="@0", type=("build", "run"))
     # end VISIONS
     depends_on("py-sphinx@1.6:6", when="@1:", type=("build", "run"))
     depends_on("py-sphinx@:6", when="@0", type=("build", "run"))
