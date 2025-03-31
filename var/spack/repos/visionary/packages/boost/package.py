@@ -9,6 +9,7 @@ import sys
 from spack import *
 
 
+# VISIONS: based on spack/0.18.1
 class Boost(Package):
     """Boost provides free peer-reviewed portable C++ source
        libraries, emphasizing libraries that work well with the C++
@@ -24,11 +25,6 @@ class Boost(Package):
     list_url = "https://sourceforge.net/projects/boost/files/boost/"
     list_depth = 1
     maintainers = ['hainest']
-
-    version('develop',
-            git='https://github.com/boostorg/boost.git',
-            branch='develop',
-            submodules=True)
 
     version('develop', branch='develop', submodules=True)
     version('1.79.0', sha256='475d589d51a7f8b3ba2ba4eda022b170e562ca3b760ee922c146b6c65856ef39')
@@ -200,9 +196,11 @@ class Boost(Package):
     variant('pic', default=False,
             description='Generate position-independent code (PIC), useful '
                         'for building static libraries')
+    # begin VISIONS (added)
     variant('valgrind', default=False,
             description='Let valgrind treat boost context memory regions as'
             'stack space . Users must define BOOST_USE_VALGRIND!')
+    # end VISIONS
 
     # https://boostorg.github.io/build/manual/develop/index.html#bbv2.builtin.features.visibility
     variant('visibility', values=('global', 'protected', 'hidden'),
@@ -222,8 +220,10 @@ class Boost(Package):
     depends_on('bzip2', when='+iostreams')
     depends_on('zlib', when='+iostreams')
     depends_on('py-numpy', when='+numpy', type=('build', 'run'))
+    # begin VISIONS (added)
     # depend on ~boost to prevent infinite recursion
     depends_on('valgrind~boost', when="+valgrind")
+    # end VISIONS
 
     # Coroutine, Context, Fiber, etc., are not straightforward.
     conflicts('+context', when='@:1.50')  # Context since 1.51.0.
@@ -293,6 +293,7 @@ class Boost(Package):
     # Patch: https://github.com/boostorg/process/commit/6a4d2ff72114ef47c7afaf92e1042aca3dfa41b0.patch
     patch('1.72_boost_process.patch', level=2, when='@1.72.0')
 
+    # begin VISIONS (added)
     # Patch fix from https://svn.boost.org/trac10/ticket/13291#comment:1
     patch('boost_1.66.0_add_read_size_helper.patch', when='@1.66.0:')
 
@@ -309,6 +310,7 @@ class Boost(Package):
 
     # TODO(ECM): bring patch upstream
     patch('boost_1.69.0_fix_factorywrapperinit.patch')
+    # end VISIONS
 
     # Fix the bootstrap/bjam build for Cray
     patch('bootstrap-path.patch', when='@1.39.0: platform=cray')
@@ -348,6 +350,7 @@ class Boost(Package):
     # See https://github.com/boostorg/python/pull/218
     patch('boost_218.patch', when='@1.63.0:1.67')
 
+    # begin VISIONS (added)
     # (imperfect) patches for the current boost version when using gcc@10: and modern C++
     # patches do not apply to 1.75 onwards, no checking below was done
     # cf. https://github.com/boostorg/bimap/pull/24
@@ -356,6 +359,7 @@ class Boost(Package):
     patch('boost_1.73.0_format_fix-cpp20.patch', level=2, when='cxxstd=17 @:1.74.99 %gcc@10:')
     # cf. https://github.com/boostorg/ublas/pull/53
     patch('boost_1.73.0_ublas_fix-cpp20.patch', level=2, when='cxxstd=17 @:1.74.99 %gcc@10:')
+    # end VISIONS
 
     # Fix B2 bootstrap toolset during installation
     # See https://github.com/spack/spack/issues/20757
@@ -409,7 +413,9 @@ class Boost(Package):
 
     def url_for_version(self, version):
         if version >= Version('1.63.0'):
+            # begin VISIONS (modified)
             url = "https://archives.boost.io/release/{0}/source/boost_{1}.tar.bz2"
+            # end VISIONS
         else:
             url = "http://downloads.sourceforge.net/project/boost/boost/{0}/boost_{1}.tar.bz2"
 
@@ -511,8 +517,10 @@ class Boost(Package):
                 '-s', 'NO_LZMA=1',
                 '-s', 'NO_ZSTD=1'])
 
+        # begin VISIONS (added)
         if '+valgrind' in spec:
             options.append('valgrind=on')
+        # end VISIONS
 
         link_types = ['static']
         if '+shared' in spec:
@@ -625,7 +633,6 @@ class Boost(Package):
 
         # Remove libraries that the release version does not support
         if spec.satisfies('@1.69.0:') and 'signals' in with_libs:
-            # signals (v1) has been discontinued
             with_libs.remove('signals')
         if not spec.satisfies('@1.54.0:') and 'log' in with_libs:
             with_libs.remove('log')
