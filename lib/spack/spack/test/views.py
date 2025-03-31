@@ -1,4 +1,4 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -9,16 +9,16 @@ import pytest
 
 from spack.directory_layout import DirectoryLayout
 from spack.filesystem_view import SimpleFilesystemView, YamlFilesystemView
+from spack.installer import PackageInstaller
 from spack.spec import Spec
 
 
-@pytest.mark.not_on_windows("Not supported on Windows (yet)")
 def test_remove_extensions_ordered(install_mockery, mock_fetch, tmpdir):
     view_dir = str(tmpdir.join("view"))
     layout = DirectoryLayout(view_dir)
     view = YamlFilesystemView(view_dir, layout)
     e2 = Spec("extension2").concretized()
-    e2.package.do_install()
+    PackageInstaller([e2.package], explicit=True).install()
     view.add_specs(e2)
 
     e1 = e2["extension1"]

@@ -1,4 +1,4 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -24,6 +24,14 @@ class PkgA(AutotoolsPackage):
     variant("lorem_ipsum", description="", default=False)
 
     variant("bvv", default=True, description="The good old BV variant")
+
+    variant(
+        "libs",
+        default="shared",
+        values=("shared", "static"),
+        multi=True,
+        description="Type of libraries to install",
+    )
 
     depends_on("pkg-b", when="foobar=bar")
     depends_on("test-dependency", type="test")

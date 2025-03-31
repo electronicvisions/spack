@@ -1,4 +1,4 @@
-# Copyright 2013-2022 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -209,7 +209,7 @@ class BinaryFilePrefixReplacer(PrefixReplacer):
         # but it's nasty to deal with matches across boundaries, so let's stick to
         # something simple.
 
-        modified = True
+        modified = False
 
         for match in self.regex.finditer(f.read()):
             # The matching prefix (old) and its replacement (new)

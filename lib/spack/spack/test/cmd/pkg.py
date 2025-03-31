@@ -1,4 +1,4 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -12,7 +12,9 @@ from llnl.util.filesystem import mkdirp, working_dir
 
 import spack.cmd.pkg
 import spack.main
+import spack.paths
 import spack.repo
+import spack.util.file_cache
 
 #: new fake package template
 pkg_template = """\
@@ -34,13 +36,14 @@ abd = {"mockpkg-a", "mockpkg-b", "mockpkg-d"}
 
 # Force all tests to use a git repository *in* the mock packages repo.
 @pytest.fixture(scope="module")
-def mock_pkg_git_repo(git, tmpdir_factory):
+def mock_pkg_git_repo(git, tmp_path_factory):
     """Copy the builtin.mock repo and make a mutable git repo inside it."""
-    tmproot = tmpdir_factory.mktemp("mock_pkg_git_repo")
-    repo_path = tmproot.join("builtin.mock")
+    root_dir = tmp_path_factory.mktemp("mock_pkg_git_repo")
+    repo_dir = root_dir / "builtin.mock"
+    shutil.copytree(spack.paths.mock_packages_path, str(repo_dir))
 
-    shutil.copytree(spack.paths.mock_packages_path, str(repo_path))
-    mock_repo = spack.repo.RepoPath(str(repo_path))
+    repo_cache = spack.util.file_cache.FileCache(str(root_dir / "cache"))
+    mock_repo = spack.repo.RepoPath(str(repo_dir), cache=repo_cache)
     mock_repo_packages = mock_repo.repos[0].packages_path
 
     with working_dir(mock_repo_packages):
@@ -81,7 +84,7 @@ def mock_pkg_git_repo(git, tmpdir_factory):
             "change mockpkg-b, remove mockpkg-c, add mockpkg-d",
         )
 
-    with spack.repo.use_repositories(str(repo_path)):
+    with spack.repo.use_repositories(str(repo_dir)):
         yield mock_repo_packages
 
 
@@ -308,7 +311,20 @@ def test_pkg_grep(mock_packages, capfd):
     output, _ = capfd.readouterr()
     assert output.strip() == "\n".join(
         spack.repo.PATH.get_pkg_class(name).module.__file__
-        for name in ["splice-a", "splice-h", "splice-t", "splice-vh", "splice-z"]
+        for name in [
+            "depends-on-manyvariants",
+            "manyvariants",
+            "splice-a",
+            "splice-depends-on-t",
+            "splice-h",
+            "splice-t",
+            "splice-vh",
+            "splice-vt",
+            "splice-z",
+            "virtual-abi-1",
+            "virtual-abi-2",
+            "virtual-abi-multi",
+        ]
     )
 
     # ensure that this string isn't fouhnd

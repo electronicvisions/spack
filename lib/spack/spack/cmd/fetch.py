@@ -1,4 +1,4 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -6,11 +6,10 @@
 import llnl.util.tty as tty
 
 import spack.cmd
-import spack.cmd.common.arguments as arguments
 import spack.config
 import spack.environment as ev
-import spack.repo
 import spack.traverse
+from spack.cmd.common import arguments
 
 description = "fetch archives for packages"
 section = "build"
@@ -18,7 +17,7 @@ level = "long"
 
 
 def setup_parser(subparser):
-    arguments.add_common_arguments(subparser, ["no_checksum", "deprecated"])
+    arguments.add_common_arguments(subparser, ["no_checksum", "specs"])
     subparser.add_argument(
         "-m",
         "--missing",
@@ -34,7 +33,7 @@ def setup_parser(subparser):
         dest='specfiles', metavar='SPEC_YAML_FILE',
         help="fetch from file. Read specs to fetch from .yaml files")
     # end VISIONS
-    arguments.add_common_arguments(subparser, ["specs"])
+    arguments.add_concretizer_args(subparser)
     subparser.epilog = (
         "With an active environment, the specs "
         "parameter can be omitted. In this case all (uninstalled"
@@ -45,10 +44,6 @@ def setup_parser(subparser):
 def fetch(parser, args):
     if args.no_checksum:
         spack.config.set("config:checksum", False, scope="command_line")
-
-    if args.deprecated:
-        spack.config.set("config:deprecated", True, scope="command_line")
-
 
     # begin VISIONS (added)
     specs = []

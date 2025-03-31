@@ -1,4 +1,4 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -46,6 +46,7 @@ import spack.deptypes as dt
 import spack.repo
 import spack.spec
 import spack.tengine
+import spack.traverse
 
 
 def find(seq, predicate):

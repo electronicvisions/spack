@@ -1,8 +1,7 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
-import inspect
 import os
 from typing import List
 
@@ -149,7 +148,7 @@ class MesonBuilder(BaseBuilder):
         else:
             default_library = "shared"
 
-        args = [
+        return [
             "-Dprefix={0}".format(pkg.prefix),
             # If we do not specify libdir explicitly, Meson chooses something
             # like lib/x86_64-linux-gnu, which causes problems when trying to
@@ -162,8 +161,6 @@ class MesonBuilder(BaseBuilder):
             # Do not automatically download and install dependencies
             "-Dwrap_mode=nodownload",
         ]
-
-        return args
 
     @property
     def build_dirname(self):
@@ -197,19 +194,19 @@ class MesonBuilder(BaseBuilder):
         options += self.std_meson_args
         options += self.meson_args()
         with fs.working_dir(self.build_directory, create=True):
-            inspect.getmodule(self.pkg).meson(*options)
+            pkg.module.meson(*options)
 
     def build(self, pkg, spec, prefix):
         """Make the build targets"""
         options = ["-v"]
         options += self.build_targets
         with fs.working_dir(self.build_directory):
-            inspect.getmodule(self.pkg).ninja(*options)
+            pkg.module.ninja(*options)
 
     def install(self, pkg, spec, prefix):
         """Make the install targets"""
         with fs.working_dir(self.build_directory):
-            inspect.getmodule(self.pkg).ninja(*self.install_targets)
+            pkg.module.ninja(*self.install_targets)
 
     spack.builder.run_after("build")(execute_build_time_tests)
 

@@ -1,11 +1,11 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
 """Test class methods on Package objects.
 
-This doesn't include methods on package *instances* (like do_install(),
+This doesn't include methods on package *instances* (like do_patch(),
 etc.).  Only methods like ``possible_dependencies()`` that deal with the
 static DSL metadata for packages.
 """
@@ -17,13 +17,15 @@ import pytest
 
 import llnl.util.filesystem as fs
 
+import spack.compilers
 import spack.deptypes as dt
+import spack.error
 import spack.install_test
 import spack.package_base
 import spack.repo
 import spack.spec
 from spack.build_systems.generic import Package
-from spack.installer import InstallError
+from spack.error import InstallError
 
 
 @pytest.fixture(scope="module")
@@ -72,7 +74,8 @@ def test_possible_direct_dependencies(mock_packages, mpileaks_possible_deps):
 
 def test_possible_dependencies_virtual(mock_packages, mpi_names):
     expected = dict(
-        (name, set(spack.repo.PATH.get_pkg_class(name).dependencies)) for name in mpi_names
+        (name, set(dep for dep in spack.repo.PATH.get_pkg_class(name).dependencies_by_name()))
+        for name in mpi_names
     )
 
     # only one mock MPI has a dependency
@@ -269,12 +272,6 @@ def test_package_fetcher_fails():
         pkg.fetcher
 
 
-def test_package_no_extendees():
-    s = spack.spec.Spec("a")
-    pkg = BaseTestPackage(s)
-    assert pkg.extendee_args is None
-
-
 def test_package_test_no_compilers(mock_packages, monkeypatch, capfd):
     def compilers(compiler, arch_spec):
         return None
@@ -288,57 +285,3 @@ def test_package_test_no_compilers(mock_packages, monkeypatch, capfd):
     error = capfd.readouterr()[1]
     assert "Skipping tests for package" in error
     assert "test requires missing compiler" in error
-
-
-# TODO (post-34236): Remove when remove deprecated run_test(), etc.
-@pytest.mark.parametrize(
-    "msg,installed,purpose,expected",
-    [
-        ("do-nothing", False, "test: echo", "do-nothing"),
-        ("not installed", True, "test: echo not installed", "expected in prefix"),
-    ],
-)
-def test_package_run_test_install(
-    install_mockery_mutable_config, mock_fetch, capfd, msg, installed, purpose, expected
-):
-    """Confirm expected outputs from run_test for installed/not installed exe."""
-    s = spack.spec.Spec("trivial-smoke-test").concretized()
-    pkg = s.package
-
-    pkg.run_test(
-        "echo", msg, expected=[expected], installed=installed, purpose=purpose, work_dir="."
-    )
-    output = capfd.readouterr()[0]
-    assert expected in output
-
-
-# TODO (post-34236): Remove when remove deprecated run_test(), etc.
-@pytest.mark.parametrize(
-    "skip,failures,status",
-    [
-        (True, 0, str(spack.install_test.TestStatus.SKIPPED)),
-        (False, 1, str(spack.install_test.TestStatus.FAILED)),
-    ],
-)
-def test_package_run_test_missing(
-    install_mockery_mutable_config, mock_fetch, capfd, skip, failures, status
-):
-    """Confirm expected results from run_test for missing exe when skip or not."""
-    s = spack.spec.Spec("trivial-smoke-test").concretized()
-    pkg = s.package
-
-    pkg.run_test("no-possible-program", skip_missing=skip)
-    output = capfd.readouterr()[0]
-    assert len(pkg.tester.test_failures) == failures
-    assert status in output
-
-
-# TODO (post-34236): Remove when remove deprecated run_test(), etc.
-def test_package_run_test_fail_fast(install_mockery_mutable_config, mock_fetch):
-    """Confirm expected exception when run_test with fail_fast enabled."""
-    s = spack.spec.Spec("trivial-smoke-test").concretized()
-    pkg = s.package
-
-    with spack.config.override("config:fail_fast", True):
-        with pytest.raises(spack.install_test.TestFailure, match="Failed to find executable"):
-            pkg.run_test("no-possible-program")

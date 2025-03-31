@@ -1,4 +1,4 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -12,7 +12,7 @@ deconcretize = SpackCommand("deconcretize")
 
 
 @pytest.fixture(scope="function")
-def test_env(mutable_mock_env_path, config, mock_packages):
+def test_env(mutable_mock_env_path, mock_packages):
     ev.create("test")
     with ev.read("test") as e:
         e.add("pkg-a@2.0 foobar=bar ^pkg-b@1.0")

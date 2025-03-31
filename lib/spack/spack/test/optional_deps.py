@@ -1,4 +1,4 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -70,13 +70,6 @@ def spec_and_expected(request):
     """Parameters for the normalization test."""
     spec, d = request.param
     return spec, Spec.from_literal(d)
-
-
-def test_normalize(spec_and_expected, config, mock_packages):
-    spec, expected = spec_and_expected
-    spec = Spec(spec)
-    spec.normalize()
-    assert spec.eq_dag(expected, deptypes=False)
 
 
 def test_default_variant(config, mock_packages):
