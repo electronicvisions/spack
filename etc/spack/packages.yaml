@@ -41,6 +41,8 @@ packages:
   mesa:
     # mesa via ghostscript -> libepoxy+glx, but doesn't build with llvm@11.1.0
     variants: [~llvm]
+  node-js:
+    version: [:21]  # JJK: @22.4.0 did not build (v0.23.1) -> constrain to @:21
   py-netcdf4:
     # we do not build openmpi with slurm support
     variants: [~mpi]
