@@ -36,6 +36,9 @@ class EmscriptenFastcomp(CMakePackage):
 
     url_clang = "https://github.com/kripken/emscripten-fastcomp-clang"
 
+    depends_on("c", type="build")
+    depends_on("cxx", type="build")
+
     # every version has a corresponding clang version
     versions = [
             "1.38.25",

@@ -13,6 +13,8 @@ class Libpsf(AutotoolsPackage):
     homepage = "https://gitlab.com/libpsf/libpsf-core"
     git      = "https://gitlab.com/libpsf/libpsf-core"
 
+    depends_on("cxx", type="build")
+
     version('0.2', commit='001dc734e01725e739847c8cde6480a0cf35a082')
 
     # option suggested by build instructions in repo

@@ -36,6 +36,9 @@ class Emscripten(Package):
     homepage = "https://kripken.github.io/emscripten-site"
     url      = "https://github.com/kripken/emscripten"
 
+    depends_on("c", type="build")
+    depends_on("cxx", type="build")
+
     # same as built_type in cmake packages
     variant('build_type', default='Release',
             description='CMake build type',
