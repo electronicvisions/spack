@@ -33,7 +33,7 @@ class VisionaryWafer(BundlePackage):
     depends_on('py-lxml') # collab tests
     depends_on('xerces-c')
     depends_on(Boost.with_default_variants)
-    depends_on('boost@1.69.0: +graph+icu+mpi+python+numpy cxxstd=17')
+    depends_on('boost@1.69.0:1.79 +graph+icu+mpi+python+numpy cxxstd=17')
     depends_on('log4cxx')
     depends_on('googletest@1.11.0:+gmock')
     depends_on('py-slurm-pipeline')
