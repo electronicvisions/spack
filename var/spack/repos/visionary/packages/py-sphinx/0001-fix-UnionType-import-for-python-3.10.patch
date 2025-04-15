@@ -1,0 +1,25 @@
+From 257146041c492ab17e7be1f070065b412fe85507 Mon Sep 17 00:00:00 2001
+From: Jakob Kaiser <jakob.kaiser@kip.uni-heidelberg.de>
+Date: Tue, 15 Apr 2025 16:34:01 +0000
+Subject: [PATCH] fix: UnionType import for python 3.10
+
+---
+ sphinx/util/typing.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sphinx/util/typing.py b/sphinx/util/typing.py
+index db754bb03..cac49a347 100644
+--- a/sphinx/util/typing.py
++++ b/sphinx/util/typing.py
+@@ -31,7 +31,7 @@ else:
+             return ref._eval_type(globalns, localns)
+ 
+ if sys.version_info > (3, 10):
+-    from types import Union as types_Union
++    from types import UnionType as types_Union
+ else:
+     types_Union = None
+ 
+-- 
+2.30.2
+
