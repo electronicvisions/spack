@@ -72,3 +72,6 @@ class VisionaryDlsCore(BundlePackage):
 
     # xilinx runtime dependencies
     depends_on('visionary-xilinx')
+
+    # some versions of dependencies are broken
+    conflicts("boost@1.86.0") # sha1 digest changed length, but boost::compute didn't adapt
