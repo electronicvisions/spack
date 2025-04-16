@@ -75,3 +75,4 @@ class VisionaryDlsCore(BundlePackage):
 
     # some versions of dependencies are broken
     conflicts("boost@1.86.0") # sha1 digest changed length, but boost::compute didn't adapt
+    conflicts("py-pytest@8.2")

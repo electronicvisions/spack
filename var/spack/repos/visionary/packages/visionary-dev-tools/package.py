@@ -87,3 +87,6 @@ class VisionaryDevTools(BundlePackage):
     depends_on('wget')
     depends_on('yaml-cpp+shared')
     depends_on('zsh')
+
+    # some versions of dependencies are broken
+    conflicts("py-pytest@8.2")
