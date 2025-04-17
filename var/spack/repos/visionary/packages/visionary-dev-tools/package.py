@@ -18,7 +18,7 @@ class VisionaryDevTools(BundlePackage):
     depends_on('automake')
     depends_on('bash-completion')
     depends_on('bazel')
-    depends_on('bear')
+    depends_on('bear@3:')
     depends_on('cairo +X')
     depends_on('cloc')
     depends_on('cmake')
