@@ -42,7 +42,7 @@ class VisionaryWafer(BundlePackage):
     #depends_on('py-brian2')
     depends_on('py-bokeh')
     depends_on('py-elephant')
-    depends_on('py-h5py')
+    depends_on('py-h5py@:3.10')  # segfaults in @3.11 if native float16 support is not available; @3.12: needs python@3.9: -> constrain to @:3.10
     depends_on('py-notebook')
     depends_on('py-numba@:0.56')  # @0.57 fails at runtime due to unsupported llvm version (constraints in py-numba package missing)
     depends_on('py-pynn @0.9.6')
