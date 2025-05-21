@@ -17,6 +17,18 @@ packages:
   py-torch:
     version: [1.9.1]
     variants: ['+cuda cuda_arch=61,80,86']
+  py-jaxlib:
+    variants: ['+cuda cuda_arch=61,80,86']
+  # BEGIN
+  # ECM (2025-05-22): pinning stuff for jaxsnn/jaxlib things (to be removed when we move to jax@0.5)
+  # (short-term hack for Elias at ISCAS 2025)
+  py-chex:
+    version: [0.1.7]
+  py-optax:
+    version: [0.1.4]
+  py-scipy:
+    version: [1.12.0]
+  # END
   binutils:
     variants: [+ld+gold+plugins]
   cairo:

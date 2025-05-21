@@ -7,6 +7,7 @@
 from spack.package import *
 
 
+# VISIONS: based on spack@0.23.1
 class PyJax(PythonPackage):
     """JAX is Autograd and XLA, brought together for high-performance
     machine learning research. With its updated version of Autograd,
@@ -70,6 +71,9 @@ class PyJax(PythonPackage):
         # https://github.com/google/jax/issues/19246
         depends_on("py-numpy@:1", when="@:0.4.25")
         depends_on("py-opt-einsum")
+        # begin VISIONS (modify): bring upstream (jax.scipy.linalg uses scipy.linalg.tril)
+        depends_on("py-scipy@:1.12", when="@:0.4.23")
+        # end VISIONS (modify)
         depends_on("py-scipy@1.10:", when="@0.4.31:")
         depends_on("py-scipy@1.9:", when="@0.4.19:")
         depends_on("py-scipy@1.7:", when="@0.4.7:")
