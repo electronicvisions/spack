@@ -28,7 +28,7 @@ class VisionaryDls(BundlePackage):
     depends_on('py-ipywidgets')
     depends_on('py-lxml')  # collab tests
     depends_on('nest')
-    depends_on('py-norse')
+    depends_on('py-norse@1.1:')
     depends_on('py-notebook')
     depends_on('py-numba')
     depends_on('py-pandas')
