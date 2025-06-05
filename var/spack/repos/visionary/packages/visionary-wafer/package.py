@@ -46,6 +46,7 @@ class VisionaryWafer(BundlePackage):
     depends_on('py-notebook')
     depends_on('py-numba@:0.56')  # @0.57 fails at runtime due to unsupported llvm version (constraints in py-numba package missing)
     depends_on('py-pynn @0.9.6')
+    depends_on('py-junit-xml')  # needed for guidebook tests
     depends_on('py-matplotlib@3:')
     depends_on('py-numpy')
     depends_on('py-pandas @0.19.0:')
@@ -57,6 +58,7 @@ class VisionaryWafer(BundlePackage):
     depends_on('py-pybind11')
     depends_on('py-mock')
     depends_on('cereal')
+    depends_on('py-xmlrunner')
     depends_on('py-yccp@:0.5.0', when="^python@:2.999.999")  #TODO remove constraints once concretizer fixed
     depends_on('py-yccp@1.0.0:', when="^python@3:")          #TODO remove constraints once concretizer fixed
 

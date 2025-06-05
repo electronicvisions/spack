@@ -25,7 +25,6 @@ class VisionaryDlsCore(BundlePackage):
     depends_on('doxygen+graphviz')
     depends_on('gecode')
     depends_on('genpybind')
-    depends_on('gflags')
     depends_on('googletest@1.11.0:+gmock')
     # depends_on('icarus')
     depends_on('inja')  # template engine for PPU source jit generation
@@ -37,6 +36,7 @@ class VisionaryDlsCore(BundlePackage):
     depends_on('munge')
     depends_on('pkg-config')
     depends_on('py-jax@0.4.13') # later requires python@3.9; `^py-jaxlib +cuda cuda_arch=61,80,86` does not work for v0.21.0 -> specify in py-jax/package.py
+    depends_on('py-junit-xml')  # needed for tests in libnux
     depends_on('py-matplotlib@3:')
     depends_on('py-networkx')
     depends_on('py-pytest')
@@ -44,14 +44,10 @@ class VisionaryDlsCore(BundlePackage):
     depends_on('py-numpy')
     depends_on('py-optax')
     depends_on('py-pybind11')
-    depends_on('py-pybind11-stubgen')
     depends_on('py-pycodestyle')
-    depends_on('py-pyelftools')
     depends_on('py-pylint')
     depends_on('py-pynn')
-    depends_on('py-python-usbtmc')
     depends_on('py-scipy')
-    depends_on('py-sqlalchemy')
     depends_on('py-tree-math')
     depends_on('python@3.10')
     depends_on('util-linux') # from lib-rcf
