@@ -49,7 +49,7 @@ class VisionaryDlsCore(BundlePackage):
     depends_on('py-pynn')
     depends_on('py-scipy')
     depends_on('py-tree-math')
-    depends_on('python@3.10')
+    depends_on('python@3.11')
     depends_on('util-linux') # from lib-rcf
     depends_on('yaml-cpp+shared')
 

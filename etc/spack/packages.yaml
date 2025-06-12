@@ -71,7 +71,7 @@ packages:
   pcre:
     variants: [+jit]
   python:
-    version: ["3.10"]
+    version: ["3.11"]
   py-h5py:
     variants: [~mpi]
   py-tables:
