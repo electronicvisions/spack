@@ -35,9 +35,20 @@ class PyPylint(PythonPackage):
     version("2.11.1", sha256="2c9843fff1a88ca0ad98a256806c82c5a8f86086e7ccbdb93297d86c3f90c436")
     version("2.8.2", sha256="586d8fa9b1891f4b725f587ef267abe2a1bad89d6b184520c7f07a253dd6e217")
 
+    # begin VISIONS (added):
+    # lower bounds for python
+    # end VISIONS
     depends_on("python@3.6:", when="@2.8.2:", type=("build", "run"))
     depends_on("python@3.6.2:", when="@2.13.5:", type=("build", "run"))
     depends_on("python@3.7.2:", when="@2.14.0:", type=("build", "run"))
+
+    # begin VISIONS (added):
+    # upper bounds for python
+    depends_on("python@:3.9", when="@:2.8", type=("build", "run"))
+    depends_on("python@:3.10", when="@:2.15", type=("build", "run"))
+    depends_on("python@:3.11", when="@:2", type=("build", "run"))
+    # end VISIONS
+
     depends_on("py-setuptools-scm", when="@2.8.2", type="build")
     depends_on("py-setuptools@17.1:", type="build")
     depends_on("py-setuptools@62.6:62", when="@2.15.0:", type="build")
