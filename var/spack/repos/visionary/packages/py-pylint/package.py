@@ -51,7 +51,9 @@ class PyPylint(PythonPackage):
 
     depends_on("py-setuptools-scm", when="@2.8.2", type="build")
     depends_on("py-setuptools@17.1:", type="build")
-    depends_on("py-setuptools@62.6:62", when="@2.15.0:", type="build")
+    # begin VISIONS (modified): we can not concretize with upper limit -> removing it worked for us
+    depends_on("py-setuptools@62.6:", when="@2.15.0:", type="build")
+    # end VISIONS
     depends_on("py-wheel@0.37.1:0.37", when="@2.15.0:", type="build")
     depends_on("py-dill@0.2:", when="@2.13.5:2.15", type=("build", "run"))
     depends_on("py-dill@0.2:", when="@2.16:  ^python@:3.10", type=("build", "run"))
