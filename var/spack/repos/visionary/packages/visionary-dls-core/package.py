@@ -29,6 +29,7 @@ class VisionaryDlsCore(BundlePackage):
     # depends_on('icarus')
     depends_on('inja')  # template engine for PPU source jit generation
     depends_on('intel-tbb')  # ppu gdbserver
+    depends_on('jwt-cpp')
     depends_on('libelf')
     depends_on('liblockfile')
     depends_on('llvm')
