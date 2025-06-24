@@ -451,6 +451,9 @@ class Llvm(CMakePackage, CudaPackage, LlvmDetection, CompilerPackage):
     variant('visionary', default=False,
             description="Include patches necessary for visionary python "
             "bindings generator")
+    variant('force_full_view', default=False,
+            description='Force linking of all files into view, including '
+                        'known conflicts (e.g. libgomp).')
 
     conflicts("@:8", when="+visionary")
     conflicts("@18:", when="+visionary")
@@ -1194,6 +1197,24 @@ class Llvm(CMakePackage, CudaPackage, LlvmDetection, CompilerPackage):
             for cfg in cfg_files:
                 with open(os.path.join(self.prefix.bin, cfg), "w") as f:
                     print(gcc_install_dir_flag, file=f)
+
+    # begin VISIONS (added)
+    def add_files_to_view(self, view, merge_map):
+        python = self.spec["python"]
+        # we remove libgomp-related files from views as they conflict with
+        # gcc- or python-ones
+        ignore_file_paths = [
+            join_path(self.prefix, "lib", "libgomp.so"),
+            join_path(self.prefix, "lib",
+                      f"python{'.'.join(str(python.version).split('.')[:2])}",
+                      "site-packages", "README.txt"),
+        ]
+        if self.spec.satisfies('~force_full_view'):
+            for path in ignore_file_paths:
+                if path in merge_map:
+                    del merge_map[path]
+        super(Llvm, self).add_files_to_view(view, merge_map)
+    # end VISIONS
 
     def llvm_config(self, *args, **kwargs):
         lc = Executable(self.prefix.bin.join("llvm-config"))
