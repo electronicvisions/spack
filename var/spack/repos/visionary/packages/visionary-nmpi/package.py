@@ -13,6 +13,6 @@ class VisionaryNmpi(BundlePackage):
 
     version('1.0')
 
-    depends_on('py-hbp-neuromorphic-platform')
+    depends_on('py-hbp-neuromorphic-platform+provider')
     depends_on('py-pandas')
     depends_on('py-psutil')
