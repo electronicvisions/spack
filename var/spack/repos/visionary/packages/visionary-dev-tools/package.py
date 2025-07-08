@@ -44,6 +44,7 @@ class VisionaryDevTools(BundlePackage):
     depends_on('py-autopep8')
     depends_on('py-black', when="^python@3.6.0:")
     depends_on('py-flake8')
+    depends_on('py-gitpython')
     depends_on('py-git-review')
     depends_on('py-ipython')
     depends_on('py-jedi')
