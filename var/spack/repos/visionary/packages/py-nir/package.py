@@ -10,9 +10,9 @@ class PyNir(PythonPackage):
     """Neuromorphic Intermediate Representation"""
 
     homepage = "https://neuroir.org/docs/index.html"
-    pypi = "nir/nir-1.0.5.tar.gz"
+    pypi = "nir/nir-1.0.6.tar.gz"
 
-    version('1.0.5', sha256='dd90022cfd60443cdcd848852190f5425776db113708b3ecdf621d3da8d4bf33')
+    version('1.0.6', sha256='ac81a0c3d56803f535f68863fc5ea3b5bbef58adab83291a4b9d30e8ac664f17')
 
     depends_on('python@3.9:', type=('build', 'run'))
     depends_on('py-numpy', type=('build', 'run'))
