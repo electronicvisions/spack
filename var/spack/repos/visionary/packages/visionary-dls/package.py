@@ -26,6 +26,7 @@ class VisionaryDls(BundlePackage):
     depends_on('py-ipycanvas')
     depends_on('py-ipywidgets')
     depends_on('nest')
+    depends_on('python+tkinter')
     depends_on('py-norse@1.1:')
     depends_on('py-notebook')
     depends_on('py-numba')
