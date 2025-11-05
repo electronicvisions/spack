@@ -14,7 +14,7 @@ class VisionaryAsic(BundlePackage):
 
     version('1.0')
 
-    depends_on('python@3.9.16')
+    depends_on('python@3.11.13')
 
     depends_on('berkeley-db@4.7') # Cadance Virtuoso 6.1.8
     depends_on('py-libpsf') # teststand
