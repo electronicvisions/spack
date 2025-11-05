@@ -20,3 +20,4 @@ class PyCocotbTest(PythonPackage):
     depends_on('py-cocotb@1.5:')
     depends_on('py-pytest')
     depends_on('py-find-libpython')
+    depends_on("py-setuptools", type="build")
