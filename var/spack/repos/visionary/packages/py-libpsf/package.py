@@ -20,3 +20,4 @@ class PyLibpsf(PythonPackage):
     depends_on('libpsf')
     depends_on('boost+python')  # not sure if needed
     depends_on('py-numpy@1.10:')
+    depends_on("py-setuptools", type="build")
