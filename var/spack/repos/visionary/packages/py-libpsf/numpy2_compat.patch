@@ -1,0 +1,40 @@
+commit 37aa83b571b86924ba702dfe53dfb1e1052a4e42
+Author: Robin Ole Heinemann <robin.ole.heinemann@gmail.com>
+Date:   Wed Nov 5 16:59:16 2025 +0100
+
+    make compatible with numpy 2
+
+diff --git a/libpsf/psfpython.cc b/libpsf/psfpython.cc
+index e9733f3..a34a990 100644
+--- a/libpsf/psfpython.cc
++++ b/libpsf/psfpython.cc
+@@ -20,6 +20,16 @@
+ using namespace boost::python;
+ namespace py = boost::python;
+ 
++#ifndef PyArray_CDOUBLE
++    #define PyArray_CDOUBLE NPY_CDOUBLE
++#endif
++#ifndef PyArray_DOUBLE
++    #define PyArray_DOUBLE NPY_DOUBLE
++#endif
++#ifndef PyArray_OBJECT
++    #define PyArray_OBJECT NPY_OBJECT
++#endif
++
+ 
+ #ifndef PY_MAJOR_VERSION
+     #error could not find python version from python headers
+@@ -124,10 +134,10 @@ PyObject *psfvector_to_numpyarray(PSFVector *vec, bool copy=false) {
+     result = create_numpy_vector(cf64v->size(), PyArray_CDOUBLE, &cf64v->at(0), copy);
+   } else if (StructVector *sv = dynamic_cast<StructVector *>(vec)) {
+     // Create numpy array
+-    npy_intp dims[1] = { sv->size() };
++    npy_intp dims[1] = { static_cast<npy_intp>(sv->size()) };
+     result = PyArray_SimpleNew(1, dims, PyArray_OBJECT);
+ 	    
+-    PyObject **ptr = (PyObject **) PyArray_DATA(result);
++    PyObject **ptr = (PyObject **) PyArray_DATA((PyArrayObject*) result);
+     for(unsigned int i=0; i < sv->size(); i++)
+       ptr[i] = Struct_to_python::convert(sv->at(i));
+       
