@@ -1,13 +1,14 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
+import os
 import re
 
 from spack.package import *
 
 
-# VISIONS: based on spack/0.20.0
+# VISIONS: based on spack/0.23.1
 class BerkeleyDb(AutotoolsPackage):
     """Oracle Berkeley DB"""
 
@@ -16,6 +17,8 @@ class BerkeleyDb(AutotoolsPackage):
     url = "https://download.oracle.com/berkeley-db/db-18.1.40.tar.gz"
 
     executables = [r"^db_load$"]  # One should be sufficient
+
+    license("UPL-1.0")
 
     version("18.1.40", sha256="0cecb2ef0c67b166de93732769abdeba0555086d51de1090df325e18ee8da9c8")
     version(
@@ -35,13 +38,17 @@ class BerkeleyDb(AutotoolsPackage):
     version("4.7.25", sha256='f14fd96dd38915a1d63dcb94a63fbb8092334ceba6b5060760427096f631263e')
     # end VISIONS
 
-    variant("docs", default=False)
+    depends_on("c", type="build")  # generated
+    depends_on("cxx", type="build")  # generated
+
+    variant("docs", default=False, description="Build documentation")
     variant("cxx", default=True, description="Build with C++ API")
     variant("stl", default=True, description="Build with C++ STL API")
 
     configure_directory = "dist"
     build_directory = "build_unix"
 
+    patch("drop-docs.patch", when="~docs")
     # Correct autoconf macro to detect TLS support.
     # Patch developed by @eschnett. There is no upstream issue because
     # Oracle's web site does not have instructions for submitting such
@@ -98,25 +105,40 @@ class BerkeleyDb(AutotoolsPackage):
 
         return config_args
 
-    def test(self):
-        """Perform smoke tests on the installed package binaries."""
-        exes = [
-            "db_checkpoint",
-            "db_deadlock",
-            "db_dump",
-            "db_load",
-            "db_printlog",
-            "db_stat",
-            "db_upgrade",
-            "db_verify",
-        ]
-        for exe in exes:
-            reason = "test version of {0} is {1}".format(exe, self.spec.version)
-            self.run_test(
-                exe,
-                ["-V"],
-                [self.spec.version.string],
-                installed=True,
-                purpose=reason,
-                skip_missing=True,
-            )
+    def check_exe_version(self, exe):
+        """Check that the installed executable prints the correct version."""
+        installed_exe = join_path(self.prefix.bin, exe)
+        if not os.path.exists(installed_exe):
+            raise SkipTest(f"{exe} is not installed")
+
+        exe = which(installed_exe)
+        out = exe("-V", output=str.split, error=str.split)
+        assert self.spec.version.string in out
+
+    def test_db_checkpoint(self):
+        """check db_checkpoint version"""
+        self.check_exe_version("db_checkpoint")
+
+    def test_db_deadlock(self):
+        """check db_deadlock version"""
+        self.check_exe_version("db_deadlock")
+
+    def test_db_dump(self):
+        """check db_dump version"""
+        self.check_exe_version("db_dump")
+
+    def test_db_load(self):
+        """check db_load version"""
+        self.check_exe_version("db_load")
+
+    def test_db_stat(self):
+        """check db_stat version"""
+        self.check_exe_version("db_stat")
+
+    def test_db_upgrade(self):
+        """check db_upgrade version"""
+        self.check_exe_version("db_upgrade")
+
+    def test_db_verify(self):
+        """check db_verify version"""
+        self.check_exe_version("db_verify")
