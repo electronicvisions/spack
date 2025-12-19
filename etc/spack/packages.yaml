@@ -16,9 +16,9 @@ packages:
     variants: [~distributed]
   py-torch:
     version: [1.9.1]
-    variants: ['+cuda cuda_arch=80,86']
+    variants: ['+cuda cuda_arch=70,80,86']
   py-jaxlib:
-    variants: ['+cuda cuda_arch=80,86']
+    variants: ['+cuda cuda_arch=70,80,86']
   # BEGIN
   # ECM (2025-05-22): pinning stuff for jaxsnn/jaxlib things (to be removed when we move to jax@0.5)
   # (short-term hack for Elias at ISCAS 2025)
