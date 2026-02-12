@@ -11,9 +11,9 @@ class PyCocotbextEth(PythonPackage):
     """Ethernet interface modules for cocotb"""
 
     homepage = "https://github.com/alexforencich/cocotbext-eth"
-    pypi = "cocotbext-eth/cocotbext-eth-0.1.20.tar.gz"
+    pypi = "cocotbext-eth/cocotbext_eth-0.1.26.tar.gz"
 
-    version('0.1.22', sha256='9cabbefd0003010692f0b5140b09d9f08f79c634')
+    version('0.1.26', sha256='f6e17d7b4c5b5160d8c49eecf5505b01761dbd8f6b3f66ff68b76ff7fdb17dee')
 
 
     depends_on('python@3.6:')

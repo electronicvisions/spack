@@ -22,7 +22,6 @@ class VisionaryAsic(BundlePackage):
     # verilog-ethernet test deps
     depends_on('py-cocotb')
     depends_on('py-cocotb-bus')
-    depends_on('py-cocotb-test')
     depends_on('py-cocotbext-axi')
     depends_on('py-cocotbext-eth')
     depends_on('py-construct')

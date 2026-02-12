@@ -11,9 +11,9 @@ class PyCocotbextAxi(PythonPackage):
     """AXI, AXI lite, and AXI stream modules for cocotb"""
 
     homepage = "https://github.com/alexforencich/cocotbext-axi"
-    pypi = "cocotbext-axi/cocotbext-axi-0.1.24.tar.gz"
+    pypi = "cocotbext-axi/cocotbext_axi-0.1.28.tar.gz"
 
-    version('0.1.24', sha256='3ed62dcaf9448833176826507c5bc5c346431c4846a731e409d87c862d960593')
+    version('0.1.28', sha256='5d062185b9bb5476839a1d816821c4533b245f56f7b171b3f39130e26891ae37')
     patch('0001-axi-ID-signal-is-optional.patch', sha256='81f29fceb97a888c08d1e7008479159bac6077a0dbb38ba7f44a5e8035c7e0f5')
 
 

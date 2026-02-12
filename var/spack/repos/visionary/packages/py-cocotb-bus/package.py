@@ -11,12 +11,11 @@ class PyCocotbBus(PythonPackage):
     """Pre-packaged testbenching tools and reusable bus interfaces for cocotb"""
 
     homepage = "https://www.cocotb.org"
-    pypi = "cocotb-bus/cocotb-bus-0.2.1.tar.gz"
+    pypi = "cocotb-bus/cocotb_bus-0.3.0.tar.gz"
 
-    version('0.2.1', sha256='a197aa4b0e0ad28469c8877b41b3fb2ec0206da9f491b9276d1578ce6dd8aa8d')
-    patch('case.patch', sha256='16e11f5a9b45733163da253b89dfaec22c6440f281c147a6e39ac597ba99b3e5')
-    patch('integer.patch', sha256='72151f003decff73bee02dd9928863b63dca556ebe4ee4a66bcf912efa48a353')
+    version('0.3.0', sha256='9762b29273ff062f52160e57274e3cb106d14e7e776515de1372c1d73546b005')
 
-    depends_on('python@3.5:')
+    depends_on('python@3.6.2:')
     depends_on('py-setuptools', type='build')
-    depends_on('py-cocotb@1.5.0.dev:1')
+    depends_on('py-cocotb@1.6.0:')
+    depends_on('py-scapy')
