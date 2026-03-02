@@ -39,6 +39,7 @@ class VisionaryDls(BundlePackage):
     depends_on('py-sphinx')
     depends_on('py-sphinx-rtd-theme')
     depends_on('py-sphinxcontrib-jupyter')
+    depends_on('py-sphinxcontrib-bibtex')
     depends_on('py-tqdm')
     depends_on('py-torchvision')
     depends_on('xerces-c')
