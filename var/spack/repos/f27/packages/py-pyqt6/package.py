@@ -25,6 +25,9 @@ class PyPyqt6(SIPPackage):
     # pyproject.toml
     depends_on("python@3.8:", type=("build", "run"), when="@6.7:")
     depends_on("py-sip@6.8:6", type="build", when="@6.7:")
+    # begin F27 (added):
+    depends_on("py-sip@6.7.12:6", type="build", when="^py-pyqt6-sip@13.6:")
+    # end F27
     depends_on("py-sip@6.5:6", type="build", when="@:6.6")
     depends_on("py-pyqt-builder@1.15:1", type="build")
 
