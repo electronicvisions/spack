@@ -36,6 +36,9 @@ class PyPyqt6(SIPPackage):
     depends_on("py-pyqt6-sip@13.4:13", type=("build", "run"), when="@:5.2")
 
     # README
+    # begin F27 (added):
+    depends_on("qt-base@6:6.6", when="@:6.6")
+    # end F27
     depends_on("qt-base@6")
 
     def setup_build_environment(self, env):
