@@ -25,5 +25,7 @@ class F27Ido(BundlePackage):
     depends_on('py-h5py')
     depends_on('py-matplotlib')
     depends_on('py-cupy+cuda')
+    depends_on('py-psutil')
     depends_on('py-pytest')
     depends_on('py-pyqt6')
+    depends_on('py-pyqtgraph')
