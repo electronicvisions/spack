@@ -42,3 +42,6 @@ class VisionaryAsic(BundlePackage):
     depends_on('py-notebook')
     depends_on('py-pytest')
     depends_on('py-pandas')
+
+    # visionary tools
+    depends_on('py-git-review')
