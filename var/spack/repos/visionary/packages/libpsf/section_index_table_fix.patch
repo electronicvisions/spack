@@ -1,0 +1,97 @@
+commit b9bbc9faa539ddbfa827d97c14045344b7d1667c
+Author: Robin Ole Heinemann <robin.ole.heinemann@gmail.com>
+Date:   Mon Sep 7 22:54:32 2026 +0200
+
+    Fix parsing of of files that have spurious data at the end.
+    
+    Instead of relying on the section index table being at the
+    end of the file use the sections lengths to find it and properly
+    adjust the "end" of the file used further on.
+
+diff --git a/src/psffile.cc b/src/psffile.cc
+index f0ecf50..2d11484 100644
+--- a/src/psffile.cc
++++ b/src/psffile.cc
+@@ -104,13 +104,43 @@ void PSFFile::open() {
+     m_size = lseek(m_fd, 0, SEEK_END);
+   
+     m_buffer = (char *)mmap(0, m_size, PROT_READ, MAP_SHARED, m_fd, 0);
++
++    m_end = find_end_of_file();
+   
+-    if(validate())
+-	deserialize((const char *)m_buffer, m_size);
++    if(validate(m_end))
++	deserialize((const char *)m_buffer, m_end);
+     else
+ 	throw InvalidFileError();
+ }
+ 
++int PSFFile::find_end_of_file() {
++    // some files do not end withe the section index table
++    // To find it,
++    // follow the chain of 0x0000_0015 $OFFSET to the
++    // First non 0x0000_0015 entry. This marks the
++    // start of the section index table.
++
++    int offset = 0x4;
++	int type;
++
++	while ((type = GET_INT32(m_buffer+offset)) == 0x15) {
++        offset = GET_INT32(m_buffer+offset+4);
++    }
++
++	// skip extra padding?
++	if (type == 0xf)
++		offset += 4;
++
++	// now go through the section index table
++	// until the Clarissa entry is found
++    while (GET_INT32(m_buffer+offset) != 0x436c6172 /* Clar */) {
++	    offset += 8;
++	}
++
++	// "Clarissa" + 4 byte size
++	return offset + 12;
++}
++
+ void PSFFile::close() {
+     munmap((void*) m_buffer, m_size);
+     
+@@ -124,10 +154,10 @@ void PSFFile::close() {
+     }
+ }
+ 
+-bool PSFFile::validate() const {
++bool PSFFile::validate(int end) const {
+     std::ifstream fstr(m_filename.c_str());
+ 	
+-    fstr.seekg(-12, std::ios::end);
++    fstr.seekg(end-12, std::ios::beg);
+ 
+     char clarissa[9];
+ 	
+diff --git a/src/psfinternal.h b/src/psfinternal.h
+index aac3fd1..430c8ed 100644
+--- a/src/psfinternal.h
++++ b/src/psfinternal.h
+@@ -622,16 +622,18 @@ public:
+     void open();
+     void close();
+     
+-    bool validate() const;
++    bool validate(int) const;
+ 
+     std::string m_filename;
+ 
+ private:
+     void deserialize(const char *buf, int size);
++    int find_end_of_file();
+ 
+     int m_fd;
+     const char *m_buffer;
+     int m_size;
++    int m_end;
+ 
+     HeaderSection *m_header;
+     TypeSection *m_types;

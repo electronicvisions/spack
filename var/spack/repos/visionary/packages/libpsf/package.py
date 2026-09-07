@@ -23,3 +23,4 @@ class Libpsf(AutotoolsPackage):
     depends_on('automake', type='build')
     depends_on('libtool',  type='build')
     depends_on(Boost.with_default_variants)
+    patch("section_index_table_fix.patch")
